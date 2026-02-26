@@ -1,0 +1,6 @@
+name: Minimal Navigation
+description: Minimal YAML used only for token capture - navigates to BC and stops
+telemetryId: 00000000-0000-0000-0000-000000000001
+start:
+  profile: BUSINESS MANAGER
+steps: []
