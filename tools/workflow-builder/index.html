@@ -3383,7 +3383,7 @@ function validate() {
         }
       }
     } else {
-      if (!step.script && !(step.scripts && step.scripts.length)) warnings.push(`Step "${step.name}" has no script`);
+      if (!step.script && !(step.scripts && step.scripts.length)) errors.push(`Step "${step.name}" has no script assigned. Drag a script onto the step or select one in step properties.`);
     }
 
     if (step.depends_on && !ids.has(step.depends_on) && !state.workflow.steps.find(s => s.id === step.depends_on)) {
