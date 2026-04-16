@@ -1,0 +1,13 @@
+{
+  "$schema": "./workflow.schema.json",
+  "name": "Projectkaart openen",
+  "description": "",
+  "bc_url": "",
+  "steps": [
+    {
+      "id": "step-1",
+      "name": "Step 1",
+      "user": ""
+    }
+  ]
+}

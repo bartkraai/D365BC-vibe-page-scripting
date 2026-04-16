@@ -4,50 +4,18 @@
     {
       "code": "PRJ",
       "name": "Projecten",
-      "description": "Projectmatige bedrijfsprocessen — van acquisitie tot oplevering.",
+      "description": "",
       "types": [
         {
-          "code": "VG",
-          "name": "Vastgoed",
-          "description": "Vastgoedprojecten — traject, projectkaart, overdracht.",
+          "code": "UAV",
+          "name": "UAV projecten",
+          "description": "",
           "process_flows": [
             {
-              "code": "TRAJECT",
-              "name": "Van traject naar project",
-              "description": "Volledig traject: aanmaken traject, overdracht, projectkaart inrichten.",
-              "workflow_path": "./Van traject naar project"
-            },
-            {
-              "code": "STD",
-              "name": "Standaard project aanmaken",
+              "code": "PRJ KAART",
+              "name": "Projectkaart openen",
               "description": "",
-              "workflow_path": "./Standaard project aanmaken"
-            },
-            {
-              "code": "PURCHASE-O",
-              "name": "Purchase Order Approval Process",
-              "description": "Multi-user workflow: Purchaser creates PO, Approver approves it",
-              "workflow_path": "./Purchase Order Approval Process"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "code": "INK",
-      "name": "Inkoop",
-      "description": "Inkoopprocessen — bestelling, goedkeuring, ontvangst.",
-      "types": [
-        {
-          "code": "PO",
-          "name": "Purchase Orders",
-          "description": "Inkooporder workflows.",
-          "process_flows": [
-            {
-              "code": "APPR",
-              "name": "PO Approval",
-              "description": "Multi-user workflow: inkoper maakt PO, goedkeurder keurt goed.",
-              "workflow_path": "./PO Approval Workflow"
+              "workflow_path": "./Projectkaart openen"
             }
           ]
         }
