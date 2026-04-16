@@ -3237,8 +3237,10 @@ function closeSaveProject() {
 }
 
 async function confirmSaveProject() {
-  const projectName = document.getElementById('save-project-name').value.trim();
-  if (!projectName) { toast('Enter a project folder name', 'error'); return; }
+  const rawName = document.getElementById('save-project-name').value.trim();
+  const projectName = sanitizeProjectName(rawName);
+  if (!projectName) { toast('Enter a valid project folder name (no trailing dots or special characters)', 'error'); return; }
+  if (projectName !== rawName) { document.getElementById('save-project-name').value = projectName; toast(`Folder name cleaned to "${projectName}"`, 'info'); }
 
   const btn = document.getElementById('save-project-btn');
   btn.disabled = true;
@@ -3545,9 +3547,11 @@ async function openProject(name, hasWorkflow) {
 }
 
 function confirmNewProject() {
-  const name = document.getElementById('new-project-name').value.trim();
+  const raw = document.getElementById('new-project-name').value.trim();
+  const name = sanitizeProjectName(raw);
   const envName = document.getElementById('picker-env')?.value;
-  if (!name) { toast('Enter a project name', 'error'); return; }
+  if (!name) { toast('Enter a valid project name (no trailing dots or special characters)', 'error'); return; }
+  if (name !== raw) { document.getElementById('new-project-name').value = name; toast(`Project name cleaned to "${name}"`, 'info'); }
   if (!envName) { toast('Select an environment first', 'error'); return; }
   state.currentProject = name;
   clearWorkflowState();
@@ -3679,6 +3683,11 @@ async function saveToCurrentProject() {
 
 function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function escAttr(s) { return String(s).replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
+
+/** Strip trailing dots/spaces and illegal path characters from project names */
+function sanitizeProjectName(name) {
+  return name.replace(/[<>:"/\\|?*\x00-\x1f]/g, '-').replace(/[.\s]+$/, '').trim();
+}
 
 /** Render a ? tooltip icon. Usage: `${fieldTip('Your help text here')}` */
 function fieldTip(text) {

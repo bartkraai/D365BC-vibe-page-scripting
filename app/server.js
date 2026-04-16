@@ -656,9 +656,24 @@ app.post('/api/projects/scaffold', (req, res) => {
   if (!projectName) return res.status(400).json({ error: 'projectName is required' });
   if (!workflow)    return res.status(400).json({ error: 'workflow is required' });
 
+  // ── Server-side validation (safety net for incomplete workflows) ──
+  const vErrors = [];
+  if (!workflow.bc_url) vErrors.push("'bc_url' is missing.");
+  if (!workflow.steps || !workflow.steps.length) vErrors.push('At least one step is required.');
+  if (workflow.steps) {
+    for (const s of workflow.steps) {
+      const label = s.name || s.id || 'unknown';
+      if (!s.user) vErrors.push(`Step "${label}": user role is required.`);
+      if (s.type !== 'bc-api') {
+        if (!s.script && !(s.scripts && s.scripts.length)) vErrors.push(`Step "${label}": no script assigned.`);
+      }
+    }
+  }
+  if (vErrors.length) return res.status(400).json({ error: 'Workflow validation failed:\n' + vErrors.join('\n') });
+
   // Prevent path traversal — keep only the final path segment and strip illegal chars
-  const safeName = path.basename(projectName).replace(/[<>:"/\\|?*\x00-\x1f]/g, '-').trim();
-  if (!safeName) return res.status(400).json({ error: 'Invalid project name' });
+  const safeName = path.basename(projectName).replace(/[<>:"/\\|?*\x00-\x1f]/g, '-').replace(/[\s.]+$/, '').trim();
+  if (!safeName) return res.status(400).json({ error: 'Invalid project name (after removing trailing dots/spaces and illegal characters, nothing remains)' });
 
   const projDir    = path.join(ROOT, 'page-scripting', safeName);
   const scriptsDir = path.join(projDir, 'scripts');

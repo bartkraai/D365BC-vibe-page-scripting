@@ -74,6 +74,7 @@ $pageScriptingRoot = Split-Path $CatalogPath -Parent
 # ── Validate catalog first ──────────────────────────────────────────────────
 Write-Host ""
 Write-Host "Validating catalog..." -ForegroundColor DarkGray
+$LASTEXITCODE = 0
 & (Join-Path $scriptRoot "Test-Catalog.ps1") -CatalogPath $CatalogPath
 if ($LASTEXITCODE -ne 0) {
     Write-Error "Catalog validation failed. Fix errors before running workflows."

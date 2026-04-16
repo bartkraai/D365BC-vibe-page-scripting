@@ -189,4 +189,5 @@ if ($errors.Count -gt 0) {
     exit 1
 } else {
     Write-Host "  VALIDATION PASSED" -ForegroundColor Green
+    exit 0
 }
