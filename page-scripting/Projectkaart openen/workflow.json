@@ -1,5 +1,4 @@
 {
-  "$schema": "./workflow.schema.json",
   "name": "Projectkaart openen",
   "description": "",
   "bc_url": "https://4psconstruct.bc.dynamics.com/9a3ecacb-258f-4487-9e56-20acb3a16014/Test?company=TestAT",
@@ -7,7 +6,8 @@
     {
       "id": "step-1",
       "name": "Step 1",
-      "user": "projectleider 4PS"
+      "user": "projectleider 4PS",
+      "script": "./scripts/open projectkaart (projectleider 4PS).yml"
     }
   ]
 }
