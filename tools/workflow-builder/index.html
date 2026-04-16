@@ -3845,8 +3845,10 @@ window.addEventListener('message', function(evt) {
         } else {
           if (s.scripts && s.scripts.length > 1) {
             step.scripts = s.scripts;
+          } else if (s.scripts && s.scripts.length === 1) {
+            step.script = s.scripts[0];
           } else {
-            step.script = s.script;
+            step.script = s.script || '';
           }
           if (Object.keys(s.capture || {}).length) step.capture = s.capture;
           if (Object.keys(s.inject || {}).length) step.inject = s.inject;
@@ -3870,6 +3872,8 @@ window.addEventListener('message', function(evt) {
 
     if (wf && wf.steps) {
       applyLoadedWorkflow(wf);
+    } else {
+      clearWorkflowState();
     }
 
     if (msg.project) {
