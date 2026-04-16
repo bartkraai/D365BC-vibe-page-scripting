@@ -78,7 +78,7 @@ function Invoke-Npx {
         if ($_ -match '\s') { "`"$_`"" } else { $_ }
     }
     $cmdLine = "npx $($quotedArgs -join ' ')"
-    cmd /c $cmdLine
+    cmd /c $cmdLine | Write-Host
     return $LASTEXITCODE
 }
 
