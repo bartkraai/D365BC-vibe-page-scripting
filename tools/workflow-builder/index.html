@@ -589,6 +589,7 @@ textarea { resize: vertical; min-height: 50px; }
 .project-card .project-no-workflow {
   font-size: 11px; color: var(--text-muted);
 }
+.project-card .project-delete:hover { color: var(--danger) !important; }
 
 .project-picker-divider {
   width: 100%; max-width: 900px;
@@ -3448,7 +3449,12 @@ async function loadProjects() {
       const card = document.createElement('div');
       card.className = 'project-card';
       card.innerHTML = `
-        <div class="project-title">${escHtml(proj.name)}</div>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div class="project-title">${escHtml(proj.name)}</div>
+          <button class="btn-sm btn-icon project-delete" onclick="event.stopPropagation();deleteProject('${escAttr(proj.name)}')" title="Delete project" style="color:var(--text-light);background:none;border:none;font-size:14px;padding:2px 4px;cursor:pointer;flex-shrink:0">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h12M5 4V2.5A.5.5 0 0 1 5.5 2h5a.5.5 0 0 1 .5.5V4M6 7v5M10 7v5"/><path d="M3.5 4l.5 9.5a1 1 0 0 0 1 .5h6a1 1 0 0 0 1-.5L12.5 4"/></svg>
+          </button>
+        </div>
         ${proj.hasWorkflow
           ? `<div class="project-has-workflow"><svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8l4 4 6-6"/></svg> workflow.json</div>`
           : `<div class="project-no-workflow">No workflow yet</div>`}
@@ -3476,6 +3482,23 @@ async function loadProjects() {
     document.getElementById('new-project-name').focus();
   };
   grid.appendChild(newCard);
+}
+
+async function deleteProject(name) {
+  if (!confirm(`Delete project "${name}" and all its files?\n\nThis cannot be undone.`)) return;
+  try {
+    const res = await fetch(`/api/projects/${encodeURIComponent(name)}`, { method: 'DELETE' });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Server error');
+    toast(`Deleted "${name}"`, 'success');
+    if (state.currentProject === name) {
+      state.currentProject = null;
+      clearWorkflowState();
+    }
+    loadProjects();
+  } catch (e) {
+    toast(`Delete failed: ${e.message}`, 'error');
+  }
 }
 
 async function openProject(name, hasWorkflow) {

@@ -467,6 +467,21 @@ app.post('/api/projects/:name/workflow', (req, res) => {
   res.json({ ok: true, path: path.relative(ROOT, wfPath).replace(/\\/g, '/') });
 });
 
+app.delete('/api/projects/:name', (req, res) => {
+  const safeName = path.basename(req.params.name);
+  if (!safeName) return res.status(400).json({ error: 'Invalid project name' });
+
+  const projDir = path.join(ROOT, 'page-scripting', safeName);
+  if (!fs.existsSync(projDir)) return res.status(404).json({ error: 'Project not found' });
+
+  try {
+    fs.rmSync(projDir, { recursive: true, force: true });
+    res.json({ ok: true, deleted: safeName });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 // ══════════════════════════════════════════════════════════════════════════════
 // ROUTES — Variant Generation
 // ══════════════════════════════════════════════════════════════════════════════
