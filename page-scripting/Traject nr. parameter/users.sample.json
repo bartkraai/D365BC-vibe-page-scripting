@@ -1,11 +1,11 @@
 {
-  "Projectleider": {
+  "Acquisiteur 4PS": {
     "username": "proks@fpstest018.onmicrosoft.com",
     "password": "your-password-here",
     "description": "",
     "mfa_seed": "your-totp-seed-here"
   },
-  "Acquisiteur 4PS": {
+  "Projectleider": {
     "username": "proks@fpstest018.onmicrosoft.com",
     "password": "your-password-here",
     "description": "",
