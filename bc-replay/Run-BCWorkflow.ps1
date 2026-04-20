@@ -119,10 +119,6 @@ if (-not (Test-Path $WorkflowPath)) {
 if (-not $UsersPath) {
     $UsersPath = Join-Path $workflowFolder "users.json"
 }
-if (-not (Test-Path $UsersPath)) {
-    Write-Error "users.json not found at: $UsersPath"
-    exit 1
-}
 
 if (-not $AppRegistrationsPath) {
     $AppRegistrationsPath = Join-Path $workflowFolder "app-registrations.json"
@@ -134,7 +130,119 @@ if (-not $ResultDir) {
 
 # ── Load configuration ─────────────────────────────────────────────────────
 $workflow = Get-Content $WorkflowPath -Raw | ConvertFrom-Json
-$users    = Get-Content $UsersPath -Raw | ConvertFrom-Json
+
+# ── Resolve user credentials (users.json or Windows Credential Vault) ──────
+$usersFromVault = $false
+if (Test-Path $UsersPath) {
+    $users = Get-Content $UsersPath -Raw | ConvertFrom-Json
+} else {
+    # Try to resolve from the local credential vault (Windows Credential Manager)
+    $users = $null
+    $appRoot = Join-Path $scriptRoot "..\app"
+    $envsFile = Join-Path $appRoot ".data\environments.json"
+
+    if (Test-Path $envsFile) {
+        $envs = Get-Content $envsFile -Raw | ConvertFrom-Json
+
+        # Match by bc_url (strip query params for flexible matching)
+        $workflowUrlBase = ($workflow.bc_url -split '\?')[0].TrimEnd('/')
+        $matchedEnv = $envs | Where-Object {
+            $envUrlBase = ($_.url -split '\?')[0].TrimEnd('/')
+            $workflowUrlBase -eq $envUrlBase
+        } | Select-Object -First 1
+
+        if (-not $matchedEnv) {
+            # Fallback: try matching by default environment
+            $matchedEnv = $envs | Where-Object { $_.isDefault -eq $true } | Select-Object -First 1
+        }
+
+        if ($matchedEnv) {
+            # Read credentials from Windows Credential Manager via Win32 CredRead API
+            if (-not ('WinCredentialManager' -as [type])) {
+                Add-Type @"
+using System;
+using System.Runtime.InteropServices;
+
+public class WinCredentialManager {
+    [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+    private static extern bool CredRead(string target, int type, int flags, out IntPtr credentialPtr);
+
+    [DllImport("advapi32.dll")]
+    private static extern void CredFree(IntPtr credential);
+
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+    private struct CREDENTIAL {
+        public int Flags;
+        public int Type;
+        public string TargetName;
+        public string Comment;
+        public long LastWritten;
+        public int CredentialBlobSize;
+        public IntPtr CredentialBlob;
+        public int Persist;
+        public int AttributeCount;
+        public IntPtr Attributes;
+        public string TargetAlias;
+        public string UserName;
+    }
+
+    public static string Read(string target) {
+        IntPtr credPtr;
+        if (!CredRead(target, 1, 0, out credPtr)) return null;
+        try {
+            var cred = (CREDENTIAL)Marshal.PtrToStructure(credPtr, typeof(CREDENTIAL));
+            if (cred.CredentialBlob != IntPtr.Zero && cred.CredentialBlobSize > 0)
+                return Marshal.PtrToStringUni(cred.CredentialBlob, cred.CredentialBlobSize / 2);
+            return null;
+        } finally {
+            CredFree(credPtr);
+        }
+    }
+}
+"@
+            }
+
+            $SERVICE = "bc-page-scripting"
+            $envName = $matchedEnv.name
+            $usersObj = New-Object PSCustomObject
+
+            # Collect all unique roles needed by bc-replay steps in this workflow
+            $requiredRoles = @($workflow.steps |
+                Where-Object { $_.type -ne 'bc-api' } |
+                ForEach-Object { $_.user } |
+                Sort-Object -Unique)
+
+            foreach ($role in $requiredRoles) {
+                $username = [WinCredentialManager]::Read("$SERVICE/$($envName):$($role):username")
+                $password = [WinCredentialManager]::Read("$SERVICE/$($envName):$($role):password")
+                $mfaSeed  = [WinCredentialManager]::Read("$SERVICE/$($envName):$($role):mfa")
+
+                $roleObj = [PSCustomObject]@{
+                    username = $username
+                    password = $password
+                }
+                if ($mfaSeed) {
+                    $roleObj | Add-Member -NotePropertyName "mfa_seed" -NotePropertyValue $mfaSeed
+                }
+                $usersObj | Add-Member -NotePropertyName $role -NotePropertyValue $roleObj
+            }
+
+            $users = $usersObj
+            $usersFromVault = $true
+            Write-Host "  Credentials: Resolved from vault (environment: '$envName')" -ForegroundColor DarkGray
+        }
+    }
+
+    if (-not $users) {
+        $availableEnvs = ""
+        if (Test-Path $envsFile) {
+            $envNames = (Get-Content $envsFile -Raw | ConvertFrom-Json) | ForEach-Object { $_.name }
+            $availableEnvs = "`n  Available environments in vault: $($envNames -join ', ')"
+        }
+        Write-Error "users.json not found at: $UsersPath`n  No matching environment found in the credential vault for URL: $($workflow.bc_url)$availableEnvs`n`n  To fix this:`n    - Set up an environment in the web UI (start.bat) with a matching BC URL and roles`n    - Or copy users.sample.json to users.json and fill in credentials"
+        exit 1
+    }
+}
 
 # Load app registrations (optional — only required if workflow has bc-api steps)
 $appRegistrations = $null
