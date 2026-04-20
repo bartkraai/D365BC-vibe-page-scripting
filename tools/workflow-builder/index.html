@@ -3273,7 +3273,6 @@ function buildWorkflowJson() {
     if (state.workflow.catalog.type) wf.catalog.type = state.workflow.catalog.type;
     if (state.workflow.catalog.process_flow) wf.catalog.process_flow = state.workflow.catalog.process_flow;
   }
-  wf.bc_url = state.workflow.bc_url;
   wf.steps = state.workflow.steps.map(s => {
       const step = { id: s.id, name: s.name, user: s.user };
       if (s.description) step.description = s.description;
@@ -3526,7 +3525,7 @@ function validate() {
   const errors = [], warnings = [];
 
   if (!state.workflow.name) warnings.push('Workflow name is empty');
-  if (!state.workflow.bc_url) errors.push('BC URL is required');
+  if (!state.environment) warnings.push('No environment selected — BC URL will need to be configured at runtime');
   if (!state.workflow.steps.length) errors.push('Add at least one step');
 
   const ids = new Set();
@@ -4018,7 +4017,6 @@ window.addEventListener('message', function(evt) {
       $schema: './workflow.schema.json',
       name: state.workflow.name,
       description: state.workflow.description,
-      bc_url: state.workflow.bc_url,
       steps: state.workflow.steps.map(function(s) {
         const step = { id: s.id, name: s.name, user: s.user };
         if (s.type === 'bc-api') {
