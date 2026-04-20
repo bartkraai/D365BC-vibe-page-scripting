@@ -1,0 +1,57 @@
+name: Test Recording traject
+description: Test recording
+telemetryId: 56b56587-1556-41b8-842a-0831d46c9967
+start:
+  profile: ACQUISITIONER 4PS
+steps:
+  - type: navigate
+    target:
+      - page: Acquisition RC
+      - action: Action1100525014
+    description: Navigate to <caption>Traject</caption>
+  - type: page-shown
+    source:
+      page: Try-out List
+    modal: false
+    runtimeId: b161
+    description: Page <caption>Traject</caption> was shown.
+  - type: invoke
+    target:
+      - page: Try-out List
+        runtimeRef: b161
+      - action: Control_New
+    invokeType: New
+    description: Invoke New on <caption>Nieuw</caption>
+  - type: page-shown
+    source:
+      page: Try-out
+    modal: false
+    runtimeId: b1ak
+    description: Page <caption>Nieuw - Traject</caption> was shown.
+  - type: focus
+    target:
+      - page: Try-out
+        runtimeRef: b1ak
+      - field: Code
+    description: Focus <caption>Code</caption>
+  - type: focus
+    target:
+      - page: Try-out
+        runtimeRef: b1ak
+      - field: Description
+    description: Focus <caption>Omschrijving</caption>
+  - type: copy-value
+    source:
+      - page: Try-out
+        runtimeRef: b1ak
+      - field: Code
+    name: Try-out - Code
+    valueType: string
+    description: Copy value from <caption>Code</caption>
+  - type: input
+    target:
+      - page: Try-out
+        runtimeRef: b1ak
+      - field: Description
+    value: Test
+    description: Input <value>Test</value> into <caption>Omschrijving</caption>

@@ -12,10 +12,10 @@
           "description": "Projectkaart openen",
           "process_flows": [
             {
-              "code": "PRJ KAART",
-              "name": "Projectkaart openen",
-              "description": "",
-              "workflow_path": "./Projectkaart openen"
+              "code": "VAN-TRAJEC",
+              "name": "Van traject naar project",
+              "description": "Volledig traject: aanmaken traject, overdracht, projectkaart inrichten.",
+              "workflow_path": "./Van traject naar project"
             }
           ]
         }
@@ -36,6 +36,32 @@
               "name": "Test Trajectkaart",
               "description": "Test trajectkaart",
               "workflow_path": "./Test Trajectkaart"
+            }
+          ]
+        },
+        {
+          "code": "",
+          "name": "",
+          "description": "",
+          "process_flows": []
+        }
+      ]
+    },
+    {
+      "code": "TP",
+      "name": "Test parameter",
+      "description": "",
+      "types": [
+        {
+          "code": "TRJ",
+          "name": "Traject",
+          "description": "Traject nr.",
+          "process_flows": [
+            {
+              "code": "TRJ",
+              "name": "Traject nr. parameter",
+              "description": "Parameter testen",
+              "workflow_path": "./Traject nr. parameter"
             }
           ]
         }
