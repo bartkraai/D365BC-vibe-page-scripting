@@ -2,12 +2,13 @@
   "$schema": "./workflow.schema.json",
   "name": "Van traject naar project",
   "description": "Volledig traject: aanmaken traject, overdracht, projectkaart inrichten.",
-  "bc_url": "https://4psconstruct.bc.dynamics.com/8f94bd30-45c4-40a9-9898-8dd15063a020/FpsDemo",
+  "bc_url": "https://4psconstruct.bc.dynamics.com/9a3ecacb-258f-4487-9e56-20acb3a16014/Test?company=TestAT",
   "steps": [
     {
       "id": "step-1",
       "name": "Step 1",
       "user": "Acquisiteur",
+      "script": "",
       "capture": {
         "try_out_successor_project_no": "Try-out Successor - Project No."
       }
@@ -16,6 +17,7 @@
       "id": "step-2",
       "name": "Step 2",
       "user": "VG Project Controller",
+      "script": "",
       "depends_on": "step-1"
     }
   ]

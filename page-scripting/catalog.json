@@ -2,20 +2,40 @@
   "$schema": "./catalog.schema.json",
   "value_chains": [
     {
-      "code": "PRJ",
-      "name": "Projecten",
+      "code": "TEST PRJ",
+      "name": "Test Projecten",
       "description": "",
       "types": [
         {
-          "code": "UAV",
-          "name": "UAV projecten",
-          "description": "",
+          "code": "TEST",
+          "name": "Test",
+          "description": "Projectkaart openen",
           "process_flows": [
             {
               "code": "PRJ KAART",
               "name": "Projectkaart openen",
               "description": "",
               "workflow_path": "./Projectkaart openen"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "PRJ",
+      "name": "Projecten",
+      "description": "UAV Project met vaste termijnen",
+      "types": [
+        {
+          "code": "UAV",
+          "name": "UAV projecten",
+          "description": "UAV Projecten Vaste termijnen",
+          "process_flows": [
+            {
+              "code": "TTRJ",
+              "name": "Test Trajectkaart",
+              "description": "Test trajectkaart",
+              "workflow_path": "./Test Trajectkaart"
             }
           ]
         }
