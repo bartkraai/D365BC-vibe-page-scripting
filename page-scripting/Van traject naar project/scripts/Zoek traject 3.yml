@@ -1,0 +1,107 @@
+name: Zoek traject 3
+description: Test recording
+telemetryId: 8dae7826-ae14-4d89-adb7-3ecf46f0ae70
+start:
+  profile: ACQUISITIONER 4PS
+steps:
+  - type: navigate
+    target:
+      - page: Acquisition RC
+      - action: Action1100525014
+    description: Navigate to <caption>Traject</caption>
+  - type: page-shown
+    source:
+      page: Try-out List
+    modal: false
+    runtimeId: b1bt
+    description: Page <caption>Traject</caption> was shown.
+  - type: filter
+    target:
+      - page: Try-out List
+        runtimeRef: b1bt
+    operation: add
+    column:
+      field: Code
+      scope: filter
+    description: Add filter for <caption>Code</caption> on <caption>Traject</caption>
+  - type: input
+    target:
+      - page: Try-out List
+        runtimeRef: b1bt
+      - scope: filter
+        field: Code
+    value: TR
+    isFilterAsYouType: true
+    description: Input <value>TR</value> into <caption>Code</caption>
+  - type: page-shown
+    source:
+      page: lookup:Code
+    modal: false
+    runtimeId: b1gf
+    description: Page <caption>Selecteren</caption> was shown.
+  - type: input
+    target:
+      - page: Try-out List
+        runtimeRef: b1bt
+      - scope: filter
+        field: Code
+    value: TR0000
+    isFilterAsYouType: true
+    description: Input <value>TR0000</value> into <caption>Code</caption>
+  - type: input
+    target:
+      - page: Try-out List
+        runtimeRef: b1bt
+      - scope: filter
+        field: Code
+    value: TR00001
+    isFilterAsYouType: true
+    description: Input <value>TR00001</value> into <caption>Code</caption>
+  - type: invoke
+    target:
+      - page: lookup:Code
+        runtimeRef: b1gf
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:Code
+    runtimeId: b1gf
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: invoke
+    target:
+      - page: Try-out List
+        runtimeRef: b1bt
+      - repeater: Control1
+    invokeType: Edit
+    parameters:
+      AlwaysCommit: false
+    description: Invoke row on <caption>Control1</caption>
+  - type: page-shown
+    source:
+      page: Try-out
+    modal: false
+    runtimeId: b1nn
+    description: Page <caption>Traject</caption> was shown.
+  - type: close-page
+    target:
+      - page: Try-out
+        runtimeRef: b1nn
+    description: Close page <caption>Traject</caption>
+  - type: page-closed
+    source:
+      page: Try-out
+    runtimeId: b1nn
+    description: Page <caption>Traject</caption> was closed.
+  - type: close-page
+    target:
+      - page: Try-out List
+        runtimeRef: b1bt
+    description: Close page <caption>Traject</caption>
+  - type: page-closed
+    source:
+      page: Try-out List
+    runtimeId: b1bt
+    description: Page <caption>Traject</caption> was closed.

@@ -17,9 +17,9 @@
       "id": "step-2",
       "name": "Step 2",
       "user": "VG Project Controller",
-      "script": "./scripts/Zoek traject.yml",
+      "script": "./scripts/Zoek traject 3.yml",
       "inject": {
-        "Try-out List.filter:system:search": "{capture.step-1.try_out_successor_project_no}"
+        "Try-out List.Code": "{capture.step-1.try_out_successor_project_no}"
       },
       "depends_on": "step-1"
     }
