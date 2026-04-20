@@ -1,0 +1,14 @@
+{
+  "purchaser": {
+    "username": "bkraai@4psmicrosoftcenter.com",
+    "password": "your-password-here",
+    "description": "",
+    "mfa_seed": "your-totp-seed-here"
+  },
+  "approver": {
+    "username": "bkraai@4psmicrosoftcenter.com",
+    "password": "your-password-here",
+    "description": "",
+    "mfa_seed": "your-totp-seed-here"
+  }
+}

@@ -2,7 +2,6 @@
   "$schema": "./workflow.schema.json",
   "name": "Van traject naar project",
   "description": "Volledig traject: aanmaken traject, overdracht, projectkaart inrichten.",
-  "bc_url": "https://4psconstruct.bc.dynamics.com/9a3ecacb-258f-4487-9e56-20acb3a16014/Test?company=TestAT",
   "steps": [
     {
       "id": "step-1",

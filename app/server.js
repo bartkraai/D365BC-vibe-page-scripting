@@ -530,6 +530,7 @@ app.post('/api/run', async (req, res) => {
   // Support both single project (legacy) and array of projects
   const projectsToRun = projectList && projectList.length ? projectList : (project ? [project] : []);
   if (!projectsToRun.length) return res.status(400).json({ error: 'project(s) required' });
+  if (!environment) return res.status(400).json({ error: 'environment is required — select an environment before running' });
 
   // Build a temporary users.json from the credential store
   let tempUsersPath = null;
@@ -560,6 +561,15 @@ app.post('/api/run', async (req, res) => {
   if (headed)          extraCommon.push('-Headed');
   if (dryRun)          extraCommon.push('-DryRun');
   if (stopOnFailure === false) extraCommon.push('-StopOnFailure:$false');
+
+  // Resolve BC URL from the selected environment
+  const envMeta = readEnvs().find(e => e.name === environment);
+  const bcUrl = envMeta?.url || '';
+  if (bcUrl) extraCommon.push('-BcUrl', bcUrl);
+
+  // Pass default company if environment has exactly one
+  const companies = envMeta?.companies || [];
+  if (companies.length === 1) extraCommon.push('-DefaultCompany', companies[0]);
 
   // Run projects sequentially
   let idx = 0;
@@ -673,7 +683,6 @@ app.post('/api/projects/scaffold', (req, res) => {
 
   // ── Server-side validation (safety net for incomplete workflows) ──
   const vErrors = [];
-  if (!workflow.bc_url) vErrors.push("'bc_url' is missing.");
   if (!workflow.steps || !workflow.steps.length) vErrors.push('At least one step is required.');
   if (workflow.steps) {
     for (const s of workflow.steps) {

@@ -4,7 +4,7 @@
   "title": "BC Workflow",
   "description": "Schema for workflow.json files used by Run-BCWorkflow.ps1 to orchestrate multi-user Business Central test sequences.",
   "type": "object",
-  "required": ["name", "bc_url", "steps"],
+  "required": ["name", "steps"],
   "additionalProperties": false,
   "properties": {
     "$schema": {
@@ -46,7 +46,7 @@
     "bc_url": {
       "type": "string",
       "format": "uri",
-      "description": "The Business Central environment URL. Found in your BC browser address bar up to and including the environment name segment.",
+      "description": "Optional legacy field. The BC URL is now derived from the selected environment. If set, used as a fallback when no environment is configured.",
       "examples": [
         "https://businesscentral.dynamics.com/00000000-0000-0000-0000-000000000000/Production"
       ]

@@ -22,6 +22,12 @@
 .PARAMETER UsersPath
     Path to users.json. Defaults to users.json in the same folder as workflow.json.
 
+.PARAMETER BcUrl
+    BC environment URL. If omitted, resolved from the environment (vault) or workflow.json (legacy fallback).
+
+.PARAMETER DefaultCompany
+    Default BC company name. Appended as ?company= to the start address when a step doesn't specify its own company.
+
 .PARAMETER ResultDir
     Base output directory for results. Each step gets a subfolder.
     Defaults to ./results/ relative to the workflow folder.
@@ -52,6 +58,12 @@ param(
 
     [Parameter(Mandatory = $false)]
     [string]$AppRegistrationsPath,
+
+    [Parameter(Mandatory = $false)]
+    [string]$BcUrl,
+
+    [Parameter(Mandatory = $false)]
+    [string]$DefaultCompany,
 
     [Parameter(Mandatory = $false)]
     [string]$ResultDir,
@@ -144,15 +156,33 @@ if (Test-Path $UsersPath) {
     if (Test-Path $envsFile) {
         $envs = Get-Content $envsFile -Raw | ConvertFrom-Json
 
-        # Match by bc_url (strip query params for flexible matching)
-        $workflowUrlBase = ($workflow.bc_url -split '\?')[0].TrimEnd('/')
-        $matchedEnv = $envs | Where-Object {
-            $envUrlBase = ($_.url -split '\?')[0].TrimEnd('/')
-            $workflowUrlBase -eq $envUrlBase
-        } | Select-Object -First 1
+        # Match strategy 1: by -BcUrl parameter
+        $matchedEnv = $null
+        if ($BcUrl) {
+            $paramUrlBase = ($BcUrl -split '\?')[0].TrimEnd('/')
+            $matchedEnv = $envs | Where-Object {
+                $envUrlBase = ($_.url -split '\?')[0].TrimEnd('/')
+                $paramUrlBase -eq $envUrlBase
+            } | Select-Object -First 1
+        }
 
+        # Match strategy 2: by workflow folder name matching environment name
         if (-not $matchedEnv) {
-            # Fallback: try matching by default environment
+            $folderName = Split-Path $workflowFolder -Leaf
+            $matchedEnv = $envs | Where-Object { $_.name -eq $folderName } | Select-Object -First 1
+        }
+
+        # Match strategy 3: by bc_url if present in workflow.json (legacy)
+        if (-not $matchedEnv -and $workflow.bc_url) {
+            $workflowUrlBase = ($workflow.bc_url -split '\?')[0].TrimEnd('/')
+            $matchedEnv = $envs | Where-Object {
+                $envUrlBase = ($_.url -split '\?')[0].TrimEnd('/')
+                $workflowUrlBase -eq $envUrlBase
+            } | Select-Object -First 1
+        }
+
+        # Fallback: try default environment
+        if (-not $matchedEnv) {
             $matchedEnv = $envs | Where-Object { $_.isDefault -eq $true } | Select-Object -First 1
         }
 
@@ -230,6 +260,18 @@ public class WinCredentialManager {
             $users = $usersObj
             $usersFromVault = $true
             Write-Host "  Credentials: Resolved from vault (environment: '$envName')" -ForegroundColor DarkGray
+
+            # Also resolve BC URL from environment if not already set
+            if (-not $BcUrl -and $matchedEnv.url) {
+                $BcUrl = $matchedEnv.url
+                Write-Host "  BC URL   : Resolved from environment '$envName'" -ForegroundColor DarkGray
+            }
+
+            # Resolve default company from environment (used when step.company is not set)
+            if (-not $DefaultCompany -and $matchedEnv.companies -and $matchedEnv.companies.Count -eq 1) {
+                $DefaultCompany = $matchedEnv.companies[0]
+                Write-Host "  Company  : Default '$DefaultCompany' (from environment)" -ForegroundColor DarkGray
+            }
         }
     }
 
@@ -239,9 +281,22 @@ public class WinCredentialManager {
             $envNames = (Get-Content $envsFile -Raw | ConvertFrom-Json) | ForEach-Object { $_.name }
             $availableEnvs = "`n  Available environments in vault: $($envNames -join ', ')"
         }
-        Write-Error "users.json not found at: $UsersPath`n  No matching environment found in the credential vault for URL: $($workflow.bc_url)$availableEnvs`n`n  To fix this:`n    - Set up an environment in the web UI (start.bat) with a matching BC URL and roles`n    - Or copy users.sample.json to users.json and fill in credentials"
+        Write-Error "users.json not found at: $UsersPath`n  No matching environment found in the credential vault.$availableEnvs`n`n  To fix this:`n    - Set up an environment in the web UI (start.bat) with matching roles`n    - Or copy users.sample.json to users.json and fill in credentials"
         exit 1
     }
+}
+
+# ── Resolve effective BC URL (priority: -BcUrl param > workflow.json fallback) ──
+if (-not $BcUrl) {
+    # Legacy fallback: read from workflow.json if present
+    if ($workflow.bc_url) {
+        $BcUrl = $workflow.bc_url
+        Write-Host "  BC URL   : Using legacy bc_url from workflow.json" -ForegroundColor DarkYellow
+    }
+}
+if (-not $BcUrl) {
+    Write-Error "BC URL could not be determined.`n  Either:`n    - Set up an environment in the web UI (start.bat) with the BC URL`n    - Or pass -BcUrl parameter to this script"
+    exit 1
 }
 
 # Load app registrations (optional — only required if workflow has bc-api steps)
@@ -264,7 +319,7 @@ Write-Host "======================================================" -ForegroundC
 Write-Host ""
 Write-Host "  Workflow : $($workflow.name)" -ForegroundColor White
 Write-Host "  Steps    : $($workflow.steps.Count)" -ForegroundColor White
-Write-Host "  BC URL   : $($workflow.bc_url)" -ForegroundColor White
+Write-Host "  BC URL   : $BcUrl" -ForegroundColor White
 Write-Host "  Results  : $ResultDir" -ForegroundColor White
 if ($DryRun) { Write-Host "  Mode     : DRY RUN (no execution)" -ForegroundColor Yellow }
 if ($Headed) { Write-Host "  Browser  : Headed (visible)" -ForegroundColor Yellow }
@@ -274,13 +329,11 @@ Write-Host ""
 Write-Host "  Validating configuration..." -ForegroundColor DarkGray
 $validationErrors = @()
 
-# 1. BC URL must be a valid URL
-if (-not $workflow.bc_url) {
-    $validationErrors += "workflow.json: 'bc_url' is missing."
-} elseif ($workflow.bc_url -notmatch '^https?://') {
-    $validationErrors += "workflow.json: 'bc_url' does not look like a valid URL: '$($workflow.bc_url)'"
-} elseif ($workflow.bc_url -match 'YOUR_TENANT|your-tenant|placeholder') {
-    $validationErrors += "workflow.json: 'bc_url' still contains a placeholder value. Update it with your real BC URL."
+# 1. BC URL must be a valid URL (already resolved above from env, param, or workflow.json)
+if ($BcUrl -notmatch '^https?://') {
+    $validationErrors += "BC URL does not look like a valid URL: '$BcUrl'"
+} elseif ($BcUrl -match 'YOUR_TENANT|your-tenant|placeholder') {
+    $validationErrors += "BC URL still contains a placeholder value. Update it with your real BC URL."
 }
 
 # 2. Validate step-specific requirements
@@ -815,12 +868,13 @@ foreach ($step in $workflow.steps) {
         }
 
         # Build npx replay command
-        # Determine the effective BC URL — append ?company= if the step specifies one
-        $effectiveBcUrl = $workflow.bc_url
-        if ($step.company) {
-            $encodedCompany = [uri]::EscapeDataString($step.company)
-            $effectiveBcUrl = "$($workflow.bc_url)?company=$encodedCompany"
-            Write-Host "  Company  : $($step.company)" -ForegroundColor DarkGray
+        # Determine the effective BC URL — append ?company= if the step or environment specifies one
+        $effectiveBcUrl = $BcUrl
+        $stepCompany = if ($step.company) { $step.company } elseif ($DefaultCompany) { $DefaultCompany } else { $null }
+        if ($stepCompany) {
+            $encodedCompany = [uri]::EscapeDataString($stepCompany)
+            $effectiveBcUrl = "$($BcUrl)?company=$encodedCompany"
+            Write-Host "  Company  : $stepCompany" -ForegroundColor DarkGray
         }
         $replayArgs = @(
             "replay"
@@ -869,7 +923,6 @@ foreach ($step in $workflow.steps) {
             $replayLogFiles = @()
             if (Test-Path $replayLogDir) {
                 $replayLogFiles = Get-ChildItem $replayLogDir -Filter "*.yml" |
-                    Where-Object { $_.Length -gt 4000 } |
                     Sort-Object Length -Descending
             }
 

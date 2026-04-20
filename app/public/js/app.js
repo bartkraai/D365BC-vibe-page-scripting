@@ -776,6 +776,7 @@ document.getElementById('btn-run').addEventListener('click', async () => {
   const selectedProjects = getSelectedRunProjects();
   const environment = document.getElementById('run-environment').value;
   if (!selectedProjects.length) { alert('Select at least one process flow.'); return; }
+  if (!environment) { alert('Select an environment before running.'); return; }
 
   document.getElementById('run-output').textContent = '';
   document.getElementById('run-output-card').style.display = '';
