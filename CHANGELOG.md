@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-04-20
+
+### Features
+
+- **Workflow Builder — Auto-detect parameters** — When adding a page script to a workflow step, injectable parameters are now automatically detected and mapped:
+  - **Auto-populate injects** — Parameters defined in the script's `parameters:` section are detected and automatically mapped to available captures from earlier steps
+  - **Fuzzy matching** — Parameter names are intelligently matched to capture variable names (e.g. `po_number` matches `Purchase Order List.No.`) before falling back to sequential assignment
+  - **On-demand metadata fetch** — If script metadata isn't loaded in the library, it is fetched from the server, parsed, and cached automatically
+  - **Unresolved parameter warnings** — Canvas step cards show an "unmapped" warning badge when parameters have no inject mapping; the properties panel shows a detailed warning with a one-click "Auto-map" fix
+  - **Multi-script support** — All parameter/capture detection now considers ALL scripts assigned to a step, not just the first one. Applies to `autoFillInjects`, `autoFillCaptures`, and the new `autoPopulateFromMeta` function
+
+### Files Changed
+
+- `tools/workflow-builder/index.html` — new functions: `autoPopulateFromMeta()`, `fetchScriptMetaAndPopulate()`, `getUnresolvedParams()`, `fuzzyParamMatch()`; updated `addScriptToStep()`, `autoFillInjects()`, `autoFillCaptures()`, `renderCanvas()`, `renderPropertiesReplay()`; added `.step-badge.unresolved` CSS
+
 ## 2026-04-17
 
 ### Features

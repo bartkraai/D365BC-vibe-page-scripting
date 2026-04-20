@@ -364,6 +364,7 @@ textarea { resize: vertical; min-height: 50px; }
 }
 .step-badge.capture { background: var(--success-light); color: var(--success); }
 .step-badge.inject { background: var(--warning-light); color: var(--warning); }
+.step-badge.unresolved { background: var(--danger-light); color: var(--danger); }
 
 /* ── Step Description ──────────────────────────────────────────────── */
 .step-description {
@@ -1392,7 +1393,7 @@ function parseYamlBasic(text) {
     const lines = paramSection[1].split('\n');
     let currentParam = null;
     for (const line of lines) {
-      const paramMatch = line.match(/^\s{2}(\S[^:]+):\s*$/);
+      const paramMatch = line.match(/^\s{2}(\S.*?):\s*$/);
       if (paramMatch) {
         currentParam = paramMatch[1].trim();
         result.parameters.push(currentParam);
@@ -1869,6 +1870,23 @@ function closeProperties() {
    CANVAS RENDERING
    ════════════════════════════════════════════════════════════════════ */
 
+// Phase 3: get parameters from assigned scripts that have no inject mapping (or empty mapping)
+function getUnresolvedParams(step) {
+  const scripts = step.scripts && step.scripts.length ? step.scripts : (step.script ? [step.script] : []);
+  const allParams = [];
+  for (const sp of scripts) {
+    const fn = sp?.replace('./scripts/', '');
+    const meta = state.scripts[fn];
+    if (meta) allParams.push(...meta.parameters);
+  }
+  const uniqueParams = [...new Set(allParams)];
+  if (!uniqueParams.length) return [];
+  const mappedParams = Object.entries(step.inject || {})
+    .filter(([, val]) => val && val.trim() !== '')
+    .map(([key]) => key);
+  return uniqueParams.filter(p => !mappedParams.includes(p));
+}
+
 function renderCanvas() {
   const inner = document.getElementById('canvas-inner');
   const roles = Object.keys(state.users);
@@ -1941,6 +1959,13 @@ function renderCanvas() {
       const injectCount = Object.keys(step.inject || {}).length;
       const companyBadge = step.company ? `<span class="step-badge" style="background:#e0f2fe;color:#0369a1" title="Company: ${escAttr(step.company)}">&#127970; ${escHtml(step.company)}</span>` : '';
       const replayDescHtml = step.description ? `<div class="step-description">${escHtml(step.description)}</div>` : '';
+
+      // Phase 3: detect unresolved parameters (defined in scripts but not mapped in inject)
+      const unresolvedParams = getUnresolvedParams(step);
+      const unresolvedBadge = unresolvedParams.length
+        ? `<span class="step-badge unresolved" title="Unmapped: ${escAttr(unresolvedParams.join(', '))}">&#9888; ${unresolvedParams.length} unmapped</span>`
+        : '';
+
       cardBodyHtml = `
         <div class="step-card-body">
           ${replayDescHtml}
@@ -1949,6 +1974,7 @@ function renderCanvas() {
             ${companyBadge}
             ${captureCount ? `<span class="step-badge capture">&#8593; ${captureCount} capture${captureCount > 1 ? 's' : ''}</span>` : ''}
             ${injectCount ? `<span class="step-badge inject">&#8595; ${injectCount} inject${injectCount > 1 ? 's' : ''}</span>` : ''}
+            ${unresolvedBadge}
           </div>
         </div>`;
     }
@@ -2393,7 +2419,7 @@ function renderPropertiesReplay(step) {
     }
   }
 
-  // Detect suggested captures/injects from the first assigned script
+  // Detect suggested captures/injects from assigned scripts
   const stepScriptsForMeta = step.scripts && step.scripts.length ? step.scripts : (step.script ? [step.script] : []);
   const scriptFile = stepScriptsForMeta[0]?.replace('./scripts/', '');
   const scriptMeta = state.scripts[scriptFile];
@@ -2407,8 +2433,14 @@ function renderPropertiesReplay(step) {
         <br><span class="add-row-btn" onclick="autoFillCaptures('${escAttr(step.id)}')">Apply suggested captures</span>
       </div>`;
     }
-    // Suggest injects based on parameters in script
-    if (scriptMeta.parameters.length && !Object.keys(step.inject || {}).length && availableCaptures.length) {
+    // Phase 3+4: show unresolved parameters from ALL scripts, even when some injects exist
+    const unresolved = getUnresolvedParams(step);
+    if (unresolved.length) {
+      suggestions += `<div class="validation-msg warning">
+        <strong>Unmapped parameters (${unresolved.length}):</strong> ${unresolved.map(p => escHtml(p)).join(', ')}
+        <br><span class="add-row-btn" onclick="autoFillInjects('${escAttr(step.id)}')">Auto-map from available captures</span>
+      </div>`;
+    } else if (scriptMeta.parameters.length && !Object.keys(step.inject || {}).length && availableCaptures.length) {
       suggestions += `<div class="validation-msg info">
         <strong>Script expects parameters:</strong> ${scriptMeta.parameters.map(p => escHtml(p)).join(', ')}
         <br><span class="add-row-btn" onclick="autoFillInjects('${escAttr(step.id)}')">Auto-map from available captures</span>
@@ -2819,19 +2851,120 @@ function addScriptToStep(stepId, filename) {
   const path = `./scripts/${filename}`;
   if (step.scripts.includes(path)) { toast('Script already in this step', 'error'); return; }
   step.scripts.push(path);
-  // Auto-populate captures from first script's metadata
-  if (step.scripts.length === 1) {
-    const meta = state.scripts[filename];
-    if (meta && meta.captures.length && !Object.keys(step.capture || {}).length) {
-      step.capture = {};
-      for (const cap of meta.captures) {
-        const varName = cap.replace(/[^a-zA-Z0-9]+/g, '_').toLowerCase().replace(/^_|_$/g, '');
-        step.capture[varName] = cap;
-      }
-    }
+
+  const meta = state.scripts[filename];
+  if (meta) {
+    autoPopulateFromMeta(step, meta);
+  } else {
+    // Phase 2: on-demand fetch when metadata not yet loaded
+    fetchScriptMetaAndPopulate(stepId, filename);
   }
   renderCanvas();
   renderProperties();
+}
+
+// Phase 2: fetch script content from server, parse metadata, then auto-populate
+async function fetchScriptMetaAndPopulate(stepId, filename) {
+  if (!state.currentProject) return;
+  try {
+    const res = await fetch(`/api/projects/${encodeURIComponent(state.currentProject)}/scripts`);
+    if (!res.ok) return;
+    const scriptFiles = await res.json();
+    const sf = scriptFiles.find(f => f.name === filename);
+    if (!sf || !sf.content) return;
+    const meta = parseYamlBasic(sf.content);
+    state.scripts[filename] = {
+      name: meta.name || filename.replace(/\.ya?ml$/i, ''),
+      content: sf.content,
+      parameters: meta.parameters,
+      captures: meta.captures,
+      parameterDefaults: meta.parameterDefaults
+    };
+    const step = state.workflow.steps.find(s => s.id === stepId);
+    if (step) {
+      autoPopulateFromMeta(step, state.scripts[filename]);
+      renderCanvas();
+      renderProperties();
+    }
+    toast(`Loaded metadata for ${filename}`, 'success');
+  } catch { /* server unavailable - user can still manually configure */ }
+}
+
+// Phase 1 + 4: auto-populate captures and injects from script metadata
+function autoPopulateFromMeta(step, meta) {
+  // Auto-populate captures if this is the first script and step has none
+  if (!Object.keys(step.capture || {}).length && meta.captures.length) {
+    step.capture = {};
+    for (const cap of meta.captures) {
+      const varName = cap.replace(/[^a-zA-Z0-9]+/g, '_').toLowerCase().replace(/^_|_$/g, '');
+      step.capture[varName] = cap;
+    }
+  }
+
+  // Phase 1 + 4: auto-populate injects from all script parameters
+  const allScripts = step.scripts && step.scripts.length ? step.scripts : (step.script ? [step.script] : []);
+  const allParams = [];
+  for (const sp of allScripts) {
+    const fn = sp?.replace('./scripts/', '');
+    const spMeta = state.scripts[fn];
+    if (spMeta) allParams.push(...spMeta.parameters);
+  }
+  const uniqueParams = [...new Set(allParams)];
+  if (!uniqueParams.length) return;
+
+  // Collect available captures from earlier steps
+  const available = [];
+  for (const s of state.workflow.steps) {
+    if (s.id === step.id) break;
+    for (const [varName] of Object.entries(s.capture || {})) {
+      available.push({ stepId: s.id, varName });
+    }
+  }
+
+  // Only auto-populate unmapped parameters
+  if (!step.inject) step.inject = {};
+  const alreadyMapped = Object.keys(step.inject);
+  const unmapped = uniqueParams.filter(p => !alreadyMapped.includes(p));
+  if (!unmapped.length) return;
+
+  let mappedCount = 0;
+  const usedCaptures = new Set(Object.values(step.inject));
+  for (const param of unmapped) {
+    // Try to find a matching capture by name similarity first
+    const bestMatch = available.find(c => !usedCaptures.has(`{capture.${c.stepId}.${c.varName}}`) && fuzzyParamMatch(param, c.varName));
+    if (bestMatch) {
+      const val = `{capture.${bestMatch.stepId}.${bestMatch.varName}}`;
+      step.inject[param] = val;
+      usedCaptures.add(val);
+      mappedCount++;
+    } else {
+      // Fall back to first unused capture
+      const fallback = available.find(c => !usedCaptures.has(`{capture.${c.stepId}.${c.varName}}`));
+      if (fallback) {
+        const val = `{capture.${fallback.stepId}.${fallback.varName}}`;
+        step.inject[param] = val;
+        usedCaptures.add(val);
+        mappedCount++;
+      } else {
+        // No capture available - leave as empty for manual configuration
+        step.inject[param] = '';
+      }
+    }
+  }
+
+  if (mappedCount > 0) {
+    toast(`Auto-mapped ${mappedCount} parameter${mappedCount > 1 ? 's' : ''} from captures`, 'success');
+  } else if (unmapped.length > 0) {
+    toast(`${unmapped.length} parameter${unmapped.length > 1 ? 's' : ''} need manual mapping`, 'warning');
+  }
+}
+
+// Fuzzy match: checks if a parameter name and capture variable name refer to the same concept
+function fuzzyParamMatch(paramName, captureName) {
+  const normalize = s => s.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+  const np = normalize(paramName);
+  const nc = normalize(captureName);
+  return np === nc || np.includes(nc) || nc.includes(np);
 }
 
 function removeScriptFromStep(stepId, index) {
@@ -2888,21 +3021,29 @@ function addCapture(stepId) {
   renderProperties();
 }
 
+// Phase 4: autoFillCaptures now considers captures from ALL scripts in the step
 function autoFillCaptures(stepId) {
   const step = state.workflow.steps.find(s => s.id === stepId);
   if (!step) return;
   const scripts = step.scripts && step.scripts.length ? step.scripts : (step.script ? [step.script] : []);
-  const fn = scripts[0]?.replace('./scripts/', '');
-  const meta = state.scripts[fn];
-  if (!meta) return;
+  const allCaptures = [];
+  for (const sp of scripts) {
+    const fn = sp?.replace('./scripts/', '');
+    const meta = state.scripts[fn];
+    if (meta) allCaptures.push(...meta.captures);
+  }
+  if (!allCaptures.length) {
+    toast('No captures found in assigned scripts', 'warning');
+    return;
+  }
   step.capture = {};
-  for (const cap of meta.captures) {
+  for (const cap of allCaptures) {
     const varName = cap.replace(/[^a-zA-Z0-9]+/g, '_').toLowerCase().replace(/^_|_$/g, '');
     step.capture[varName] = cap;
   }
   renderCanvas();
   renderProperties();
-  toast('Captures populated from script', 'success');
+  toast('Captures populated from scripts', 'success');
 }
 
 function updateInject(stepId, index, part, value) {
@@ -2963,13 +3104,24 @@ function addInject(stepId) {
   renderProperties();
 }
 
+// Phase 4: autoFillInjects now considers parameters from ALL scripts in the step
 function autoFillInjects(stepId) {
   const step = state.workflow.steps.find(s => s.id === stepId);
   if (!step) return;
+
+  // Collect parameters from ALL assigned scripts
   const scripts = step.scripts && step.scripts.length ? step.scripts : (step.script ? [step.script] : []);
-  const fn = scripts[0]?.replace('./scripts/', '');
-  const meta = state.scripts[fn];
-  if (!meta) return;
+  const allParams = [];
+  for (const sp of scripts) {
+    const fn = sp?.replace('./scripts/', '');
+    const meta = state.scripts[fn];
+    if (meta) allParams.push(...meta.parameters);
+  }
+  const uniqueParams = [...new Set(allParams)];
+  if (!uniqueParams.length) {
+    toast('No parameters found in assigned scripts', 'warning');
+    return;
+  }
 
   // Collect available captures from earlier steps
   const available = [];
@@ -2981,13 +3133,24 @@ function autoFillInjects(stepId) {
   }
 
   step.inject = {};
-  for (const param of meta.parameters) {
-    // Try to match parameter to an available capture
-    if (available.length > 0) {
-      const match = available.shift();
-      step.inject[param] = `{capture.${match.stepId}.${match.varName}}`;
+  const usedCaptures = new Set();
+  for (const param of uniqueParams) {
+    // Try fuzzy match first
+    const bestMatch = available.find(c => !usedCaptures.has(`{capture.${c.stepId}.${c.varName}}`) && fuzzyParamMatch(param, c.varName));
+    if (bestMatch) {
+      const val = `{capture.${bestMatch.stepId}.${bestMatch.varName}}`;
+      step.inject[param] = val;
+      usedCaptures.add(val);
     } else {
-      step.inject[param] = '';
+      // Fall back to first unused capture
+      const fallback = available.find(c => !usedCaptures.has(`{capture.${c.stepId}.${c.varName}}`));
+      if (fallback) {
+        const val = `{capture.${fallback.stepId}.${fallback.varName}}`;
+        step.inject[param] = val;
+        usedCaptures.add(val);
+      } else {
+        step.inject[param] = '';
+      }
     }
   }
 
