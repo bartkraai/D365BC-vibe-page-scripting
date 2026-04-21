@@ -1,10 +1,4 @@
 {
-  "Acquisiteur 4PS": {
-    "username": "proks@fpstest018.onmicrosoft.com",
-    "password": "your-password-here",
-    "description": "",
-    "mfa_seed": "your-totp-seed-here"
-  },
   "Projectleider": {
     "username": "proks@fpstest018.onmicrosoft.com",
     "password": "your-password-here",
@@ -12,6 +6,12 @@
     "mfa_seed": "your-totp-seed-here"
   },
   "Werkvoorbereider": {
+    "username": "proks@fpstest018.onmicrosoft.com",
+    "password": "your-password-here",
+    "description": "",
+    "mfa_seed": "your-totp-seed-here"
+  },
+  "Acquisiteur 4PS": {
     "username": "proks@fpstest018.onmicrosoft.com",
     "password": "your-password-here",
     "description": "",

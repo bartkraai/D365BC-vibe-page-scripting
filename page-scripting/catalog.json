@@ -64,6 +64,19 @@
               "workflow_path": "./Traject nr. parameter"
             }
           ]
+        },
+        {
+          "code": "INKOOP",
+          "name": "Inkooporder",
+          "description": "Inkooporder aanmaken, goedkeuren en ontvangen",
+          "process_flows": [
+            {
+              "code": "TIK",
+              "name": "Test inkoop",
+              "description": "Inkooporder aanmaken, goedkeuren en ontvangen",
+              "workflow_path": "./Test inkoop"
+            }
+          ]
         }
       ]
     }
