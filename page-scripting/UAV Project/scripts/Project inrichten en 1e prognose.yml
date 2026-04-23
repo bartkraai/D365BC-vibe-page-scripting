@@ -1,0 +1,5152 @@
+name: Project inrichten en 1e prognose
+description: Test recording
+telemetryId: 3d147ed5-c5c3-4508-93d1-aa973c71b732
+start:
+  profile: PROJECTLEIDER 4PS
+steps:
+  - type: invoke
+    invokeType: OpenSettings
+    description: Invoke OpenSettings
+  - type: page-shown
+    source:
+      page: User Settings
+    modal: false
+    runtimeId: byw
+    description: Page <caption>Mijn instellingen</caption> was shown.
+  - type: invoke
+    target:
+      - page: User Settings
+        runtimeRef: byw
+    invokeType: Ok
+    description: Invoke Ok on <caption>Mijn instellingen</caption>
+  - type: page-closed
+    source:
+      page: User Settings
+    runtimeId: byw
+    description: Page <caption>Mijn instellingen</caption> was closed.
+  - type: navigate
+    target:
+      - page: Project Engineer Role Center
+      - action: Jobs
+    description: Navigate to <caption>Projecten</caption>
+  - type: page-shown
+    source:
+      page: Job List
+    modal: false
+    runtimeId: bzj
+    description: Page <caption>Projecten</caption> was shown.
+  - type: filter
+    target:
+      - page: Job List
+        runtimeRef: bzj
+    operation: add
+    column:
+      field: No.
+      scope: filter
+    description: Add filter for <caption>No.</caption> on <caption>Projecten</caption>
+  - type: input
+    target:
+      - page: Job List
+        runtimeRef: bzj
+      - scope: filter
+        field: No.
+    value: PR
+    isFilterAsYouType: true
+    description: Input <value>PR</value> into <caption>Nr.</caption>
+  - type: page-shown
+    source:
+      page: lookup:No.
+    modal: false
+    runtimeId: b1d8
+    description: Page <caption>Selecteren</caption> was shown.
+  - type: input
+    target:
+      - page: Job List
+        runtimeRef: bzj
+      - scope: filter
+        field: No.
+    value: PR00
+    isFilterAsYouType: true
+    description: Input <value>PR00</value> into <caption>Nr.</caption>
+  - type: input
+    target:
+      - page: Job List
+        runtimeRef: bzj
+      - scope: filter
+        field: No.
+    isFilterAsYouType: true
+    description: Input <value>Parameters.'Job List.No.'</value> into <caption>Nr.</caption>
+    value: =Parameters.'Job List.No.'
+  - type: invoke
+    target:
+      - page: lookup:No.
+        runtimeRef: b1d8
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:No.
+    runtimeId: b1d8
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: invoke
+    target:
+      - page: Job List
+        runtimeRef: bzj
+      - repeater: Control1
+    invokeType: Edit
+    parameters:
+      AlwaysCommit: false
+    description: Invoke row on <caption>Control1</caption>
+  - type: page-shown
+    source:
+      page: Job Card
+    modal: false
+    runtimeId: b1tx
+    description: Page <caption>Project</caption> was shown.
+  - type: invoke
+    target:
+      - page: Job Card
+        runtimeRef: b1tx
+      - field: Control1210190175
+    invokeType: Lookup
+    description: Invoke Lookup on <caption>Projectleider</caption>
+  - type: page-shown
+    source:
+      page: lookup:Control1210190175
+    modal: false
+    runtimeId: b2al
+    description: Page <caption>Selecteren</caption> was shown.
+  - type: set-current-row
+    target:
+      - page: lookup:Control1210190175
+        runtimeRef: b2al
+      - repeater: repeater
+    targetRecord:
+      relative: 20
+    description: Set current row in <caption>repeater</caption>
+  - type: invoke
+    target:
+      - page: lookup:Control1210190175
+        runtimeRef: b2al
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:Control1210190175
+    runtimeId: b2al
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: invoke
+    target:
+      - page: Job Card
+        runtimeRef: b1tx
+      - field: Control1210190180
+    invokeType: Lookup
+    description: Invoke Lookup on <caption>Werkvoorbereider</caption>
+  - type: page-shown
+    source:
+      page: lookup:Control1210190180
+    modal: false
+    runtimeId: b2b9
+    description: Page <caption>Selecteren</caption> was shown.
+  - type: set-current-row
+    target:
+      - page: lookup:Control1210190180
+        runtimeRef: b2b9
+      - repeater: repeater
+    targetRecord:
+      relative: 17
+    description: Set current row in <caption>repeater</caption>
+  - type: invoke
+    target:
+      - page: lookup:Control1210190180
+        runtimeRef: b2b9
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:Control1210190180
+    runtimeId: b2b9
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: invoke
+    target:
+      - page: Job Card
+        runtimeRef: b1tx
+      - field: Control1210190173
+    invokeType: Lookup
+    description: Invoke Lookup on <caption>Uitvoerder</caption>
+  - type: page-shown
+    source:
+      page: lookup:Control1210190173
+    modal: false
+    runtimeId: b2bv
+    description: Page <caption>Selecteren</caption> was shown.
+  - type: set-current-row
+    target:
+      - page: lookup:Control1210190173
+        runtimeRef: b2bv
+      - repeater: repeater
+    targetRecord:
+      relative: 24
+    description: Set current row in <caption>repeater</caption>
+  - type: invoke
+    target:
+      - page: lookup:Control1210190173
+        runtimeRef: b2bv
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:Control1210190173
+    runtimeId: b2bv
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: input
+    target:
+      - page: Job Card
+        runtimeRef: b1tx
+      - field: Prognosis Level
+    value: 1
+    description: Input <value>1</value> into <caption>Prognose niveau</caption>
+  - type: invoke
+    target:
+      - page: Job Card
+        runtimeRef: b1tx
+      - field: Summary Sheet Option
+    invokeType: Lookup
+    description: Invoke Lookup on <caption>Staartblad meerwerkoptie</caption>
+  - type: page-shown
+    source:
+      page: lookup:Summary Sheet Option
+    modal: false
+    runtimeId: b2ch
+    description: Page <caption>Selecteren</caption> was shown.
+  - type: set-current-row
+    target:
+      - page: lookup:Summary Sheet Option
+        runtimeRef: b2ch
+      - repeater: repeater
+    targetRecord:
+      relative: 3
+    description: Set current row in <caption>repeater</caption>
+  - type: invoke
+    target:
+      - page: lookup:Summary Sheet Option
+        runtimeRef: b2ch
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:Summary Sheet Option
+    runtimeId: b2ch
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: invoke
+    target:
+      - page: Job Card
+        runtimeRef: b1tx
+      - action: Project &Locations
+    description: Invoke <caption>Projectlocaties</caption>
+  - type: page-shown
+    source:
+      page: Project Location
+    modal: false
+    runtimeId: b2gv
+    description: Page <caption>Projectlocaties</caption> was shown.
+  - type: focus
+    target:
+      - page: Project Location
+        runtimeRef: b2gv
+      - repeater: Control1
+      - field: Code
+    description: Focus <caption>Code</caption>
+  - type: input
+    target:
+      - page: Project Location
+        runtimeRef: b2gv
+      - repeater: Control1
+      - field: Code
+    value: L1
+    description: Input <value>L1</value> into <caption>Code</caption>
+  - type: close-page
+    target:
+      - page: lookup:Summary Sheet Option
+        runtimeRef: b2ch
+    description: Close page <caption>Selecteren</caption>
+  - type: copy-value
+    source:
+      - page: Project Location
+        runtimeRef: b2gv
+      - repeater: Control1
+      - field: Code
+    name: Project Location - Code
+    valueType: string
+    description: Copy value from <caption>Code</caption>
+  - type: focus
+    target:
+      - page: Project Location
+        runtimeRef: b2gv
+      - repeater: Control1
+      - field: Code
+    description: Focus <caption>Code</caption>
+  - type: focus
+    target:
+      - page: Project Location
+        runtimeRef: b2gv
+      - repeater: Control1
+      - field: Name
+    description: Focus <caption>Naam</caption>
+  - type: input
+    target:
+      - page: Project Location
+        runtimeRef: b2gv
+      - repeater: Control1
+      - field: Name
+    value: Projectlocatie 1
+    description: Input <value>Projectlocatie 1</value> into <caption>Naam</caption>
+  - type: focus
+    target:
+      - page: Project Location
+        runtimeRef: b2gv
+      - repeater: Control1
+      - field: Address
+    description: Focus <caption>Adres</caption>
+  - type: input
+    target:
+      - page: Project Location
+        runtimeRef: b2gv
+      - repeater: Control1
+      - field: Address
+    value: Fietsstraat 48
+    description: Input <value>Fietsstraat 48</value> into <caption>Adres</caption>
+  - type: input
+    target:
+      - page: Project Location
+        runtimeRef: b2gv
+      - repeater: Control1
+      - field: Post Code
+    value: ""
+    isFilterAsYouType: true
+    description: Input <value></value> into <caption>Postcode</caption>
+  - type: focus
+    target:
+      - page: Project Location
+        runtimeRef: b2gv
+      - repeater: Control1
+      - field: Post Code
+    description: Focus <caption>Postcode</caption>
+  - type: page-shown
+    source:
+      page: lookup:Post Code
+    modal: false
+    runtimeId: b2kq
+    description: Page <caption>Selecteren</caption> was shown.
+  - type: input
+    target:
+      - page: Project Location
+        runtimeRef: b2gv
+      - repeater: Control1
+      - field: Post Code
+    value: "4848"
+    isFilterAsYouType: true
+    description: Input <value>4848</value> into <caption>Postcode</caption>
+  - type: close-page
+    target:
+      - page: lookup:Post Code
+        runtimeRef: b2kq
+    description: Close page <caption>Selecteren</caption>
+  - type: page-closed
+    source:
+      page: lookup:Post Code
+    runtimeId: b2kq
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: input
+    target:
+      - page: Project Location
+        runtimeRef: b2gv
+      - repeater: Control1
+      - field: Post Code
+    value: 4848AM
+    isFilterAsYouType: true
+    description: Input <value>4848AM</value> into <caption>Postcode</caption>
+  - type: close-page
+    target:
+      - page: lookup:Post Code
+        runtimeRef: b2lg
+    description: Close page <caption>Selecteren</caption>
+  - type: input
+    target:
+      - page: Project Location
+        runtimeRef: b2gv
+      - repeater: Control1
+      - field: Post Code
+    value: 4848AM
+    description: Input <value>4848AM</value> into <caption>Postcode</caption>
+  - type: input
+    target:
+      - page: Project Location
+        runtimeRef: b2gv
+      - repeater: Control1
+      - field: City
+    value: ""
+    isFilterAsYouType: true
+    description: Input <value></value> into <caption>Plaats</caption>
+  - type: focus
+    target:
+      - page: Project Location
+        runtimeRef: b2gv
+      - repeater: Control1
+      - field: City
+    description: Focus <caption>Plaats</caption>
+  - type: page-shown
+    source:
+      page: lookup:City
+    modal: false
+    runtimeId: b2lh
+    description: Page <caption>Selecteren</caption> was shown.
+  - type: input
+    target:
+      - page: Project Location
+        runtimeRef: b2gv
+      - repeater: Control1
+      - field: City
+    value: Amsterdam
+    isFilterAsYouType: true
+    description: Input <value>Amsterdam</value> into <caption>Plaats</caption>
+  - type: close-page
+    target:
+      - page: lookup:City
+        runtimeRef: b2lh
+    description: Close page <caption>Selecteren</caption>
+  - type: page-closed
+    source:
+      page: lookup:City
+    runtimeId: b2lh
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: input
+    target:
+      - page: Project Location
+        runtimeRef: b2gv
+      - repeater: Control1
+      - field: City
+    value: Amsterdam
+    description: Input <value>Amsterdam</value> into <caption>Plaats</caption>
+  - type: input
+    target:
+      - page: Project Location
+        runtimeRef: b2gv
+      - repeater: Control1
+      - field: Country/Region Code
+    value: ""
+    isFilterAsYouType: true
+    description: Input <value></value> into <caption>Land/Regio</caption>
+  - type: focus
+    target:
+      - page: Project Location
+        runtimeRef: b2gv
+      - repeater: Control1
+      - field: Country/Region Code
+    description: Focus <caption>Land/Regio</caption>
+  - type: page-shown
+    source:
+      page: lookup:Country/Region Code
+    modal: false
+    runtimeId: b2m7
+    description: Page <caption>Selecteren</caption> was shown.
+  - type: set-current-row
+    target:
+      - page: lookup:Country/Region Code
+        runtimeRef: b2m7
+      - repeater: repeater
+    targetRecord:
+      relative: 4
+    description: Set current row in <caption>repeater</caption>
+  - type: invoke
+    target:
+      - page: lookup:Country/Region Code
+        runtimeRef: b2m7
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:Country/Region Code
+    runtimeId: b2m7
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: focus
+    target:
+      - page: Project Location
+        runtimeRef: b2gv
+      - repeater: Control1
+      - field: Country/Region Code
+    description: Focus <caption>Land/Regio</caption>
+  - type: input
+    target:
+      - page: Project Location
+        runtimeRef: b2gv
+      - repeater: Control1
+      - field: Employee No.
+    value: ""
+    isFilterAsYouType: true
+    description: Input <value></value> into <caption>Werknemer</caption>
+  - type: focus
+    target:
+      - page: Project Location
+        runtimeRef: b2gv
+      - repeater: Control1
+      - field: Employee No.
+    description: Focus <caption>Werknemer</caption>
+  - type: page-shown
+    source:
+      page: lookup:Employee No.
+    modal: false
+    runtimeId: b36j
+    description: Page <caption>Selecteren</caption> was shown.
+  - type: set-current-row
+    target:
+      - page: lookup:Employee No.
+        runtimeRef: b36j
+      - repeater: repeater
+    targetRecord:
+      relative: 24
+    description: Set current row in <caption>repeater</caption>
+  - type: invoke
+    target:
+      - page: lookup:Employee No.
+        runtimeRef: b36j
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:Employee No.
+    runtimeId: b36j
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: focus
+    target:
+      - page: Project Location
+        runtimeRef: b2gv
+      - repeater: Control1
+      - field: Employee No.
+    description: Focus <caption>Werknemer</caption>
+  - type: close-page
+    target:
+      - page: Project Location
+        runtimeRef: b2gv
+    description: Close page <caption>Projectlocaties</caption>
+  - type: page-closed
+    source:
+      page: Project Location
+    runtimeId: b2gv
+    description: Page <caption>Projectlocaties</caption> was closed.
+  - type: invoke
+    target:
+      - page: Job Card
+        runtimeRef: b1tx
+      - action: "&Responsible Persons"
+    parameters: {}
+    description: Invoke <caption>Verantwoordelijken</caption>
+  - type: page-shown
+    source:
+      page: Project Responsible Persons
+    modal: false
+    runtimeId: b377
+    description: Page <caption>Project-verantwoordelijken</caption> was shown.
+  - type: set-current-row
+    target:
+      - page: Project Responsible Persons
+        runtimeRef: b377
+      - repeater: Control1
+    targetRecord:
+      relative: 3
+    description: Set current row in <caption>Control1</caption>
+  - type: input
+    target:
+      - page: Project Responsible Persons
+        runtimeRef: b377
+      - repeater: Control1
+      - field: Responsibility
+    value: ""
+    isFilterAsYouType: true
+    description: Input <value></value> into <caption>Verantwoordelijkheid</caption>
+  - type: page-shown
+    source:
+      page: lookup:Responsibility
+    modal: false
+    runtimeId: b392
+    description: Page <caption>Selecteren</caption> was shown.
+  - type: set-current-row
+    target:
+      - page: lookup:Responsibility
+        runtimeRef: b392
+      - repeater: repeater
+    targetRecord:
+      relative: 13
+    description: Set current row in <caption>repeater</caption>
+  - type: invoke
+    target:
+      - page: lookup:Responsibility
+        runtimeRef: b392
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:Responsibility
+    runtimeId: b392
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: focus
+    target:
+      - page: Project Responsible Persons
+        runtimeRef: b377
+      - repeater: Control1
+      - field: Responsibility
+    description: Focus <caption>Verantwoordelijkheid</caption>
+  - type: focus
+    target:
+      - page: Project Responsible Persons
+        runtimeRef: b377
+      - repeater: Control1
+      - field: Employee No.
+    description: Focus <caption>Werknemer</caption>
+  - type: invoke
+    target:
+      - page: Project Responsible Persons
+        runtimeRef: b377
+      - repeater: Control1
+      - field: Employee No.
+    invokeType: Lookup
+    description: Invoke Lookup on <caption>Werknemer</caption>
+  - type: page-shown
+    source:
+      page: Employee List
+    modal: true
+    runtimeId: b39k
+    description: Page <caption>Werknemers</caption> was shown.
+  - type: set-current-row
+    target:
+      - page: Employee List
+        runtimeRef: b39k
+      - repeater: Control1
+    targetRecord:
+      relative: 2
+    description: Set current row in <caption>Control1</caption>
+  - type: invoke
+    target:
+      - page: Employee List
+        runtimeRef: b39k
+      - repeater: Control1
+    parameters:
+      AlwaysCommit: false
+    description: Invoke row on <caption>Control1</caption>
+  - type: page-closed
+    source:
+      page: Employee List
+    runtimeId: b39k
+    description: Page <caption>Werknemers</caption> was closed.
+  - type: focus
+    target:
+      - page: Project Responsible Persons
+        runtimeRef: b377
+      - repeater: Control1
+      - field: Employee No.
+    description: Focus <caption>Werknemer</caption>
+  - type: close-page
+    target:
+      - page: Project Responsible Persons
+        runtimeRef: b377
+    description: Close page <caption>Project-verantwoordelijken</caption>
+  - type: page-closed
+    source:
+      page: Project Responsible Persons
+    runtimeId: b377
+    description: Page <caption>Project-verantwoordelijken</caption> was closed.
+  - type: invoke
+    target:
+      - page: Job Card
+        runtimeRef: b1tx
+      - action: Co&mments
+    parameters: {}
+    description: Invoke <caption>Opmerkingen</caption>
+  - type: page-shown
+    source:
+      page: Comment Sheet
+    modal: false
+    runtimeId: b3eq
+    description: Page <caption>Opmerkingen</caption> was shown.
+  - type: focus
+    target:
+      - page: Comment Sheet
+        runtimeRef: b3eq
+      - repeater: Control1
+      - field: Date
+    description: Focus <caption>Datum</caption>
+  - type: focus
+    target:
+      - page: Comment Sheet
+        runtimeRef: b3eq
+      - repeater: Control1
+      - field: Comment
+    description: Focus <caption>Opmerking</caption>
+  - type: input
+    target:
+      - page: Comment Sheet
+        runtimeRef: b3eq
+      - repeater: Control1
+      - field: Comment
+    value: Contract nalopen
+    description: Input <value>Contract nalopen</value> into <caption>Opmerking</caption>
+  - type: close-page
+    target:
+      - page: Comment Sheet
+        runtimeRef: b3eq
+    description: Close page <caption>Opmerkingen</caption>
+  - type: page-closed
+    source:
+      page: Comment Sheet
+    runtimeId: b3eq
+    description: Page <caption>Opmerkingen</caption> was closed.
+  - type: invoke
+    target:
+      - page: Job Card
+        runtimeRef: b1tx
+      - action: Copy &General Data
+    description: Invoke <caption>Kopiëren standaard gegevens...</caption>
+  - type: page-shown
+    source:
+      page: Copy General Data
+    modal: true
+    runtimeId: b3t1
+    description: Page <caption>Kopiëren standaardgegevens</caption> was shown.
+  - type: invoke
+    target:
+      - page: Copy General Data
+        runtimeRef: b3t1
+    invokeType: Ok
+    description: Invoke Ok on <caption>Kopiëren standaardgegevens</caption>
+  - type: page-closed
+    source:
+      page: Copy General Data
+    runtimeId: b3t1
+    description: Page <caption>Kopiëren standaardgegevens</caption> was closed.
+  - type: message
+    automationId: 8da61efd-0002-0003-0507-0b0d1113171d
+    text: "De volgende gegevens zijn gekopieerd:\r
+
+      \r
+
+      0 van de 1 standaard woningmodellen\r
+
+      97 van de 97 standaard elementen\r
+
+      0 van de 66 standaard inkoopacties\r
+
+      0 van de 11 standaard begrotingstarieven\r
+
+      0 van de 6 standaard elementfasen\r
+
+      0 van de 12 standaard elementfaselabels"
+    description: "Message: <value>De volgende gegevens zijn gekopieerd:\r
+
+      \r
+
+      0 van de 1 standaard woningmodellen\r
+
+      97 van de 97 standaard elementen\r
+
+      0 van de 66 standaard inkoopacties\r
+
+      0 van de 11 standaard begrotingstarieven\r
+
+      0 van de 6 standaard elementfasen\r
+
+      0 van de 12 standaard elementfaselabels</value>"
+  - type: invoke
+    target:
+      - page: Job Card
+        runtimeRef: b1tx
+      - action: Budget
+    parameters: {}
+    description: Invoke <caption>Begroting</caption>
+  - type: page-shown
+    source:
+      page: Project Budget
+    modal: false
+    runtimeId: b3tn
+    description: Page <caption>Werkbegroting</caption> was shown.
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Element
+    value: ""
+    isFilterAsYouType: true
+    description: Input <value></value> into <caption>Element</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Element
+    description: Focus <caption>Element</caption>
+  - type: page-shown
+    source:
+      page: lookup:Element
+    modal: false
+    runtimeId: b4tm
+    description: Page <caption>Selecteren</caption> was shown.
+  - type: invoke
+    target:
+      - page: lookup:Element
+        runtimeRef: b4tm
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:Element
+    runtimeId: b4tm
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Element
+    description: Focus <caption>Element</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Object
+    value: ""
+    isFilterAsYouType: true
+    description: Input <value></value> into <caption>Kostendrager</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Object
+    description: Focus <caption>Kostendrager</caption>
+  - type: page-shown
+    source:
+      page: lookup:Cost Object
+    modal: false
+    runtimeId: b4u1
+    description: Page <caption>Selecteren</caption> was shown.
+  - type: set-current-row
+    target:
+      - page: lookup:Cost Object
+        runtimeRef: b4u1
+      - repeater: repeater
+    targetRecord:
+      relative: 1
+    description: Set current row in <caption>repeater</caption>
+  - type: invoke
+    target:
+      - page: lookup:Cost Object
+        runtimeRef: b4u1
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:Cost Object
+    runtimeId: b4u1
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Object
+    description: Focus <caption>Kostendrager</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Description
+    description: Focus <caption>Omschrijving</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Description
+    value: Voorwerk
+    description: Input <value>Voorwerk</value> into <caption>Omschrijving</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Quantity
+    description: Focus <caption>Hoeveelheid</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Quantity
+    value: "40"
+    description: Input <value>40</value> into <caption>Hoeveelheid</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Unit of Measure
+    description: Focus <caption>Eenheid</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Unit of Measure
+    value: uur
+    description: Input <value>uur</value> into <caption>Eenheid</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Norm
+    value: "1"
+    description: Input <value>1</value> into <caption>Norm</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Production Rate
+    value: "1"
+    description: Input <value>1</value> into <caption>Productiesnelheid</caption>
+  - type: invoke
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Rate Code
+    invokeType: Lookup
+    description: Invoke Lookup on <caption>Tariefcode</caption>
+  - type: page-shown
+    source:
+      page: Budget Rate List
+    modal: true
+    runtimeId: b4ug
+    description: Page <caption>Begrotingstarieven overzicht</caption> was shown.
+  - type: set-current-row
+    target:
+      - page: Budget Rate List
+        runtimeRef: b4ug
+      - repeater: Control1
+    targetRecord:
+      relative: 3
+    description: Set current row in <caption>Control1</caption>
+  - type: invoke
+    target:
+      - page: Budget Rate List
+        runtimeRef: b4ug
+      - repeater: Control1
+    parameters:
+      AlwaysCommit: false
+    description: Invoke row on <caption>Control1</caption>
+  - type: page-closed
+    source:
+      page: Budget Rate List
+    runtimeId: b4ug
+    description: Page <caption>Begrotingstarieven overzicht</caption> was closed.
+  - type: set-current-row
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+    targetRecord:
+      relative: 1
+    description: Set current row in <caption>Control1</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Element
+    value: ""
+    isFilterAsYouType: true
+    description: Input <value></value> into <caption>Element</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Element
+    description: Focus <caption>Element</caption>
+  - type: page-shown
+    source:
+      page: lookup:Element
+    modal: false
+    runtimeId: b4ws
+    description: Page <caption>Selecteren</caption> was shown.
+  - type: invoke
+    target:
+      - page: lookup:Element
+        runtimeRef: b4ws
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:Element
+    runtimeId: b4ws
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Element
+    description: Focus <caption>Element</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Type
+    description: Focus <caption>Kostensoort</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Type
+    value: 1
+    description: Input <value>1</value> into <caption>Kostensoort</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Type
+    description: Focus <caption>Kostensoort</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Object
+    value: ""
+    isFilterAsYouType: true
+    description: Input <value></value> into <caption>Kostendrager</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Object
+    description: Focus <caption>Kostendrager</caption>
+  - type: page-shown
+    source:
+      page: lookup:Cost Object
+    modal: false
+    runtimeId: b4x7
+    description: Page <caption>Selecteren</caption> was shown.
+  - type: invoke
+    target:
+      - page: lookup:Cost Object
+        runtimeRef: b4x7
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:Cost Object
+    runtimeId: b4x7
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Object
+    description: Focus <caption>Kostendrager</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Description
+    description: Focus <caption>Omschrijving</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Description
+    value: Bouwveiligheidsmateriaal
+    description: Input <value>Bouwveiligheidsmateriaal</value> into
+      <caption>Omschrijving</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Quantity
+    description: Focus <caption>Hoeveelheid</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Quantity
+    value: "6"
+    description: Input <value>6</value> into <caption>Hoeveelheid</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Unit of Measure
+    description: Focus <caption>Eenheid</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Unit of Measure
+    value: ST
+    description: Input <value>ST</value> into <caption>Eenheid</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Price (LCY)
+    value: "500"
+    description: Input <value>500</value> into <caption>Prijs (LV)</caption>
+  - type: set-current-row
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+    targetRecord:
+      relative: 1
+    description: Set current row in <caption>Control1</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Element
+    description: Focus <caption>Element</caption>
+  - type: invoke
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Element
+    invokeType: Lookup
+    description: Invoke Lookup on <caption>Element</caption>
+  - type: page-shown
+    source:
+      page: lookup:Element
+    modal: false
+    runtimeId: b4xm
+    description: Page <caption>Selecteren</caption> was shown.
+  - type: set-current-row
+    target:
+      - page: lookup:Element
+        runtimeRef: b4xm
+      - repeater: repeater
+    targetRecord:
+      relative: 1
+    description: Set current row in <caption>repeater</caption>
+  - type: invoke
+    target:
+      - page: lookup:Element
+        runtimeRef: b4xm
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:Element
+    runtimeId: b4xm
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Element
+    description: Focus <caption>Element</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Type
+    description: Focus <caption>Kostensoort</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Type
+    value: 0
+    description: Input <value>0</value> into <caption>Kostensoort</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Type
+    description: Focus <caption>Kostensoort</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Object
+    value: ""
+    isFilterAsYouType: true
+    description: Input <value></value> into <caption>Kostendrager</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Object
+    description: Focus <caption>Kostendrager</caption>
+  - type: page-shown
+    source:
+      page: lookup:Cost Object
+    modal: false
+    runtimeId: b4y1
+    description: Page <caption>Selecteren</caption> was shown.
+  - type: set-current-row
+    target:
+      - page: lookup:Cost Object
+        runtimeRef: b4y1
+      - repeater: repeater
+    targetRecord:
+      relative: 1
+    description: Set current row in <caption>repeater</caption>
+  - type: invoke
+    target:
+      - page: lookup:Cost Object
+        runtimeRef: b4y1
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:Cost Object
+    runtimeId: b4y1
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Object
+    description: Focus <caption>Kostendrager</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Description
+    description: Focus <caption>Omschrijving</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Description
+    value: Bouwhekken plaatsen
+    description: Input <value>Bouwhekken plaatsen</value> into
+      <caption>Omschrijving</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Quantity
+    description: Focus <caption>Hoeveelheid</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Quantity
+    value: "40"
+    description: Input <value>40</value> into <caption>Hoeveelheid</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Unit of Measure
+    description: Focus <caption>Eenheid</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Unit of Measure
+    value: UUR
+    description: Input <value>UUR</value> into <caption>Eenheid</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Norm
+    value: "1"
+    description: Input <value>1</value> into <caption>Norm</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Production Rate
+    value: "1"
+    description: Input <value>1</value> into <caption>Productiesnelheid</caption>
+  - type: invoke
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Rate Code
+    invokeType: Lookup
+    description: Invoke Lookup on <caption>Tariefcode</caption>
+  - type: page-shown
+    source:
+      page: Budget Rate List
+    modal: true
+    runtimeId: b4yg
+    description: Page <caption>Begrotingstarieven overzicht</caption> was shown.
+  - type: set-current-row
+    target:
+      - page: Budget Rate List
+        runtimeRef: b4yg
+      - repeater: Control1
+    targetRecord:
+      relative: 3
+    description: Set current row in <caption>Control1</caption>
+  - type: invoke
+    target:
+      - page: Budget Rate List
+        runtimeRef: b4yg
+      - repeater: Control1
+    parameters:
+      AlwaysCommit: false
+    description: Invoke row on <caption>Control1</caption>
+  - type: page-closed
+    source:
+      page: Budget Rate List
+    runtimeId: b4yg
+    description: Page <caption>Begrotingstarieven overzicht</caption> was closed.
+  - type: set-current-row
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+    targetRecord:
+      relative: 1
+    description: Set current row in <caption>Control1</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Element
+    description: Focus <caption>Element</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Element
+    value: ""
+    isFilterAsYouType: true
+    description: Input <value></value> into <caption>Element</caption>
+  - type: page-shown
+    source:
+      page: lookup:Element
+    modal: false
+    runtimeId: b50s
+    description: Page <caption>Selecteren</caption> was shown.
+  - type: set-current-row
+    target:
+      - page: lookup:Element
+        runtimeRef: b50s
+      - repeater: repeater
+    targetRecord:
+      relative: 1
+    description: Set current row in <caption>repeater</caption>
+  - type: invoke
+    target:
+      - page: lookup:Element
+        runtimeRef: b50s
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:Element
+    runtimeId: b50s
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Element
+    description: Focus <caption>Element</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Type
+    description: Focus <caption>Kostensoort</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Type
+    value: 1
+    description: Input <value>1</value> into <caption>Kostensoort</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Type
+    description: Focus <caption>Kostensoort</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Object
+    value: ""
+    isFilterAsYouType: true
+    description: Input <value></value> into <caption>Kostendrager</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Object
+    description: Focus <caption>Kostendrager</caption>
+  - type: page-shown
+    source:
+      page: lookup:Cost Object
+    modal: false
+    runtimeId: b517
+    description: Page <caption>Selecteren</caption> was shown.
+  - type: invoke
+    target:
+      - page: lookup:Cost Object
+        runtimeRef: b517
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:Cost Object
+    runtimeId: b517
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Object
+    description: Focus <caption>Kostendrager</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Description
+    description: Focus <caption>Omschrijving</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Description
+    value: Wegafzetting
+    description: Input <value>Wegafzetting</value> into <caption>Omschrijving</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Quantity
+    description: Focus <caption>Hoeveelheid</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Quantity
+    value: "3"
+    description: Input <value>3</value> into <caption>Hoeveelheid</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Unit of Measure
+    description: Focus <caption>Eenheid</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Unit of Measure
+    value: ST
+    description: Input <value>ST</value> into <caption>Eenheid</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Price (LCY)
+    value: "500"
+    description: Input <value>500</value> into <caption>Prijs (LV)</caption>
+  - type: set-current-row
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+    targetRecord:
+      relative: 1
+    description: Set current row in <caption>Control1</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Element
+    description: Focus <caption>Element</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Element
+    value: ""
+    isFilterAsYouType: true
+    description: Input <value></value> into <caption>Element</caption>
+  - type: page-shown
+    source:
+      page: lookup:Element
+    modal: false
+    runtimeId: b51m
+    description: Page <caption>Selecteren</caption> was shown.
+  - type: set-current-row
+    target:
+      - page: lookup:Element
+        runtimeRef: b51m
+      - repeater: repeater
+    targetRecord:
+      relative: 1
+    description: Set current row in <caption>repeater</caption>
+  - type: invoke
+    target:
+      - page: lookup:Element
+        runtimeRef: b51m
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:Element
+    runtimeId: b51m
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Element
+    description: Focus <caption>Element</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Type
+    description: Focus <caption>Kostensoort</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Type
+    value: 3
+    description: Input <value>3</value> into <caption>Kostensoort</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Type
+    description: Focus <caption>Kostensoort</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Object
+    value: ""
+    isFilterAsYouType: true
+    description: Input <value></value> into <caption>Kostendrager</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Object
+    description: Focus <caption>Kostendrager</caption>
+  - type: page-shown
+    source:
+      page: lookup:Cost Object
+    modal: false
+    runtimeId: b521
+    description: Page <caption>Selecteren</caption> was shown.
+  - type: set-current-row
+    target:
+      - page: lookup:Cost Object
+        runtimeRef: b521
+      - repeater: repeater
+    targetRecord:
+      relative: 3
+    description: Set current row in <caption>repeater</caption>
+  - type: invoke
+    target:
+      - page: lookup:Cost Object
+        runtimeRef: b521
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:Cost Object
+    runtimeId: b521
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Object
+    description: Focus <caption>Kostendrager</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Description
+    description: Focus <caption>Omschrijving</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Description
+    value: Bouwhekken
+    description: Input <value>Bouwhekken</value> into <caption>Omschrijving</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Quantity
+    description: Focus <caption>Hoeveelheid</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Quantity
+    value: "40"
+    description: Input <value>40</value> into <caption>Hoeveelheid</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Unit of Measure
+    description: Focus <caption>Eenheid</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Unit of Measure
+    value: MTR
+    description: Input <value>MTR</value> into <caption>Eenheid</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Price (LCY)
+    value: "27"
+    description: Input <value>27</value> into <caption>Prijs (LV)</caption>
+  - type: set-current-row
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+    targetRecord:
+      relative: 1
+    description: Set current row in <caption>Control1</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Element
+    description: Focus <caption>Element</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Element
+    value: ""
+    isFilterAsYouType: true
+    description: Input <value></value> into <caption>Element</caption>
+  - type: page-shown
+    source:
+      page: lookup:Element
+    modal: false
+    runtimeId: b52g
+    description: Page <caption>Selecteren</caption> was shown.
+  - type: set-current-row
+    target:
+      - page: lookup:Element
+        runtimeRef: b52g
+      - repeater: repeater
+    targetRecord:
+      relative: 2
+    description: Set current row in <caption>repeater</caption>
+  - type: invoke
+    target:
+      - page: lookup:Element
+        runtimeRef: b52g
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:Element
+    runtimeId: b52g
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Element
+    description: Focus <caption>Element</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Type
+    description: Focus <caption>Kostensoort</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Type
+    value: 0
+    description: Input <value>0</value> into <caption>Kostensoort</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Type
+    description: Focus <caption>Kostensoort</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Object
+    value: ""
+    isFilterAsYouType: true
+    description: Input <value></value> into <caption>Kostendrager</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Object
+    description: Focus <caption>Kostendrager</caption>
+  - type: page-shown
+    source:
+      page: lookup:Cost Object
+    modal: false
+    runtimeId: b52v
+    description: Page <caption>Selecteren</caption> was shown.
+  - type: set-current-row
+    target:
+      - page: lookup:Cost Object
+        runtimeRef: b52v
+      - repeater: repeater
+    targetRecord:
+      relative: 1
+    description: Set current row in <caption>repeater</caption>
+  - type: invoke
+    target:
+      - page: lookup:Cost Object
+        runtimeRef: b52v
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:Cost Object
+    runtimeId: b52v
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Object
+    description: Focus <caption>Kostendrager</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Description
+    description: Focus <caption>Omschrijving</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Description
+    value: Plaatsen afrastering
+    description: Input <value>Plaatsen afrastering</value> into
+      <caption>Omschrijving</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Quantity
+    description: Focus <caption>Hoeveelheid</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Quantity
+    value: "40"
+    description: Input <value>40</value> into <caption>Hoeveelheid</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Unit of Measure
+    description: Focus <caption>Eenheid</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Unit of Measure
+    value: M
+    description: Input <value>M</value> into <caption>Eenheid</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Norm
+    value: "1"
+    description: Input <value>1</value> into <caption>Norm</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Production Rate
+    value: "1"
+    description: Input <value>1</value> into <caption>Productiesnelheid</caption>
+  - type: invoke
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Rate Code
+    invokeType: Lookup
+    description: Invoke Lookup on <caption>Tariefcode</caption>
+  - type: page-shown
+    source:
+      page: Budget Rate List
+    modal: true
+    runtimeId: b53a
+    description: Page <caption>Begrotingstarieven overzicht</caption> was shown.
+  - type: set-current-row
+    target:
+      - page: Budget Rate List
+        runtimeRef: b53a
+      - repeater: Control1
+    targetRecord:
+      relative: 3
+    description: Set current row in <caption>Control1</caption>
+  - type: invoke
+    target:
+      - page: Budget Rate List
+        runtimeRef: b53a
+      - repeater: Control1
+    parameters:
+      AlwaysCommit: false
+    description: Invoke row on <caption>Control1</caption>
+  - type: page-closed
+    source:
+      page: Budget Rate List
+    runtimeId: b53a
+    description: Page <caption>Begrotingstarieven overzicht</caption> was closed.
+  - type: set-current-row
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+    targetRecord:
+      relative: 1
+    description: Set current row in <caption>Control1</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Element
+    description: Focus <caption>Element</caption>
+  - type: invoke
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Element
+    invokeType: Lookup
+    description: Invoke Lookup on <caption>Element</caption>
+  - type: page-shown
+    source:
+      page: lookup:Element
+    modal: false
+    runtimeId: b55m
+    description: Page <caption>Selecteren</caption> was shown.
+  - type: set-current-row
+    target:
+      - page: lookup:Element
+        runtimeRef: b55m
+      - repeater: repeater
+    targetRecord:
+      relative: 2
+    description: Set current row in <caption>repeater</caption>
+  - type: invoke
+    target:
+      - page: lookup:Element
+        runtimeRef: b55m
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:Element
+    runtimeId: b55m
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Element
+    description: Focus <caption>Element</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Type
+    description: Focus <caption>Kostensoort</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Type
+    value: 2
+    description: Input <value>2</value> into <caption>Kostensoort</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Type
+    description: Focus <caption>Kostensoort</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Object
+    value: ""
+    isFilterAsYouType: true
+    description: Input <value></value> into <caption>Kostendrager</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Object
+    description: Focus <caption>Kostendrager</caption>
+  - type: page-shown
+    source:
+      page: lookup:Cost Object
+    modal: false
+    runtimeId: b561
+    description: Page <caption>Selecteren</caption> was shown.
+  - type: set-current-row
+    target:
+      - page: lookup:Cost Object
+        runtimeRef: b561
+      - repeater: repeater
+    targetRecord:
+      relative: 10
+    description: Set current row in <caption>repeater</caption>
+  - type: invoke
+    target:
+      - page: lookup:Cost Object
+        runtimeRef: b561
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:Cost Object
+    runtimeId: b561
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Object
+    description: Focus <caption>Kostendrager</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Description
+    description: Focus <caption>Omschrijving</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Description
+    value: Plaatsen afrastering
+    description: Input <value>Plaatsen afrastering</value> into
+      <caption>Omschrijving</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Quantity
+    description: Focus <caption>Hoeveelheid</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Quantity
+    value: "40"
+    description: Input <value>40</value> into <caption>Hoeveelheid</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Unit of Measure
+    description: Focus <caption>Eenheid</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Unit of Measure
+    value: m
+    description: Input <value>m</value> into <caption>Eenheid</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Price (LCY)
+    value: "180"
+    description: Input <value>180</value> into <caption>Prijs (LV)</caption>
+  - type: set-current-row
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+    targetRecord:
+      relative: 1
+    description: Set current row in <caption>Control1</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Element
+    description: Focus <caption>Element</caption>
+  - type: invoke
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Element
+    invokeType: Lookup
+    description: Invoke Lookup on <caption>Element</caption>
+  - type: page-shown
+    source:
+      page: lookup:Element
+    modal: false
+    runtimeId: b56g
+    description: Page <caption>Selecteren</caption> was shown.
+  - type: set-current-row
+    target:
+      - page: lookup:Element
+        runtimeRef: b56g
+      - repeater: repeater
+    targetRecord:
+      relative: 1
+    description: Set current row in <caption>repeater</caption>
+  - type: invoke
+    target:
+      - page: lookup:Element
+        runtimeRef: b56g
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:Element
+    runtimeId: b56g
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Element
+    description: Focus <caption>Element</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Type
+    description: Focus <caption>Kostensoort</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Type
+    value: 0
+    description: Input <value>0</value> into <caption>Kostensoort</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Type
+    description: Focus <caption>Kostensoort</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Object
+    value: ""
+    isFilterAsYouType: true
+    description: Input <value></value> into <caption>Kostendrager</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Object
+    description: Focus <caption>Kostendrager</caption>
+  - type: page-shown
+    source:
+      page: lookup:Cost Object
+    modal: false
+    runtimeId: b56v
+    description: Page <caption>Selecteren</caption> was shown.
+  - type: set-current-row
+    target:
+      - page: lookup:Cost Object
+        runtimeRef: b56v
+      - repeater: repeater
+    targetRecord:
+      relative: 1
+    description: Set current row in <caption>repeater</caption>
+  - type: invoke
+    target:
+      - page: lookup:Cost Object
+        runtimeRef: b56v
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:Cost Object
+    runtimeId: b56v
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Object
+    description: Focus <caption>Kostendrager</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Description
+    description: Focus <caption>Omschrijving</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Description
+    value: Kraan
+    description: Input <value>Kraan</value> into <caption>Omschrijving</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Quantity
+    description: Focus <caption>Hoeveelheid</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Quantity
+    value: "40"
+    description: Input <value>40</value> into <caption>Hoeveelheid</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Unit of Measure
+    description: Focus <caption>Eenheid</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Unit of Measure
+    value: UUR
+    description: Input <value>UUR</value> into <caption>Eenheid</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Norm
+    value: "1"
+    description: Input <value>1</value> into <caption>Norm</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Production Rate
+    value: "1"
+    description: Input <value>1</value> into <caption>Productiesnelheid</caption>
+  - type: invoke
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Rate Code
+    invokeType: Lookup
+    description: Invoke Lookup on <caption>Tariefcode</caption>
+  - type: page-shown
+    source:
+      page: Budget Rate List
+    modal: true
+    runtimeId: b57a
+    description: Page <caption>Begrotingstarieven overzicht</caption> was shown.
+  - type: set-current-row
+    target:
+      - page: Budget Rate List
+        runtimeRef: b57a
+      - repeater: Control1
+    targetRecord:
+      relative: 3
+    description: Set current row in <caption>Control1</caption>
+  - type: invoke
+    target:
+      - page: Budget Rate List
+        runtimeRef: b57a
+      - repeater: Control1
+    parameters:
+      AlwaysCommit: false
+    description: Invoke row on <caption>Control1</caption>
+  - type: page-closed
+    source:
+      page: Budget Rate List
+    runtimeId: b57a
+    description: Page <caption>Begrotingstarieven overzicht</caption> was closed.
+  - type: set-current-row
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+    targetRecord:
+      relative: 1
+    description: Set current row in <caption>Control1</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Element
+    description: Focus <caption>Element</caption>
+  - type: invoke
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Element
+    invokeType: Lookup
+    description: Invoke Lookup on <caption>Element</caption>
+  - type: page-shown
+    source:
+      page: lookup:Element
+    modal: false
+    runtimeId: b59m
+    description: Page <caption>Selecteren</caption> was shown.
+  - type: set-current-row
+    target:
+      - page: lookup:Element
+        runtimeRef: b59m
+      - repeater: repeater
+    targetRecord:
+      relative: 1
+    description: Set current row in <caption>repeater</caption>
+  - type: invoke
+    target:
+      - page: lookup:Element
+        runtimeRef: b59m
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:Element
+    runtimeId: b59m
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Element
+    description: Focus <caption>Element</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Type
+    description: Focus <caption>Kostensoort</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Type
+    value: 3
+    description: Input <value>3</value> into <caption>Kostensoort</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Type
+    description: Focus <caption>Kostensoort</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Object
+    value: ""
+    isFilterAsYouType: true
+    description: Input <value></value> into <caption>Kostendrager</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Object
+    description: Focus <caption>Kostendrager</caption>
+  - type: page-shown
+    source:
+      page: lookup:Cost Object
+    modal: false
+    runtimeId: b5a1
+    description: Page <caption>Selecteren</caption> was shown.
+  - type: set-current-row
+    target:
+      - page: lookup:Cost Object
+        runtimeRef: b5a1
+      - repeater: repeater
+    targetRecord:
+      relative: 1
+    description: Set current row in <caption>repeater</caption>
+  - type: invoke
+    target:
+      - page: lookup:Cost Object
+        runtimeRef: b5a1
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:Cost Object
+    runtimeId: b5a1
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Object
+    description: Focus <caption>Kostendrager</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Description
+    description: Focus <caption>Omschrijving</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Description
+    value: Kraan
+    description: Input <value>Kraan</value> into <caption>Omschrijving</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Quantity
+    description: Focus <caption>Hoeveelheid</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Quantity
+    value: "1"
+    description: Input <value>1</value> into <caption>Hoeveelheid</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Unit of Measure
+    description: Focus <caption>Eenheid</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Unit of Measure
+    value: DAG
+    description: Input <value>DAG</value> into <caption>Eenheid</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Price (LCY)
+    value: "1100"
+    description: Input <value>1100</value> into <caption>Prijs (LV)</caption>
+  - type: set-current-row
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+    targetRecord:
+      relative: 1
+    description: Set current row in <caption>Control1</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Element
+    description: Focus <caption>Element</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Element
+    value: ""
+    isFilterAsYouType: true
+    description: Input <value></value> into <caption>Element</caption>
+  - type: page-shown
+    source:
+      page: lookup:Element
+    modal: false
+    runtimeId: b5as
+    description: Page <caption>Selecteren</caption> was shown.
+  - type: set-current-row
+    target:
+      - page: lookup:Element
+        runtimeRef: b5as
+      - repeater: repeater
+    targetRecord:
+      relative: 1
+    description: Set current row in <caption>repeater</caption>
+  - type: invoke
+    target:
+      - page: lookup:Element
+        runtimeRef: b5as
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:Element
+    runtimeId: b5as
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Element
+    description: Focus <caption>Element</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Type
+    description: Focus <caption>Kostensoort</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Type
+    value: 0
+    description: Input <value>0</value> into <caption>Kostensoort</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Type
+    description: Focus <caption>Kostensoort</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Object
+    value: ""
+    isFilterAsYouType: true
+    description: Input <value></value> into <caption>Kostendrager</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Object
+    description: Focus <caption>Kostendrager</caption>
+  - type: page-shown
+    source:
+      page: lookup:Cost Object
+    modal: false
+    runtimeId: b5b7
+    description: Page <caption>Selecteren</caption> was shown.
+  - type: set-current-row
+    target:
+      - page: lookup:Cost Object
+        runtimeRef: b5b7
+      - repeater: repeater
+    targetRecord:
+      relative: 1
+    description: Set current row in <caption>repeater</caption>
+  - type: invoke
+    target:
+      - page: lookup:Cost Object
+        runtimeRef: b5b7
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:Cost Object
+    runtimeId: b5b7
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Object
+    description: Focus <caption>Kostendrager</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Description
+    description: Focus <caption>Omschrijving</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Description
+    value: Kraanmachinist
+    description: Input <value>Kraanmachinist</value> into <caption>Omschrijving</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Quantity
+    description: Focus <caption>Hoeveelheid</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Quantity
+    value: "1"
+    description: Input <value>1</value> into <caption>Hoeveelheid</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Unit of Measure
+    description: Focus <caption>Eenheid</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Unit of Measure
+    value: DAG
+    description: Input <value>DAG</value> into <caption>Eenheid</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Norm
+    value: "8"
+    description: Input <value>8</value> into <caption>Norm</caption>
+  - type: invoke
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Rate Code
+    invokeType: Lookup
+    description: Invoke Lookup on <caption>Tariefcode</caption>
+  - type: page-shown
+    source:
+      page: Budget Rate List
+    modal: true
+    runtimeId: b5bm
+    description: Page <caption>Begrotingstarieven overzicht</caption> was shown.
+  - type: set-current-row
+    target:
+      - page: Budget Rate List
+        runtimeRef: b5bm
+      - repeater: Control1
+    targetRecord:
+      relative: 6
+    description: Set current row in <caption>Control1</caption>
+  - type: invoke
+    target:
+      - page: Budget Rate List
+        runtimeRef: b5bm
+      - repeater: Control1
+    parameters:
+      AlwaysCommit: false
+    description: Invoke row on <caption>Control1</caption>
+  - type: page-closed
+    source:
+      page: Budget Rate List
+    runtimeId: b5bm
+    description: Page <caption>Begrotingstarieven overzicht</caption> was closed.
+  - type: set-current-row
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+    targetRecord:
+      relative: 1
+    description: Set current row in <caption>Control1</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Element
+    description: Focus <caption>Element</caption>
+  - type: invoke
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Element
+    invokeType: Lookup
+    description: Invoke Lookup on <caption>Element</caption>
+  - type: page-shown
+    source:
+      page: lookup:Element
+    modal: false
+    runtimeId: b5dy
+    description: Page <caption>Selecteren</caption> was shown.
+  - type: set-current-row
+    target:
+      - page: lookup:Element
+        runtimeRef: b5dy
+      - repeater: repeater
+    targetRecord:
+      relative: 1
+    description: Set current row in <caption>repeater</caption>
+  - type: invoke
+    target:
+      - page: lookup:Element
+        runtimeRef: b5dy
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:Element
+    runtimeId: b5dy
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Element
+    description: Focus <caption>Element</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Type
+    description: Focus <caption>Kostensoort</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Type
+    value: 2
+    description: Input <value>2</value> into <caption>Kostensoort</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Type
+    description: Focus <caption>Kostensoort</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Object
+    value: ""
+    isFilterAsYouType: true
+    description: Input <value></value> into <caption>Kostendrager</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Object
+    description: Focus <caption>Kostendrager</caption>
+  - type: page-shown
+    source:
+      page: lookup:Cost Object
+    modal: false
+    runtimeId: b5ed
+    description: Page <caption>Selecteren</caption> was shown.
+  - type: invoke
+    target:
+      - page: lookup:Cost Object
+        runtimeRef: b5ed
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:Cost Object
+    runtimeId: b5ed
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Object
+    description: Focus <caption>Kostendrager</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Description
+    description: Focus <caption>Omschrijving</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Description
+    value: Kraanmachinist
+    description: Input <value>Kraanmachinist</value> into <caption>Omschrijving</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Quantity
+    description: Focus <caption>Hoeveelheid</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Quantity
+    value: "3"
+    description: Input <value>3</value> into <caption>Hoeveelheid</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Unit of Measure
+    description: Focus <caption>Eenheid</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Unit of Measure
+    value: DAG
+    description: Input <value>DAG</value> into <caption>Eenheid</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Price (LCY)
+    value: "1100"
+    description: Input <value>1100</value> into <caption>Prijs (LV)</caption>
+  - type: set-current-row
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+    targetRecord:
+      relative: 1
+    description: Set current row in <caption>Control1</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Element
+    value: ""
+    isFilterAsYouType: true
+    description: Input <value></value> into <caption>Element</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Element
+    description: Focus <caption>Element</caption>
+  - type: page-shown
+    source:
+      page: lookup:Element
+    modal: false
+    runtimeId: b5es
+    description: Page <caption>Selecteren</caption> was shown.
+  - type: set-current-row
+    target:
+      - page: lookup:Element
+        runtimeRef: b5es
+      - repeater: repeater
+    targetRecord:
+      relative: 3
+    description: Set current row in <caption>repeater</caption>
+  - type: invoke
+    target:
+      - page: lookup:Element
+        runtimeRef: b5es
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:Element
+    runtimeId: b5es
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Element
+    description: Focus <caption>Element</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Type
+    description: Focus <caption>Kostensoort</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Type
+    value: 0
+    description: Input <value>0</value> into <caption>Kostensoort</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Type
+    description: Focus <caption>Kostensoort</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Object
+    value: ""
+    isFilterAsYouType: true
+    description: Input <value></value> into <caption>Kostendrager</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Object
+    description: Focus <caption>Kostendrager</caption>
+  - type: page-shown
+    source:
+      page: lookup:Cost Object
+    modal: false
+    runtimeId: b5f7
+    description: Page <caption>Selecteren</caption> was shown.
+  - type: set-current-row
+    target:
+      - page: lookup:Cost Object
+        runtimeRef: b5f7
+      - repeater: repeater
+    targetRecord:
+      relative: 1
+    description: Set current row in <caption>repeater</caption>
+  - type: invoke
+    target:
+      - page: lookup:Cost Object
+        runtimeRef: b5f7
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:Cost Object
+    runtimeId: b5f7
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Object
+    description: Focus <caption>Kostendrager</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Description
+    description: Focus <caption>Omschrijving</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Description
+    value: Conform offerte Theo Sloop
+    description: Input <value>Conform offerte Theo Sloop</value> into
+      <caption>Omschrijving</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Quantity
+    description: Focus <caption>Hoeveelheid</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Quantity
+    value: "40"
+    description: Input <value>40</value> into <caption>Hoeveelheid</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Unit of Measure
+    description: Focus <caption>Eenheid</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Unit of Measure
+    value: UUR
+    description: Input <value>UUR</value> into <caption>Eenheid</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Norm
+    value: "1"
+    description: Input <value>1</value> into <caption>Norm</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Production Rate
+    value: "1"
+    description: Input <value>1</value> into <caption>Productiesnelheid</caption>
+  - type: invoke
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Rate Code
+    invokeType: Lookup
+    description: Invoke Lookup on <caption>Tariefcode</caption>
+  - type: page-shown
+    source:
+      page: Budget Rate List
+    modal: true
+    runtimeId: b5fm
+    description: Page <caption>Begrotingstarieven overzicht</caption> was shown.
+  - type: set-current-row
+    target:
+      - page: Budget Rate List
+        runtimeRef: b5fm
+      - repeater: Control1
+    targetRecord:
+      relative: 3
+    description: Set current row in <caption>Control1</caption>
+  - type: invoke
+    target:
+      - page: Budget Rate List
+        runtimeRef: b5fm
+      - repeater: Control1
+    parameters:
+      AlwaysCommit: false
+    description: Invoke row on <caption>Control1</caption>
+  - type: page-closed
+    source:
+      page: Budget Rate List
+    runtimeId: b5fm
+    description: Page <caption>Begrotingstarieven overzicht</caption> was closed.
+  - type: set-current-row
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+    targetRecord:
+      relative: 1
+    description: Set current row in <caption>Control1</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Element
+    description: Focus <caption>Element</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Element
+    value: ""
+    isFilterAsYouType: true
+    description: Input <value></value> into <caption>Element</caption>
+  - type: page-shown
+    source:
+      page: lookup:Element
+    modal: false
+    runtimeId: b5hy
+    description: Page <caption>Selecteren</caption> was shown.
+  - type: set-current-row
+    target:
+      - page: lookup:Element
+        runtimeRef: b5hy
+      - repeater: repeater
+    targetRecord:
+      relative: 5
+    description: Set current row in <caption>repeater</caption>
+  - type: invoke
+    target:
+      - page: lookup:Element
+        runtimeRef: b5hy
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:Element
+    runtimeId: b5hy
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Element
+    description: Focus <caption>Element</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Type
+    description: Focus <caption>Kostensoort</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Type
+    value: 2
+    description: Input <value>2</value> into <caption>Kostensoort</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Type
+    description: Focus <caption>Kostensoort</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Object
+    value: ""
+    isFilterAsYouType: true
+    description: Input <value></value> into <caption>Kostendrager</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Object
+    description: Focus <caption>Kostendrager</caption>
+  - type: page-shown
+    source:
+      page: lookup:Cost Object
+    modal: false
+    runtimeId: b5id
+    description: Page <caption>Selecteren</caption> was shown.
+  - type: invoke
+    target:
+      - page: lookup:Cost Object
+        runtimeRef: b5id
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:Cost Object
+    runtimeId: b5id
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Object
+    description: Focus <caption>Kostendrager</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Description
+    description: Focus <caption>Omschrijving</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Description
+    value: Conform offerte Theo Sloop
+    description: Input <value>Conform offerte Theo Sloop</value> into
+      <caption>Omschrijving</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Quantity
+    description: Focus <caption>Hoeveelheid</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Quantity
+    value: "3"
+    description: Input <value>3</value> into <caption>Hoeveelheid</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Unit of Measure
+    description: Focus <caption>Eenheid</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Unit of Measure
+    value: DAG
+    description: Input <value>DAG</value> into <caption>Eenheid</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Price (LCY)
+    value: "5000"
+    description: Input <value>5000</value> into <caption>Prijs (LV)</caption>
+  - type: set-current-row
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+    targetRecord:
+      relative: 1
+    description: Set current row in <caption>Control1</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Element
+    description: Focus <caption>Element</caption>
+  - type: invoke
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Element
+    invokeType: Lookup
+    description: Invoke Lookup on <caption>Element</caption>
+  - type: page-shown
+    source:
+      page: lookup:Element
+    modal: false
+    runtimeId: b5is
+    description: Page <caption>Selecteren</caption> was shown.
+  - type: set-current-row
+    target:
+      - page: lookup:Element
+        runtimeRef: b5is
+      - repeater: repeater
+    targetRecord:
+      relative: 53
+    description: Set current row in <caption>repeater</caption>
+  - type: invoke
+    target:
+      - page: lookup:Element
+        runtimeRef: b5is
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:Element
+    runtimeId: b5is
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Element
+    description: Focus <caption>Element</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Type
+    description: Focus <caption>Kostensoort</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Type
+    value: 0
+    description: Input <value>0</value> into <caption>Kostensoort</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Type
+    description: Focus <caption>Kostensoort</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Object
+    value: ""
+    isFilterAsYouType: true
+    description: Input <value></value> into <caption>Kostendrager</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Object
+    description: Focus <caption>Kostendrager</caption>
+  - type: page-shown
+    source:
+      page: lookup:Cost Object
+    modal: false
+    runtimeId: b5j7
+    description: Page <caption>Selecteren</caption> was shown.
+  - type: set-current-row
+    target:
+      - page: lookup:Cost Object
+        runtimeRef: b5j7
+      - repeater: repeater
+    targetRecord:
+      relative: 1
+    description: Set current row in <caption>repeater</caption>
+  - type: invoke
+    target:
+      - page: lookup:Cost Object
+        runtimeRef: b5j7
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:Cost Object
+    runtimeId: b5j7
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Object
+    description: Focus <caption>Kostendrager</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Description
+    description: Focus <caption>Omschrijving</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Description
+    value: Prefab brug conform offerte
+    description: Input <value>Prefab brug conform offerte</value> into
+      <caption>Omschrijving</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Quantity
+    description: Focus <caption>Hoeveelheid</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Quantity
+    value: "1"
+    description: Input <value>1</value> into <caption>Hoeveelheid</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Unit of Measure
+    description: Focus <caption>Eenheid</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Unit of Measure
+    value: DAG
+    description: Input <value>DAG</value> into <caption>Eenheid</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Norm
+    value: "45"
+    description: Input <value>45</value> into <caption>Norm</caption>
+  - type: invoke
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Rate Code
+    invokeType: Lookup
+    description: Invoke Lookup on <caption>Tariefcode</caption>
+  - type: page-shown
+    source:
+      page: Budget Rate List
+    modal: true
+    runtimeId: b5ly
+    description: Page <caption>Begrotingstarieven overzicht</caption> was shown.
+  - type: set-current-row
+    target:
+      - page: Budget Rate List
+        runtimeRef: b5ly
+      - repeater: Control1
+    targetRecord:
+      relative: 3
+    description: Set current row in <caption>Control1</caption>
+  - type: invoke
+    target:
+      - page: Budget Rate List
+        runtimeRef: b5ly
+      - repeater: Control1
+    parameters:
+      AlwaysCommit: false
+    description: Invoke row on <caption>Control1</caption>
+  - type: page-closed
+    source:
+      page: Budget Rate List
+    runtimeId: b5ly
+    description: Page <caption>Begrotingstarieven overzicht</caption> was closed.
+  - type: set-current-row
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+    targetRecord:
+      relative: 1
+    description: Set current row in <caption>Control1</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Element
+    description: Focus <caption>Element</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Element
+    value: ""
+    isFilterAsYouType: true
+    description: Input <value></value> into <caption>Element</caption>
+  - type: page-shown
+    source:
+      page: lookup:Element
+    modal: false
+    runtimeId: b5oa
+    description: Page <caption>Selecteren</caption> was shown.
+  - type: set-current-row
+    target:
+      - page: lookup:Element
+        runtimeRef: b5oa
+      - repeater: repeater
+    targetRecord:
+      relative: 53
+    description: Set current row in <caption>repeater</caption>
+  - type: invoke
+    target:
+      - page: lookup:Element
+        runtimeRef: b5oa
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:Element
+    runtimeId: b5oa
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Element
+    description: Focus <caption>Element</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Type
+    description: Focus <caption>Kostensoort</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Type
+    value: 1
+    description: Input <value>1</value> into <caption>Kostensoort</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Type
+    description: Focus <caption>Kostensoort</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Object
+    value: ""
+    isFilterAsYouType: true
+    description: Input <value></value> into <caption>Kostendrager</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Object
+    description: Focus <caption>Kostendrager</caption>
+  - type: page-shown
+    source:
+      page: lookup:Cost Object
+    modal: false
+    runtimeId: b5op
+    description: Page <caption>Selecteren</caption> was shown.
+  - type: invoke
+    target:
+      - page: lookup:Cost Object
+        runtimeRef: b5op
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:Cost Object
+    runtimeId: b5op
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Object
+    description: Focus <caption>Kostendrager</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Description
+    description: Focus <caption>Omschrijving</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Description
+    value: Prefab brug conform offerte
+    description: Input <value>Prefab brug conform offerte</value> into
+      <caption>Omschrijving</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Quantity
+    description: Focus <caption>Hoeveelheid</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Quantity
+    value: "1"
+    description: Input <value>1</value> into <caption>Hoeveelheid</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Unit of Measure
+    description: Focus <caption>Eenheid</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Unit of Measure
+    value: ST
+    description: Input <value>ST</value> into <caption>Eenheid</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Price (LCY)
+    value: "81000"
+    description: Input <value>81000</value> into <caption>Prijs (LV)</caption>
+  - type: set-current-row
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+    targetRecord:
+      relative: 1
+    description: Set current row in <caption>Control1</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Element
+    description: Focus <caption>Element</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Element
+    value: ""
+    isFilterAsYouType: true
+    description: Input <value></value> into <caption>Element</caption>
+  - type: page-shown
+    source:
+      page: lookup:Element
+    modal: false
+    runtimeId: b5p4
+    description: Page <caption>Selecteren</caption> was shown.
+  - type: set-current-row
+    target:
+      - page: lookup:Element
+        runtimeRef: b5p4
+      - repeater: repeater
+    targetRecord:
+      relative: 25
+    description: Set current row in <caption>repeater</caption>
+  - type: invoke
+    target:
+      - page: lookup:Element
+        runtimeRef: b5p4
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:Element
+    runtimeId: b5p4
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Element
+    description: Focus <caption>Element</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Type
+    description: Focus <caption>Kostensoort</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Type
+    value: 0
+    description: Input <value>0</value> into <caption>Kostensoort</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Type
+    description: Focus <caption>Kostensoort</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Object
+    value: ""
+    isFilterAsYouType: true
+    description: Input <value></value> into <caption>Kostendrager</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Object
+    description: Focus <caption>Kostendrager</caption>
+  - type: page-shown
+    source:
+      page: lookup:Cost Object
+    modal: false
+    runtimeId: b5pj
+    description: Page <caption>Selecteren</caption> was shown.
+  - type: set-current-row
+    target:
+      - page: lookup:Cost Object
+        runtimeRef: b5pj
+      - repeater: repeater
+    targetRecord:
+      relative: 1
+    description: Set current row in <caption>repeater</caption>
+  - type: invoke
+    target:
+      - page: lookup:Cost Object
+        runtimeRef: b5pj
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:Cost Object
+    runtimeId: b5pj
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Object
+    description: Focus <caption>Kostendrager</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Description
+    description: Focus <caption>Omschrijving</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Description
+    value: Asfaltering conform offerte
+    description: Input <value>Asfaltering conform offerte</value> into
+      <caption>Omschrijving</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Quantity
+    description: Focus <caption>Hoeveelheid</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Quantity
+    value: "16"
+    description: Input <value>16</value> into <caption>Hoeveelheid</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Unit of Measure
+    description: Focus <caption>Eenheid</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Unit of Measure
+    value: UUR
+    description: Input <value>UUR</value> into <caption>Eenheid</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Norm
+    value: "1"
+    description: Input <value>1</value> into <caption>Norm</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Production Rate
+    value: "1"
+    description: Input <value>1</value> into <caption>Productiesnelheid</caption>
+  - type: invoke
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Rate Code
+    invokeType: Lookup
+    description: Invoke Lookup on <caption>Tariefcode</caption>
+  - type: page-shown
+    source:
+      page: Budget Rate List
+    modal: true
+    runtimeId: b5py
+    description: Page <caption>Begrotingstarieven overzicht</caption> was shown.
+  - type: set-current-row
+    target:
+      - page: Budget Rate List
+        runtimeRef: b5py
+      - repeater: Control1
+    targetRecord:
+      relative: 3
+    description: Set current row in <caption>Control1</caption>
+  - type: invoke
+    target:
+      - page: Budget Rate List
+        runtimeRef: b5py
+      - repeater: Control1
+    parameters:
+      AlwaysCommit: false
+    description: Invoke row on <caption>Control1</caption>
+  - type: page-closed
+    source:
+      page: Budget Rate List
+    runtimeId: b5py
+    description: Page <caption>Begrotingstarieven overzicht</caption> was closed.
+  - type: set-current-row
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+    targetRecord:
+      relative: 1
+    description: Set current row in <caption>Control1</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Element
+    description: Focus <caption>Element</caption>
+  - type: invoke
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Element
+    invokeType: Lookup
+    description: Invoke Lookup on <caption>Element</caption>
+  - type: page-shown
+    source:
+      page: lookup:Element
+    modal: false
+    runtimeId: b5sa
+    description: Page <caption>Selecteren</caption> was shown.
+  - type: set-current-row
+    target:
+      - page: lookup:Element
+        runtimeRef: b5sa
+      - repeater: repeater
+    targetRecord:
+      relative: 25
+    description: Set current row in <caption>repeater</caption>
+  - type: invoke
+    target:
+      - page: lookup:Element
+        runtimeRef: b5sa
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:Element
+    runtimeId: b5sa
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Element
+    description: Focus <caption>Element</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Type
+    description: Focus <caption>Kostensoort</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Type
+    value: 2
+    description: Input <value>2</value> into <caption>Kostensoort</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Type
+    description: Focus <caption>Kostensoort</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Object
+    value: ""
+    isFilterAsYouType: true
+    description: Input <value></value> into <caption>Kostendrager</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Object
+    description: Focus <caption>Kostendrager</caption>
+  - type: page-shown
+    source:
+      page: lookup:Cost Object
+    modal: false
+    runtimeId: b5sp
+    description: Page <caption>Selecteren</caption> was shown.
+  - type: invoke
+    target:
+      - page: lookup:Cost Object
+        runtimeRef: b5sp
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:Cost Object
+    runtimeId: b5sp
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Object
+    description: Focus <caption>Kostendrager</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Description
+    description: Focus <caption>Omschrijving</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Description
+    value: Asfaltering conform offerte
+    description: Input <value>Asfaltering conform offerte</value> into
+      <caption>Omschrijving</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Quantity
+    description: Focus <caption>Hoeveelheid</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Quantity
+    value: "1"
+    description: Input <value>1</value> into <caption>Hoeveelheid</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Unit of Measure
+    description: Focus <caption>Eenheid</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Unit of Measure
+    value: DAG
+    description: Input <value>DAG</value> into <caption>Eenheid</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Price (LCY)
+    value: "15000"
+    description: Input <value>15000</value> into <caption>Prijs (LV)</caption>
+  - type: set-current-row
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+    targetRecord:
+      relative: 1
+    description: Set current row in <caption>Control1</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Element
+    description: Focus <caption>Element</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Element
+    value: ""
+    isFilterAsYouType: true
+    description: Input <value></value> into <caption>Element</caption>
+  - type: page-shown
+    source:
+      page: lookup:Element
+    modal: false
+    runtimeId: b5t4
+    description: Page <caption>Selecteren</caption> was shown.
+  - type: set-current-row
+    target:
+      - page: lookup:Element
+        runtimeRef: b5t4
+      - repeater: repeater
+    targetRecord:
+      relative: 25
+    description: Set current row in <caption>repeater</caption>
+  - type: invoke
+    target:
+      - page: lookup:Element
+        runtimeRef: b5t4
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:Element
+    runtimeId: b5t4
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Element
+    description: Focus <caption>Element</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Type
+    description: Focus <caption>Kostensoort</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Type
+    value: 1
+    description: Input <value>1</value> into <caption>Kostensoort</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Type
+    description: Focus <caption>Kostensoort</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Object
+    value: ""
+    isFilterAsYouType: true
+    description: Input <value></value> into <caption>Kostendrager</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Object
+    description: Focus <caption>Kostendrager</caption>
+  - type: page-shown
+    source:
+      page: lookup:Cost Object
+    modal: false
+    runtimeId: b5tj
+    description: Page <caption>Selecteren</caption> was shown.
+  - type: invoke
+    target:
+      - page: lookup:Cost Object
+        runtimeRef: b5tj
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:Cost Object
+    runtimeId: b5tj
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Cost Object
+    description: Focus <caption>Kostendrager</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Description
+    description: Focus <caption>Omschrijving</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Description
+    value: Asfalt markering
+    description: Input <value>Asfalt markering</value> into <caption>Omschrijving</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Quantity
+    description: Focus <caption>Hoeveelheid</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Quantity
+    value: "40"
+    description: Input <value>40</value> into <caption>Hoeveelheid</caption>
+  - type: focus
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Unit of Measure
+    description: Focus <caption>Eenheid</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Unit of Measure
+    value: m
+    description: Input <value>m</value> into <caption>Eenheid</caption>
+  - type: input
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - part: OrigBudget
+      - page: Budget Subform
+      - repeater: Control1
+      - field: Price (LCY)
+    value: "90"
+    description: Input <value>90</value> into <caption>Prijs (LV)</caption>
+  - type: invoke
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+      - action: Summary Sheet
+    parameters: {}
+    description: Invoke <caption>Staartblad</caption>
+  - type: page-shown
+    source:
+      page: Budget Summary Sheet
+    modal: true
+    runtimeId: b5uq
+    description: Page <caption>Staartblad werkbegroting</caption> was shown.
+  - type: invoke
+    target:
+      - page: Budget Summary Sheet
+        runtimeRef: b5uq
+    invokeType: Cancel
+    description: Invoke Cancel on <caption>Staartblad werkbegroting</caption>
+  - type: page-closed
+    source:
+      page: Budget Summary Sheet
+    runtimeId: b5uq
+    description: Page <caption>Staartblad werkbegroting</caption> was closed.
+  - type: close-page
+    target:
+      - page: Project Budget
+        runtimeRef: b4g1
+    description: Close page <caption>Werkbegroting</caption>
+  - type: page-closed
+    source:
+      page: Project Budget
+    runtimeId: b4g1
+    description: Page <caption>Werkbegroting</caption> was closed.
+  - type: input
+    target:
+      - page: Job Card
+        runtimeRef: b1tx
+      - field: Budget Fixed
+    value: true
+    description: Input <value>true</value> into <caption>Begroting bevroren</caption>
+  - type: invoke
+    target:
+      - page: Job Card
+        runtimeRef: b1tx
+      - action: Pr&ognosis
+    parameters: {}
+    description: Invoke <caption>Prognose</caption>
+  - type: page-shown
+    source:
+      page: Prognosis List
+    modal: true
+    runtimeId: b60y
+    description: Page <caption>Prognoses</caption> was shown.
+  - type: invoke
+    target:
+      - page: Prognosis List
+        runtimeRef: b60y
+      - action: Control_New
+    invokeType: New
+    description: Invoke New on <caption>Nieuw</caption>
+  - type: page-shown
+    source:
+      page: Prognosis
+    modal: false
+    runtimeId: b645
+    description: Page <caption>Prognose</caption> was shown.
+  - type: focus
+    target:
+      - page: Prognosis
+        runtimeRef: b645
+      - field: Project No.
+    description: Focus <caption>Projectnr.</caption>
+  - type: focus
+    target:
+      - page: Prognosis
+        runtimeRef: b645
+      - field: Prognosis Date
+    description: Focus <caption>Prognosedatum</caption>
+  - type: input
+    target:
+      - page: Prognosis
+        runtimeRef: b645
+      - field: Prognosis Date
+    value: 4-5-2026
+    description: Input <value>4-5-2026</value> into <caption>Prognosedatum</caption>
+  - type: focus
+    target:
+      - page: Prognosis
+        runtimeRef: b645
+      - field: General Costs
+    description: Focus <caption>Algemene kosten</caption>
+  - type: input
+    target:
+      - page: Prognosis
+        runtimeRef: b645
+      - field: General Costs
+    value: 1
+    description: Input <value>1</value> into <caption>Algemene kosten</caption>
+  - type: invoke
+    target:
+      - page: Prognosis
+        runtimeRef: b645
+      - action: "&Create"
+    parameters: {}
+    description: Invoke <caption>Aanmaken</caption>
+  - type: input
+    target:
+      - page: Prognosis
+        runtimeRef: b645
+      - field: Comment
+    value: 1e prognose
+    description: Input <value>1e prognose</value> into <caption>Opmerking</caption>
+  - type: input
+    target:
+      - page: Prognosis
+        runtimeRef: b645
+      - field: Fixed
+    value: true
+    description: Input <value>true</value> into <caption>Bevroren</caption>
+  - type: invoke
+    target:
+      - page: Prognosis
+        runtimeRef: b645
+      - action: Prognosis Costs
+    parameters: {}
+    description: Invoke <caption>Prognose kosten</caption>
+  - type: page-shown
+    source:
+      page: Prognosis Costs per Element
+    modal: false
+    runtimeId: b67s
+    description: Page <caption>Prognose kosten per element</caption> was shown.
+  - type: close-page
+    target:
+      - page: Prognosis Costs per Element
+        runtimeRef: b67s
+    description: Close page <caption>Prognose kosten per element</caption>
+  - type: page-closed
+    source:
+      page: Prognosis Costs per Element
+    runtimeId: b67s
+    description: Page <caption>Prognose kosten per element</caption> was closed.
+  - type: invoke
+    target:
+      - page: Prognosis
+        runtimeRef: b645
+      - action: Revenue on Element Level
+    parameters: {}
+    description: Invoke <caption>Prognose Opbrengsten</caption>
+  - type: page-shown
+    source:
+      page: Prognosis Revenues per Element
+    modal: false
+    runtimeId: b6ef
+    description: Page <caption>Prognose opbrengsten per element</caption> was shown.
+  - type: close-page
+    target:
+      - page: Prognosis Revenues per Element
+        runtimeRef: b6ef
+    description: Close page <caption>Prognose opbrengsten per element</caption>
+  - type: page-closed
+    source:
+      page: Prognosis Revenues per Element
+    runtimeId: b6ef
+    description: Page <caption>Prognose opbrengsten per element</caption> was closed.
+  - type: close-page
+    target:
+      - page: Prognosis
+        runtimeRef: b645
+    description: Close page <caption>Prognose</caption>
+  - type: page-closed
+    source:
+      page: Prognosis
+    runtimeId: b645
+    description: Page <caption>Prognose</caption> was closed.
+  - type: invoke
+    target:
+      - page: Prognosis List
+        runtimeRef: b60y
+    invokeType: CloseOk
+    description: Invoke CloseOk on <caption>Prognoses</caption>
+  - type: page-closed
+    source:
+      page: Prognosis List
+    runtimeId: b60y
+    description: Page <caption>Prognoses</caption> was closed.
+  - type: close-page
+    target:
+      - page: Job Card
+        runtimeRef: b1tx
+    description: Close page <caption>Project</caption>
+  - type: page-closed
+    source:
+      page: Job Card
+    runtimeId: b1tx
+    description: Page <caption>Project</caption> was closed.
+  - type: close-page
+    target:
+      - page: Job List
+        runtimeRef: bzj
+    description: Close page <caption>Projecten</caption>
+  - type: page-closed
+    source:
+      page: Job List
+    runtimeId: bzj
+    description: Page <caption>Projecten</caption> was closed.
+parameters:
+  Job List.No.:
+    type: string
+    default: PR00311

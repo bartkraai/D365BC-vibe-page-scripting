@@ -1,8 +1,0 @@
-{
-  "testrole": {
-    "username": "bkraai@4ps.nl",
-    "password": "your-password-here",
-    "description": "",
-    "mfa_seed": "your-totp-seed-here"
-  }
-}

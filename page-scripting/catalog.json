@@ -22,32 +22,6 @@
       ]
     },
     {
-      "code": "PRJ",
-      "name": "Projecten",
-      "description": "UAV Project met vaste termijnen",
-      "types": [
-        {
-          "code": "UAV",
-          "name": "UAV projecten",
-          "description": "UAV Projecten Vaste termijnen",
-          "process_flows": [
-            {
-              "code": "TTRJ",
-              "name": "Test Trajectkaart",
-              "description": "Test trajectkaart",
-              "workflow_path": "./Test Trajectkaart"
-            }
-          ]
-        },
-        {
-          "code": "",
-          "name": "",
-          "description": "",
-          "process_flows": []
-        }
-      ]
-    },
-    {
       "code": "TP",
       "name": "Test parameter",
       "description": "",
@@ -75,6 +49,26 @@
               "name": "Test inkoop",
               "description": "Inkooporder aanmaken, goedkeuren en ontvangen",
               "workflow_path": "./Test inkoop"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "PRJ",
+      "name": "Projecten",
+      "description": "",
+      "types": [
+        {
+          "code": "UAV",
+          "name": "UAV Project",
+          "description": "UAV Project (Vaste termijnen)",
+          "process_flows": [
+            {
+              "code": "UAV PRJ",
+              "name": "UAV Project",
+              "description": "UAV Project (Vaste termijnen)",
+              "workflow_path": "./UAV Project"
             }
           ]
         }

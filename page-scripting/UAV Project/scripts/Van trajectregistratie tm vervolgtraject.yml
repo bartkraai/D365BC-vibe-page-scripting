@@ -1,6 +1,6 @@
-name: Van traject naar project
+name: Van trajectregistratie tm vervolgtraject
 description: Test recording
-telemetryId: aaad6d6d-a208-452b-9a45-052e5add87ed
+telemetryId: 64080d13-3f62-46ae-8a06-3bcc70444354
 start:
   profile: ACQUISITIONER 4PS
 steps:
@@ -11,33 +11,34 @@ steps:
     source:
       page: User Settings
     modal: false
-    runtimeId: b68
+    runtimeId: b6v
     description: Page <caption>Mijn instellingen</caption> was shown.
   - type: invoke
     target:
       - page: User Settings
-        runtimeRef: b68
+        runtimeRef: b6v
     invokeType: Ok
     description: Invoke Ok on <caption>Mijn instellingen</caption>
   - type: page-closed
     source:
       page: User Settings
-    runtimeId: b68
+    runtimeId: b6v
     description: Page <caption>Mijn instellingen</caption> was closed.
   - type: navigate
     target:
-      - page: Try-out List
-    description: Navigate to Trajecten
+      - page: Acquisition RC
+      - action: Action1100525014
+    description: Navigate to <caption>Traject</caption>
   - type: page-shown
     source:
       page: Try-out List
     modal: false
-    runtimeId: b7a
-    description: Page <caption>Trajecten</caption> was shown.
+    runtimeId: bc2
+    description: Page <caption>Traject</caption> was shown.
   - type: invoke
     target:
       - page: Try-out List
-        runtimeRef: b7a
+        runtimeRef: bc2
       - action: Control_New
     invokeType: New
     description: Invoke New on <caption>Nieuw</caption>
@@ -45,37 +46,37 @@ steps:
     source:
       page: Try-out
     modal: false
-    runtimeId: bbv
+    runtimeId: bgm
     description: Page <caption>Nieuw - Traject</caption> was shown.
   - type: focus
     target:
       - page: Try-out
-        runtimeRef: bbv
+        runtimeRef: bgm
       - field: Code
     description: Focus <caption>Code</caption>
   - type: focus
     target:
       - page: Try-out
-        runtimeRef: bbv
+        runtimeRef: bgm
       - field: Description
     description: Focus <caption>Omschrijving</caption>
   - type: input
     target:
       - page: Try-out
-        runtimeRef: bbv
+        runtimeRef: bgm
       - field: Description
     value: Fietsbrug AT
     description: Input <value>Fietsbrug AT</value> into <caption>Omschrijving</caption>
   - type: focus
     target:
       - page: Try-out
-        runtimeRef: bbv
-      - field: Salesperson Code
-    description: Focus <caption>In/Verkoper</caption>
+        runtimeRef: bgm
+      - part: sub
+    description: Focus <caption>Relaties</caption>
   - type: invoke
     target:
       - page: Try-out
-        runtimeRef: bbv
+        runtimeRef: bgm
       - field: Salesperson Code
     invokeType: Lookup
     description: Invoke Lookup on <caption>In/Verkoper</caption>
@@ -83,12 +84,20 @@ steps:
     source:
       page: lookup:Salesperson Code
     modal: false
-    runtimeId: biq
+    runtimeId: bnh
     description: Page <caption>Selecteren</caption> was shown.
+  - type: set-current-row
+    target:
+      - page: lookup:Salesperson Code
+        runtimeRef: bnh
+      - repeater: repeater
+    targetRecord:
+      relative: 3
+    description: Set current row in <caption>repeater</caption>
   - type: invoke
     target:
       - page: lookup:Salesperson Code
-        runtimeRef: biq
+        runtimeRef: bnh
       - repeater: repeater
     parameters:
       AlwaysCommit: true
@@ -96,12 +105,12 @@ steps:
   - type: page-closed
     source:
       page: lookup:Salesperson Code
-    runtimeId: biq
+    runtimeId: bnh
     description: Page <caption>Selecteren</caption> was closed.
   - type: invoke
     target:
       - page: Try-out
-        runtimeRef: bbv
+        runtimeRef: bgm
       - field: Status
     invokeType: Lookup
     description: Invoke Lookup on <caption>Status</caption>
@@ -109,12 +118,20 @@ steps:
     source:
       page: lookup:Status
     modal: false
-    runtimeId: bj7
+    runtimeId: bny
     description: Page <caption>Selecteren</caption> was shown.
+  - type: set-current-row
+    target:
+      - page: lookup:Status
+        runtimeRef: bny
+      - repeater: repeater
+    targetRecord:
+      relative: 3
+    description: Set current row in <caption>repeater</caption>
   - type: invoke
     target:
       - page: lookup:Status
-        runtimeRef: bj7
+        runtimeRef: bny
       - repeater: repeater
     parameters:
       AlwaysCommit: true
@@ -122,12 +139,12 @@ steps:
   - type: page-closed
     source:
       page: lookup:Status
-    runtimeId: bj7
+    runtimeId: bny
     description: Page <caption>Selecteren</caption> was closed.
   - type: input
     target:
       - page: Try-out
-        runtimeRef: bbv
+        runtimeRef: bgm
       - part: sub
       - page: Try-out Lines SF
       - repeater: Control1
@@ -138,7 +155,7 @@ steps:
   - type: focus
     target:
       - page: Try-out
-        runtimeRef: bbv
+        runtimeRef: bgm
       - part: sub
       - page: Try-out Lines SF
       - repeater: Control1
@@ -148,38 +165,37 @@ steps:
     source:
       page: lookup:Contact No.
     modal: false
-    runtimeId: bjt
+    runtimeId: bok
     description: Page <caption>Selecteren</caption> was shown.
   - type: invoke
     target:
       - page: lookup:Contact No.
-        runtimeRef: bjt
+        runtimeRef: bok
       - action: system:fulllist
     description: Invoke <caption>Selecteren vanuit volledige lijst</caption>
   - type: page-closed
     source:
       page: lookup:Contact No.
-    runtimeId: bjt
+    runtimeId: bok
     description: Page <caption>Selecteren</caption> was closed.
   - type: page-shown
     source:
       page: Contact List
     modal: false
-    runtimeId: bkr
+    runtimeId: bpi
     description: Page <caption>Selecteren - Contacten</caption> was shown.
-  - type: input
+  - type: set-current-row
     target:
       - page: Contact List
-        runtimeRef: bkr
-      - scope: filter
-        field: filter:system:search
-    value: rijks
-    isFilterAsYouType: true
-    description: Input <value>rijks</value> into <caption>Zoeken</caption>
+        runtimeRef: bpi
+      - repeater: Control1
+    targetRecord:
+      relative: 583
+    description: Set current row in <caption>Control1</caption>
   - type: invoke
     target:
       - page: Contact List
-        runtimeRef: bkr
+        runtimeRef: bpi
       - repeater: Control1
     parameters:
       AlwaysCommit: false
@@ -187,93 +203,25 @@ steps:
   - type: page-closed
     source:
       page: Contact List
-    runtimeId: bkr
+    runtimeId: bpi
     description: Page <caption>Selecteren - Contacten</caption> was closed.
   - type: input
     target:
       - page: Try-out
-        runtimeRef: bbv
-      - part: sub
-      - page: Try-out Lines SF
-      - repeater: Control1
-      - field: Contact Type
-    value: ""
-    isFilterAsYouType: true
-    description: Input <value></value> into <caption>Relatiesoort</caption>
-  - type: page-shown
-    source:
-      page: lookup:Contact Type
-    modal: false
-    runtimeId: bud
-    description: Page <caption>Selecteren</caption> was shown.
-  - type: set-current-row
-    target:
-      - page: lookup:Contact Type
-        runtimeRef: bud
-      - repeater: repeater
-    targetRecord:
-      relative: 11
-    description: Set current row in <caption>repeater</caption>
-  - type: invoke
-    target:
-      - page: lookup:Contact Type
-        runtimeRef: bud
-      - repeater: repeater
-    parameters:
-      AlwaysCommit: true
-    description: Invoke row on <caption>repeater</caption>
-  - type: page-closed
-    source:
-      page: lookup:Contact Type
-    runtimeId: bud
-    description: Page <caption>Selecteren</caption> was closed.
-  - type: input
-    target:
-      - page: Try-out
-        runtimeRef: bbv
-      - part: sub
-      - page: Try-out Lines SF
-      - repeater: Control1
-      - field: Contact Person No.
-    value: ""
-    isFilterAsYouType: true
-    description: Input <value></value> into <caption>Contactpersoonnr.</caption>
-  - type: page-shown
-    source:
-      page: lookup:Contact Person No.
-    modal: false
-    runtimeId: buv
-    description: Page <caption>Selecteren</caption> was shown.
-  - type: invoke
-    target:
-      - page: lookup:Contact Person No.
-        runtimeRef: buv
-      - repeater: repeater
-    parameters:
-      AlwaysCommit: true
-    description: Invoke row on <caption>repeater</caption>
-  - type: page-closed
-    source:
-      page: lookup:Contact Person No.
-    runtimeId: buv
-    description: Page <caption>Selecteren</caption> was closed.
-  - type: input
-    target:
-      - page: Try-out
-        runtimeRef: bbv
+        runtimeRef: bgm
       - field: Control17
-    value: Teststraat
-    description: Input <value>Teststraat</value> into <caption>Adres</caption>
+    value: Fietstraat 48
+    description: Input <value>Fietstraat 48</value> into <caption>Adres</caption>
   - type: focus
     target:
       - page: Try-out
-        runtimeRef: bbv
+        runtimeRef: bgm
       - field: Post Code
     description: Focus <caption>Postcode</caption>
   - type: input
     target:
       - page: Try-out
-        runtimeRef: bbv
+        runtimeRef: bgm
       - field: Post Code
     value: ""
     isFilterAsYouType: true
@@ -282,30 +230,12 @@ steps:
     source:
       page: lookup:Post Code
     modal: false
-    runtimeId: bvt
+    runtimeId: bz4
     description: Page <caption>Selecteren</caption> was shown.
   - type: input
     target:
       - page: Try-out
-        runtimeRef: bbv
-      - field: Post Code
-    value: "48"
-    isFilterAsYouType: true
-    description: Input <value>48</value> into <caption>Postcode</caption>
-  - type: close-page
-    target:
-      - page: lookup:Post Code
-        runtimeRef: bvt
-    description: Close page <caption>Selecteren</caption>
-  - type: page-closed
-    source:
-      page: lookup:Post Code
-    runtimeId: bvt
-    description: Page <caption>Selecteren</caption> was closed.
-  - type: input
-    target:
-      - page: Try-out
-        runtimeRef: bbv
+        runtimeRef: bgm
       - field: Post Code
     value: "4848"
     isFilterAsYouType: true
@@ -313,38 +243,43 @@ steps:
   - type: close-page
     target:
       - page: lookup:Post Code
-        runtimeRef: bwj
+        runtimeRef: bz4
     description: Close page <caption>Selecteren</caption>
+  - type: page-closed
+    source:
+      page: lookup:Post Code
+    runtimeId: bz4
+    description: Page <caption>Selecteren</caption> was closed.
   - type: input
     target:
       - page: Try-out
-        runtimeRef: bbv
+        runtimeRef: bgm
       - field: Post Code
-    value: 4848AZ
+    value: 4848AM
     isFilterAsYouType: true
-    description: Input <value>4848AZ</value> into <caption>Postcode</caption>
+    description: Input <value>4848AM</value> into <caption>Postcode</caption>
   - type: close-page
     target:
       - page: lookup:Post Code
-        runtimeRef: bwk
+        runtimeRef: bzu
     description: Close page <caption>Selecteren</caption>
   - type: input
     target:
       - page: Try-out
-        runtimeRef: bbv
+        runtimeRef: bgm
       - field: Post Code
-    value: 4848AZ
-    description: Input <value>4848AZ</value> into <caption>Postcode</caption>
+    value: 4848AM
+    description: Input <value>4848AM</value> into <caption>Postcode</caption>
   - type: focus
     target:
       - page: Try-out
-        runtimeRef: bbv
+        runtimeRef: bgm
       - field: City
     description: Focus <caption>Plaats</caption>
   - type: input
     target:
       - page: Try-out
-        runtimeRef: bbv
+        runtimeRef: bgm
       - field: City
     value: ""
     isFilterAsYouType: true
@@ -353,12 +288,43 @@ steps:
     source:
       page: lookup:City
     modal: false
-    runtimeId: bwl
+    runtimeId: bzv
     description: Page <caption>Selecteren</caption> was shown.
   - type: input
     target:
       - page: Try-out
-        runtimeRef: bbv
+        runtimeRef: bgm
+      - field: City
+    value: Ams
+    isFilterAsYouType: true
+    description: Input <value>Ams</value> into <caption>Plaats</caption>
+  - type: close-page
+    target:
+      - page: lookup:City
+        runtimeRef: bzv
+    description: Close page <caption>Selecteren</caption>
+  - type: page-closed
+    source:
+      page: lookup:City
+    runtimeId: bzv
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: input
+    target:
+      - page: Try-out
+        runtimeRef: bgm
+      - field: City
+    value: Amst
+    isFilterAsYouType: true
+    description: Input <value>Amst</value> into <caption>Plaats</caption>
+  - type: close-page
+    target:
+      - page: lookup:City
+        runtimeRef: b10l
+    description: Close page <caption>Selecteren</caption>
+  - type: input
+    target:
+      - page: Try-out
+        runtimeRef: bgm
       - field: City
     value: Amsterdam
     isFilterAsYouType: true
@@ -366,38 +332,254 @@ steps:
   - type: close-page
     target:
       - page: lookup:City
-        runtimeRef: bwl
+        runtimeRef: b10m
     description: Close page <caption>Selecteren</caption>
-  - type: page-closed
-    source:
-      page: lookup:City
-    runtimeId: bwl
-    description: Page <caption>Selecteren</caption> was closed.
   - type: input
     target:
       - page: Try-out
-        runtimeRef: bbv
+        runtimeRef: bgm
       - field: City
     value: Amsterdam
     description: Input <value>Amsterdam</value> into <caption>Plaats</caption>
   - type: input
     target:
       - page: Try-out
-        runtimeRef: bbv
-      - field: Country/Region Code
-    value: ""
-    isFilterAsYouType: true
-    description: Input <value></value> into <caption>Land-/regiocode</caption>
+        runtimeRef: bgm
+      - field: Expected Starting Date
+    value: 4-5-2026
+    description: Input <value>4-5-2026</value> into <caption>Verwachte begindatum</caption>
+  - type: input
+    target:
+      - page: Try-out
+        runtimeRef: bgm
+      - field: Expected End Date
+    value: 4-1-2027
+    description: Input <value>4-1-2027</value> into <caption>Verwachte einddatum</caption>
+  - type: input
+    target:
+      - page: Try-out
+        runtimeRef: bgm
+      - field: Order Amount (FCY)
+    value: "200000"
+    description: Input <value>200000</value> into <caption>(Verwacht) orderbedrag</caption>
+  - type: input
+    target:
+      - page: Try-out
+        runtimeRef: bgm
+      - field: Cost Estimate
+    value: "150000"
+    description: Input <value>150000</value> into <caption>Raming kosten</caption>
+  - type: input
+    target:
+      - page: Try-out
+        runtimeRef: bgm
+      - field: Scoring Percentage
+    value: "65"
+    description: Input <value>65</value> into <caption>Scoringskans</caption>
+  - type: invoke
+    target:
+      - page: Try-out
+        runtimeRef: bgm
+      - action: "&Features"
+    parameters: {}
+    description: Invoke <caption>Kenmerken</caption>
   - type: page-shown
     source:
-      page: lookup:Country/Region Code
+      page: Contact Feature Type
     modal: false
-    runtimeId: bxb
-    description: Page <caption>Selecteren</caption> was shown.
+    runtimeId: b1aa
+    description: Page <caption>Relatiekenmerksoort</caption> was shown.
+  - type: invoke
+    target:
+      - page: Contact Feature Type
+        runtimeRef: b1aa
+      - repeater: Control1
+      - field: Feature
+    invokeType: Lookup
+    description: Invoke Lookup on <caption>Kenmerk</caption>
+  - type: page-shown
+    source:
+      page: Contact Feature List
+    modal: true
+    runtimeId: b1eg
+    description: Page <caption>Relatiekenmerkoverzicht</caption> was shown.
+  - type: set-current-row
+    target:
+      - page: Contact Feature List
+        runtimeRef: b1eg
+      - repeater: Control1
+    targetRecord:
+      relative: 3
+    description: Set current row in <caption>Control1</caption>
+  - type: invoke
+    target:
+      - page: Contact Feature List
+        runtimeRef: b1eg
+      - repeater: Control1
+    parameters:
+      AlwaysCommit: false
+    description: Invoke row on <caption>Control1</caption>
+  - type: page-closed
+    source:
+      page: Contact Feature List
+    runtimeId: b1eg
+    description: Page <caption>Relatiekenmerkoverzicht</caption> was closed.
+  - type: invoke
+    target:
+      - page: Contact Feature Type
+        runtimeRef: b1aa
+      - repeater: Control1
+      - field: Feature
+    invokeType: Lookup
+    description: Invoke Lookup on <caption>Kenmerk</caption>
+  - type: page-shown
+    source:
+      page: Contact Feature List
+    modal: true
+    runtimeId: b1gg
+    description: Page <caption>Relatiekenmerkoverzicht</caption> was shown.
+  - type: set-current-row
+    target:
+      - page: Contact Feature List
+        runtimeRef: b1gg
+      - repeater: Control1
+    targetRecord:
+      relative: 3
+    description: Set current row in <caption>Control1</caption>
+  - type: invoke
+    target:
+      - page: Contact Feature List
+        runtimeRef: b1gg
+      - repeater: Control1
+    parameters:
+      AlwaysCommit: false
+    description: Invoke row on <caption>Control1</caption>
+  - type: page-closed
+    source:
+      page: Contact Feature List
+    runtimeId: b1gg
+    description: Page <caption>Relatiekenmerkoverzicht</caption> was closed.
+  - type: invoke
+    target:
+      - page: Contact Feature Type
+        runtimeRef: b1aa
+      - repeater: Control1
+      - field: Feature
+    invokeType: Lookup
+    description: Invoke Lookup on <caption>Kenmerk</caption>
+  - type: page-shown
+    source:
+      page: Contact Feature List
+    modal: true
+    runtimeId: b1ig
+    description: Page <caption>Relatiekenmerkoverzicht</caption> was shown.
+  - type: set-current-row
+    target:
+      - page: Contact Feature List
+        runtimeRef: b1ig
+      - repeater: Control1
+    targetRecord:
+      relative: 1
+    description: Set current row in <caption>Control1</caption>
+  - type: invoke
+    target:
+      - page: Contact Feature List
+        runtimeRef: b1ig
+      - repeater: Control1
+    parameters:
+      AlwaysCommit: false
+    description: Invoke row on <caption>Control1</caption>
+  - type: page-closed
+    source:
+      page: Contact Feature List
+    runtimeId: b1ig
+    description: Page <caption>Relatiekenmerkoverzicht</caption> was closed.
+  - type: close-page
+    target:
+      - page: Contact Feature Type
+        runtimeRef: b1aa
+    description: Close page <caption>Relatiekenmerksoort</caption>
+  - type: page-shown
+    source:
+      page: null
+      automationId: 8da61efd-0002-0003-0507-0b0d1113171d
+      caption: Bevestigen
+    modal: true
+    runtimeId: b1jh
+    description: Page <caption>Bevestigen</caption> was shown.
+  - type: invoke
+    target:
+      - page: null
+        automationId: 8da61efd-0002-0003-0507-0b0d1113171d
+        caption: Bevestigen
+        runtimeRef: b1jh
+    invokeType: Yes
+    description: Invoke Yes on <caption>Bevestigen</caption>
+  - type: page-closed
+    source:
+      page: null
+    runtimeId: b1jh
+    description: Page <caption>Bevestigen</caption> was closed.
+  - type: page-closed
+    source:
+      page: Contact Feature Type
+    runtimeId: b1aa
+    description: Page <caption>Relatiekenmerksoort</caption> was closed.
+  - type: invoke
+    target:
+      - page: Try-out
+        runtimeRef: bgm
+      - action: Co&mments
+    description: Invoke <caption>Opmerkingen</caption>
+  - type: page-shown
+    source:
+      page: Comment Sheet
+    modal: false
+    runtimeId: b1lu
+    description: Page <caption>Opmerkingen</caption> was shown.
+  - type: focus
+    target:
+      - page: Comment Sheet
+        runtimeRef: b1lu
+      - repeater: Control1
+      - field: Date
+    description: Focus <caption>Datum</caption>
+  - type: focus
+    target:
+      - page: Comment Sheet
+        runtimeRef: b1lu
+      - repeater: Control1
+      - field: Comment
+    description: Focus <caption>Opmerking</caption>
+  - type: input
+    target:
+      - page: Comment Sheet
+        runtimeRef: b1lu
+      - repeater: Control1
+      - field: Comment
+    value: Test opmerking
+    description: Input <value>Test opmerking</value> into <caption>Opmerking</caption>
+  - type: close-page
+    target:
+      - page: Comment Sheet
+        runtimeRef: b1lu
+    description: Close page <caption>Opmerkingen</caption>
+  - type: page-closed
+    source:
+      page: Comment Sheet
+    runtimeId: b1lu
+    description: Page <caption>Opmerkingen</caption> was closed.
+  - type: invoke
+    target:
+      - page: Try-out
+        runtimeRef: bgm
+      - field: Country/Region Code
+    invokeType: Lookup
+    description: Invoke Lookup on <caption>Land-/regiocode</caption>
   - type: set-current-row
     target:
       - page: lookup:Country/Region Code
-        runtimeRef: bxb
+        runtimeRef: b1nz
       - repeater: repeater
     targetRecord:
       relative: 4
@@ -405,7 +587,7 @@ steps:
   - type: invoke
     target:
       - page: lookup:Country/Region Code
-        runtimeRef: bxb
+        runtimeRef: b1nz
       - repeater: repeater
     parameters:
       AlwaysCommit: true
@@ -413,183 +595,12 @@ steps:
   - type: page-closed
     source:
       page: lookup:Country/Region Code
-    runtimeId: bxb
+    runtimeId: b1nz
     description: Page <caption>Selecteren</caption> was closed.
-  - type: input
-    target:
-      - page: Try-out
-        runtimeRef: bbv
-      - field: Expected Starting Date
-    value: 7-9-2026
-    description: Input <value>7-9-2026</value> into <caption>Verwachte begindatum</caption>
-  - type: input
-    target:
-      - page: Try-out
-        runtimeRef: bbv
-      - field: Expected End Date
-    value: 14-12-2026
-    description: Input <value>14-12-2026</value> into <caption>Verwachte einddatum</caption>
-  - type: input
-    target:
-      - page: Try-out
-        runtimeRef: bbv
-      - field: Order Amount (FCY)
-    value: "175000"
-    description: Input <value>175000</value> into <caption>(Verwacht) orderbedrag</caption>
-  - type: input
-    target:
-      - page: Try-out
-        runtimeRef: bbv
-      - field: Cost Estimate
-    value: "130000"
-    description: Input <value>130000</value> into <caption>Raming kosten</caption>
-  - type: input
-    target:
-      - page: Try-out
-        runtimeRef: bbv
-      - field: Scoring Percentage
-    value: "65"
-    description: Input <value>65</value> into <caption>Scoringskans</caption>
-  - type: close-page
-    target:
-      - page: lookup:Country/Region Code
-        runtimeRef: bxb
-    description: Close page <caption>Selecteren</caption>
   - type: invoke
     target:
       - page: Try-out
-        runtimeRef: bbv
-      - action: "&Features"
-    parameters: {}
-    description: Invoke <caption>Kenmerken</caption>
-  - type: page-shown
-    source:
-      page: Contact Feature Type
-    modal: false
-    runtimeId: b15g
-    description: Page <caption>Relatiekenmerksoort</caption> was shown.
-  - type: set-current-row
-    target:
-      - page: Contact Feature Type
-        runtimeRef: b15g
-      - repeater: Control1
-    targetRecord:
-      relative: 1
-    description: Set current row in <caption>Control1</caption>
-  - type: invoke
-    target:
-      - page: Contact Feature Type
-        runtimeRef: b15g
-      - repeater: Control1
-      - field: Feature
-    invokeType: Lookup
-    description: Invoke Lookup on <caption>Kenmerk</caption>
-  - type: page-shown
-    source:
-      page: Contact Feature List
-    modal: true
-    runtimeId: b18m
-    description: Page <caption>Relatiekenmerkoverzicht</caption> was shown.
-  - type: set-current-row
-    target:
-      - page: Contact Feature List
-        runtimeRef: b18m
-      - repeater: Control1
-    targetRecord:
-      relative: 5
-    description: Set current row in <caption>Control1</caption>
-  - type: invoke
-    target:
-      - page: Contact Feature List
-        runtimeRef: b18m
-      - repeater: Control1
-    parameters:
-      AlwaysCommit: false
-    description: Invoke row on <caption>Control1</caption>
-  - type: page-closed
-    source:
-      page: Contact Feature List
-    runtimeId: b18m
-    description: Page <caption>Relatiekenmerkoverzicht</caption> was closed.
-  - type: close-page
-    target:
-      - page: Contact Feature Type
-        runtimeRef: b15g
-    description: Close page <caption>Relatiekenmerksoort</caption>
-  - type: page-shown
-    source:
-      page: null
-      automationId: 8da61efd-0002-0003-0507-0b0d1113171d
-      caption: Bevestigen
-    modal: true
-    runtimeId: b19n
-    description: Page <caption>Bevestigen</caption> was shown.
-  - type: invoke
-    target:
-      - page: null
-        automationId: 8da61efd-0002-0003-0507-0b0d1113171d
-        caption: Bevestigen
-        runtimeRef: b19n
-    invokeType: Yes
-    description: Invoke Yes on <caption>Bevestigen</caption>
-  - type: page-closed
-    source:
-      page: null
-    runtimeId: b19n
-    description: Page <caption>Bevestigen</caption> was closed.
-  - type: page-closed
-    source:
-      page: Contact Feature Type
-    runtimeId: b15g
-    description: Page <caption>Relatiekenmerksoort</caption> was closed.
-  - type: invoke
-    target:
-      - page: Try-out
-        runtimeRef: bbv
-      - action: Co&mments
-    description: Invoke <caption>Opmerkingen</caption>
-  - type: page-shown
-    source:
-      page: Comment Sheet
-    modal: false
-    runtimeId: b19v
-    description: Page <caption>Opmerkingen</caption> was shown.
-  - type: focus
-    target:
-      - page: Comment Sheet
-        runtimeRef: b19v
-      - repeater: Control1
-      - field: Date
-    description: Focus <caption>Datum</caption>
-  - type: focus
-    target:
-      - page: Comment Sheet
-        runtimeRef: b19v
-      - repeater: Control1
-      - field: Comment
-    description: Focus <caption>Opmerking</caption>
-  - type: input
-    target:
-      - page: Comment Sheet
-        runtimeRef: b19v
-      - repeater: Control1
-      - field: Comment
-    value: Test opmerking
-    description: Input <value>Test opmerking</value> into <caption>Opmerking</caption>
-  - type: close-page
-    target:
-      - page: Comment Sheet
-        runtimeRef: b19v
-    description: Close page <caption>Opmerkingen</caption>
-  - type: page-closed
-    source:
-      page: Comment Sheet
-    runtimeId: b19v
-    description: Page <caption>Opmerkingen</caption> was closed.
-  - type: invoke
-    target:
-      - page: Try-out
-        runtimeRef: bbv
+        runtimeRef: bgm
       - action: Try-out Quotes
     parameters: {}
     description: Invoke <caption>Trajectoffertes</caption>
@@ -597,12 +608,12 @@ steps:
     source:
       page: Try-out Quote List
     modal: false
-    runtimeId: b1c0
+    runtimeId: b1oh
     description: Page <caption>Trajectoffertes</caption> was shown.
   - type: invoke
     target:
       - page: Try-out Quote List
-        runtimeRef: b1c0
+        runtimeRef: b1oh
       - action: Control_New
     invokeType: New
     description: Invoke New on <caption>Nieuw</caption>
@@ -610,50 +621,31 @@ steps:
     source:
       page: Try-out Quote
     modal: false
-    runtimeId: b1i5
+    runtimeId: b1um
     description: Page <caption>Nieuw - Trajectofferte</caption> was shown.
   - type: focus
     target:
       - page: Try-out Quote
-        runtimeRef: b1i5
+        runtimeRef: b1um
       - field: Code
     description: Focus <caption>Code</caption>
   - type: focus
     target:
       - page: Try-out Quote
-        runtimeRef: b1i5
+        runtimeRef: b1um
       - field: Description
     description: Focus <caption>Omschrijving</caption>
   - type: input
     target:
       - page: Try-out Quote
-        runtimeRef: b1i5
+        runtimeRef: b1um
       - field: Description
     value: Fietsbrug AT
     description: Input <value>Fietsbrug AT</value> into <caption>Omschrijving</caption>
-  - type: focus
-    target:
-      - page: Try-out Quote
-        runtimeRef: b1i5
-      - field: Description 2
-    description: Focus <caption>Omschrijving 2</caption>
-  - type: input
-    target:
-      - page: Try-out Quote
-        runtimeRef: b1i5
-      - field: Description 2
-    value: 1e offerte
-    description: Input <value>1e offerte</value> into <caption>Omschrijving 2</caption>
-  - type: focus
-    target:
-      - page: Try-out Quote
-        runtimeRef: b1i5
-      - field: Contact No.
-    description: Focus <caption>Relatienr.</caption>
   - type: invoke
     target:
       - page: Try-out Quote
-        runtimeRef: b1i5
+        runtimeRef: b1um
       - field: Contact No.
     invokeType: Lookup
     description: Invoke Lookup on <caption>Relatienr.</caption>
@@ -661,12 +653,12 @@ steps:
     source:
       page: Contact List
     modal: true
-    runtimeId: b1qw
+    runtimeId: b2be
     description: Page <caption>Contacten</caption> was shown.
   - type: invoke
     target:
       - page: Contact List
-        runtimeRef: b1qw
+        runtimeRef: b2be
       - repeater: Control1
     parameters:
       AlwaysCommit: false
@@ -674,12 +666,12 @@ steps:
   - type: page-closed
     source:
       page: Contact List
-    runtimeId: b1qw
+    runtimeId: b2be
     description: Page <caption>Contacten</caption> was closed.
   - type: invoke
     target:
       - page: Try-out Quote
-        runtimeRef: b1i5
+        runtimeRef: b1um
       - field: Contact Person No.
     invokeType: Lookup
     description: Invoke Lookup on <caption>Contactpersoonnr.</caption>
@@ -687,12 +679,12 @@ steps:
     source:
       page: lookup:Contact Person No.
     modal: false
-    runtimeId: b20i
+    runtimeId: b2l0
     description: Page <caption>Selecteren</caption> was shown.
   - type: invoke
     target:
       - page: lookup:Contact Person No.
-        runtimeRef: b20i
+        runtimeRef: b2l0
       - repeater: repeater
     parameters:
       AlwaysCommit: true
@@ -700,125 +692,238 @@ steps:
   - type: page-closed
     source:
       page: lookup:Contact Person No.
-    runtimeId: b20i
+    runtimeId: b2l0
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: invoke
+    target:
+      - page: Try-out Quote
+        runtimeRef: b1um
+      - field: Global Dimension 1 Code
+    invokeType: Lookup
+    description: Invoke Lookup on <caption>Kostenplaats</caption>
+  - type: page-shown
+    source:
+      page: lookup:Global Dimension 1 Code
+    modal: false
+    runtimeId: b2mx
+    description: Page <caption>Selecteren</caption> was shown.
+  - type: invoke
+    target:
+      - page: lookup:Global Dimension 1 Code
+        runtimeRef: b2mx
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:Global Dimension 1 Code
+    runtimeId: b2mx
     description: Page <caption>Selecteren</caption> was closed.
   - type: input
     target:
       - page: Try-out Quote
-        runtimeRef: b1i5
-      - field: Your reference
-    value: 2237AM
-    description: Input <value>2237AM</value> into <caption>Uw referentie</caption>
+        runtimeRef: b1um
+      - field: Apply Date
+    value: 22-4-2026
+    description: Input <value>22-4-2026</value> into <caption>Aanvraagdatum</caption>
+  - type: close-page
+    target:
+      - page: lookup:Discipline
+        runtimeRef: b2m0
+    description: Close page <caption>Selecteren</caption>
   - type: input
     target:
       - page: Try-out Quote
-        runtimeRef: b23n
+        runtimeRef: b1um
       - field: Offered Amount (FCY)
-    value: "175000"
-    description: Input <value>175000</value> into <caption>Aanbiedingsbedrag</caption>
+    value: "200000"
+    description: Input <value>200000</value> into <caption>Aanbiedingsbedrag</caption>
   - type: focus
     target:
       - page: Try-out Quote
-        runtimeRef: b23n
+        runtimeRef: b1um
       - field: Cost Price
     description: Focus <caption>Kostprijs</caption>
   - type: input
     target:
       - page: Try-out Quote
-        runtimeRef: b23n
+        runtimeRef: b1um
       - field: Cost Price
-    value: "140000"
-    description: Input <value>140000</value> into <caption>Kostprijs</caption>
+    value: "150000"
+    description: Input <value>150000</value> into <caption>Kostprijs</caption>
   - type: input
     target:
       - page: Try-out Quote
-        runtimeRef: b23n
+        runtimeRef: b1um
       - field: Scoring Percentage
     value: "65"
     description: Input <value>65</value> into <caption>Scoringskans</caption>
   - type: input
     target:
       - page: Try-out Quote
-        runtimeRef: b23n
+        runtimeRef: b1um
       - field: Order Date
-    value: 7-9-2026
-    description: Input <value>7-9-2026</value> into <caption>Opdracht d.d.</caption>
+    value: 4-5-2026
+    description: Input <value>4-5-2026</value> into <caption>Opdracht d.d.</caption>
   - type: input
     target:
       - page: Try-out Quote
-        runtimeRef: b23n
-      - field: Control1100485003
-    value: Test offerte tekst
-    description: Input <value>Test offerte tekst</value> into <caption>Offerte
-      tekst</caption>
+        runtimeRef: b1um
+      - field: Expected Order Date
+    value: 27-4-2026
+    description: Input <value>27-4-2026</value> into <caption>Verwachte orderdatum</caption>
   - type: invoke
     target:
       - page: Try-out Quote
-        runtimeRef: b23n
-      - action: Co&mments
-    description: Invoke <caption>Opmerkingen</caption>
-  - type: page-shown
-    source:
-      page: Comment Sheet
-    modal: false
-    runtimeId: b2dm
-    description: Page <caption>Opmerkingen</caption> was shown.
-  - type: focus
+        runtimeRef: b1um
+      - field: Territory Code
+    invokeType: Lookup
+    description: Invoke Lookup on <caption>Regio</caption>
+  - type: invoke
     target:
-      - page: Comment Sheet
-        runtimeRef: b2dm
-      - repeater: Control1
-      - field: Date
-    description: Focus <caption>Datum</caption>
-  - type: focus
-    target:
-      - page: Comment Sheet
-        runtimeRef: b2dm
-      - repeater: Control1
-      - field: Comment
-    description: Focus <caption>Opmerking</caption>
-  - type: input
-    target:
-      - page: Comment Sheet
-        runtimeRef: b2dm
-      - repeater: Control1
-      - field: Comment
-    value: Test opmerking
-    description: Input <value>Test opmerking</value> into <caption>Opmerking</caption>
-  - type: close-page
-    target:
-      - page: Comment Sheet
-        runtimeRef: b2dm
-    description: Close page <caption>Opmerkingen</caption>
+      - page: lookup:Territory Code
+        runtimeRef: b2nz
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
   - type: page-closed
     source:
-      page: Comment Sheet
-    runtimeId: b2dm
-    description: Page <caption>Opmerkingen</caption> was closed.
+      page: lookup:Territory Code
+    runtimeId: b2nz
+    description: Page <caption>Selecteren</caption> was closed.
   - type: invoke
     target:
       - page: Try-out Quote
-        runtimeRef: b23n
+        runtimeRef: b1um
+      - field: Country/Region Code
+    invokeType: Lookup
+    description: Invoke Lookup on <caption>Land-/regiocode</caption>
+  - type: page-shown
+    source:
+      page: lookup:Country/Region Code
+    modal: false
+    runtimeId: b2oh
+    description: Page <caption>Selecteren</caption> was shown.
+  - type: set-current-row
+    target:
+      - page: lookup:Country/Region Code
+        runtimeRef: b2oh
+      - repeater: repeater
+    targetRecord:
+      relative: 4
+    description: Set current row in <caption>repeater</caption>
+  - type: invoke
+    target:
+      - page: lookup:Country/Region Code
+        runtimeRef: b2oh
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:Country/Region Code
+    runtimeId: b2oh
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: input
+    target:
+      - page: Try-out Quote
+        runtimeRef: b1um
+      - field: Control1100485003
+    value: >-
+      Geachte Rijk Waters, 
+
+
+      Hierbij de offerte voor de fietsbrug in het kader van het nieuwe
+      fietsplan. 
+
+
+      Hartelijke groet, 
+
+
+      4PS.
+    description: >-
+      Input <value>Geachte Rijk Waters, 
+
+
+      Hierbij de offerte voor de fietsbrug in het kader van het nieuwe
+      fietsplan. 
+
+
+      Hartelijke groet, 
+
+
+      4PS.</value> into <caption>Offerte tekst</caption>
+  - type: close-page
+    target:
+      - page: lookup:Territory Code
+        runtimeRef: b2nz
+    description: Close page <caption>Selecteren</caption>
+  - type: close-page
+    target:
+      - page: lookup:Country/Region Code
+        runtimeRef: b2oh
+    description: Close page <caption>Selecteren</caption>
+  - type: invoke
+    target:
+      - page: Try-out Quote
+        runtimeRef: b1um
+      - field: Bill-to Customer No.
+    invokeType: Lookup
+    description: Invoke Lookup on <caption>Factureren aan</caption>
+  - type: page-shown
+    source:
+      page: lookup:Bill-to Customer No.
+    modal: false
+    runtimeId: b2q2
+    description: Page <caption>Selecteren</caption> was shown.
+  - type: set-current-row
+    target:
+      - page: lookup:Bill-to Customer No.
+        runtimeRef: b2q2
+      - repeater: repeater
+    targetRecord:
+      relative: 4
+    description: Set current row in <caption>repeater</caption>
+  - type: invoke
+    target:
+      - page: lookup:Bill-to Customer No.
+        runtimeRef: b2q2
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:Bill-to Customer No.
+    runtimeId: b2q2
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: invoke
+    target:
+      - page: Try-out Quote
+        runtimeRef: b1um
       - action: "&Features"
     description: Invoke <caption>Kenmerken</caption>
   - type: page-shown
     source:
       page: Contact Feature Type
     modal: false
-    runtimeId: b2fr
+    runtimeId: b2vk
     description: Page <caption>Relatiekenmerksoort</caption> was shown.
   - type: set-current-row
     target:
       - page: Contact Feature Type
-        runtimeRef: b2fr
+        runtimeRef: b2vk
       - repeater: Control1
     targetRecord:
-      relative: 5
+      relative: 11
     description: Set current row in <caption>Control1</caption>
   - type: invoke
     target:
       - page: Contact Feature Type
-        runtimeRef: b2fr
+        runtimeRef: b2vk
       - repeater: Control1
       - field: Feature
     invokeType: Lookup
@@ -827,20 +932,20 @@ steps:
     source:
       page: Contact Feature List
     modal: true
-    runtimeId: b2ix
+    runtimeId: b2yq
     description: Page <caption>Relatiekenmerkoverzicht</caption> was shown.
   - type: set-current-row
     target:
       - page: Contact Feature List
-        runtimeRef: b2ix
+        runtimeRef: b2yq
       - repeater: Control1
     targetRecord:
-      relative: 3
+      relative: 7
     description: Set current row in <caption>Control1</caption>
   - type: invoke
     target:
       - page: Contact Feature List
-        runtimeRef: b2ix
+        runtimeRef: b2yq
       - repeater: Control1
     parameters:
       AlwaysCommit: false
@@ -848,12 +953,12 @@ steps:
   - type: page-closed
     source:
       page: Contact Feature List
-    runtimeId: b2ix
+    runtimeId: b2yq
     description: Page <caption>Relatiekenmerkoverzicht</caption> was closed.
   - type: invoke
     target:
       - page: Contact Feature Type
-        runtimeRef: b2fr
+        runtimeRef: b2vk
       - repeater: Control1
       - field: Feature
     invokeType: Lookup
@@ -862,20 +967,20 @@ steps:
     source:
       page: Contact Feature List
     modal: true
-    runtimeId: b2lx
+    runtimeId: b30q
     description: Page <caption>Relatiekenmerkoverzicht</caption> was shown.
   - type: set-current-row
     target:
       - page: Contact Feature List
-        runtimeRef: b2lx
+        runtimeRef: b30q
       - repeater: Control1
     targetRecord:
-      relative: 1
+      relative: 4
     description: Set current row in <caption>Control1</caption>
   - type: invoke
     target:
       - page: Contact Feature List
-        runtimeRef: b2lx
+        runtimeRef: b30q
       - repeater: Control1
     parameters:
       AlwaysCommit: false
@@ -883,12 +988,12 @@ steps:
   - type: page-closed
     source:
       page: Contact Feature List
-    runtimeId: b2lx
+    runtimeId: b30q
     description: Page <caption>Relatiekenmerkoverzicht</caption> was closed.
   - type: invoke
     target:
       - page: Contact Feature Type
-        runtimeRef: b2fr
+        runtimeRef: b2vk
       - repeater: Control1
       - field: Feature
     invokeType: Lookup
@@ -897,12 +1002,12 @@ steps:
     source:
       page: Contact Feature List
     modal: true
-    runtimeId: b2nx
+    runtimeId: b32q
     description: Page <caption>Relatiekenmerkoverzicht</caption> was shown.
   - type: invoke
     target:
       - page: Contact Feature List
-        runtimeRef: b2nx
+        runtimeRef: b32q
       - repeater: Control1
     parameters:
       AlwaysCommit: false
@@ -910,43 +1015,22 @@ steps:
   - type: page-closed
     source:
       page: Contact Feature List
-    runtimeId: b2nx
+    runtimeId: b32q
     description: Page <caption>Relatiekenmerkoverzicht</caption> was closed.
   - type: close-page
     target:
       - page: Contact Feature Type
-        runtimeRef: b2p6
+        runtimeRef: b2vk
     description: Close page <caption>Relatiekenmerksoort</caption>
-  - type: page-shown
-    source:
-      page: null
-      automationId: 8da61efd-0002-0003-0507-0b0d1113171d
-      caption: Bevestigen
-    modal: true
-    runtimeId: b2sd
-    description: Page <caption>Bevestigen</caption> was shown.
-  - type: invoke
-    target:
-      - page: null
-        automationId: 8da61efd-0002-0003-0507-0b0d1113171d
-        caption: Bevestigen
-        runtimeRef: b2sd
-    invokeType: Yes
-    description: Invoke Yes on <caption>Bevestigen</caption>
-  - type: page-closed
-    source:
-      page: null
-    runtimeId: b2sd
-    description: Page <caption>Bevestigen</caption> was closed.
   - type: page-closed
     source:
       page: Contact Feature Type
-    runtimeId: b2p6
+    runtimeId: b2vk
     description: Page <caption>Relatiekenmerksoort</caption> was closed.
   - type: invoke
     target:
       - page: Try-out Quote
-        runtimeRef: b23n
+        runtimeRef: b3ir
       - field: Status
     invokeType: Lookup
     description: Invoke Lookup on <caption>Status</caption>
@@ -954,12 +1038,12 @@ steps:
     source:
       page: lookup:Status
     modal: false
-    runtimeId: b2sl
+    runtimeId: b3qo
     description: Page <caption>Selecteren</caption> was shown.
   - type: set-current-row
     target:
       - page: lookup:Status
-        runtimeRef: b2sl
+        runtimeRef: b3qo
       - repeater: repeater
     targetRecord:
       relative: 3
@@ -967,7 +1051,7 @@ steps:
   - type: invoke
     target:
       - page: lookup:Status
-        runtimeRef: b2sl
+        runtimeRef: b3qo
       - repeater: repeater
     parameters:
       AlwaysCommit: true
@@ -975,66 +1059,32 @@ steps:
   - type: page-closed
     source:
       page: lookup:Status
-    runtimeId: b2sl
-    description: Page <caption>Selecteren</caption> was closed.
-  - type: invoke
-    target:
-      - page: Try-out Quote
-        runtimeRef: b23n
-      - field: Status
-    invokeType: Lookup
-    description: Invoke Lookup on <caption>Status</caption>
-  - type: page-shown
-    source:
-      page: lookup:Status
-    modal: false
-    runtimeId: b2t7
-    description: Page <caption>Selecteren</caption> was shown.
-  - type: set-current-row
-    target:
-      - page: lookup:Status
-        runtimeRef: b2t7
-      - repeater: repeater
-    targetRecord:
-      relative: 2
-    description: Set current row in <caption>repeater</caption>
-  - type: invoke
-    target:
-      - page: lookup:Status
-        runtimeRef: b2t7
-      - repeater: repeater
-    parameters:
-      AlwaysCommit: true
-    description: Invoke row on <caption>repeater</caption>
-  - type: page-closed
-    source:
-      page: lookup:Status
-    runtimeId: b2t7
+    runtimeId: b3qo
     description: Page <caption>Selecteren</caption> was closed.
   - type: close-page
     target:
       - page: Try-out Quote
-        runtimeRef: b23n
+        runtimeRef: b3ir
     description: Close page <caption>Trajectofferte</caption>
   - type: page-closed
     source:
       page: Try-out Quote
-    runtimeId: b23n
+    runtimeId: b3ir
     description: Page <caption>Trajectofferte</caption> was closed.
   - type: close-page
     target:
       - page: Try-out Quote List
-        runtimeRef: b1c0
+        runtimeRef: b35i
     description: Close page <caption>Trajectoffertes</caption>
   - type: page-closed
     source:
       page: Try-out Quote List
-    runtimeId: b1c0
+    runtimeId: b35i
     description: Page <caption>Trajectoffertes</caption> was closed.
   - type: invoke
     target:
       - page: Try-out
-        runtimeRef: bbv
+        runtimeRef: bgm
       - field: Status
     invokeType: Lookup
     description: Invoke Lookup on <caption>Status</caption>
@@ -1042,20 +1092,28 @@ steps:
     source:
       page: lookup:Status
     modal: false
-    runtimeId: b2tx
+    runtimeId: b3re
     description: Page <caption>Selecteren</caption> was shown.
   - type: set-current-row
     target:
       - page: lookup:Status
-        runtimeRef: b2tx
+        runtimeRef: b3re
       - repeater: repeater
     targetRecord:
-      relative: 5
+      relative: 1
+    description: Set current row in <caption>repeater</caption>
+  - type: set-current-row
+    target:
+      - page: lookup:Status
+        runtimeRef: b3re
+      - repeater: repeater
+    targetRecord:
+      relative: 1
     description: Set current row in <caption>repeater</caption>
   - type: invoke
     target:
       - page: lookup:Status
-        runtimeRef: b2tx
+        runtimeRef: b3re
       - repeater: repeater
     parameters:
       AlwaysCommit: true
@@ -1063,12 +1121,12 @@ steps:
   - type: page-closed
     source:
       page: lookup:Status
-    runtimeId: b2tx
+    runtimeId: b3re
     description: Page <caption>Selecteren</caption> was closed.
   - type: invoke
     target:
       - page: Try-out
-        runtimeRef: bbv
+        runtimeRef: bgm
       - action: Try-out Quotes
     parameters: {}
     description: Invoke <caption>Trajectoffertes</caption>
@@ -1076,12 +1134,12 @@ steps:
     source:
       page: Try-out Quote List
     modal: false
-    runtimeId: b2uj
+    runtimeId: b3s0
     description: Page <caption>Trajectoffertes</caption> was shown.
   - type: invoke
     target:
       - page: Try-out Quote List
-        runtimeRef: b2uj
+        runtimeRef: b3s0
       - repeater: Control1
     invokeType: Edit
     parameters:
@@ -1091,12 +1149,127 @@ steps:
     source:
       page: Try-out Quote
     modal: false
-    runtimeId: b30o
+    runtimeId: b3y5
     description: Page <caption>Trajectofferte</caption> was shown.
   - type: invoke
     target:
       - page: Try-out Quote
-        runtimeRef: b30o
+        runtimeRef: b3y5
+      - field: Status
+    invokeType: Lookup
+    description: Invoke Lookup on <caption>Status</caption>
+  - type: page-shown
+    source:
+      page: lookup:Status
+    modal: false
+    runtimeId: b45g
+    description: Page <caption>Selecteren</caption> was shown.
+  - type: set-current-row
+    target:
+      - page: lookup:Status
+        runtimeRef: b45g
+      - repeater: repeater
+    targetRecord:
+      relative: 2
+    description: Set current row in <caption>repeater</caption>
+  - type: invoke
+    target:
+      - page: lookup:Status
+        runtimeRef: b45g
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:Status
+    runtimeId: b45g
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: invoke
+    target:
+      - page: Try-out Quote
+        runtimeRef: b3y5
+      - field: Reason Code
+    invokeType: Lookup
+    description: Invoke Lookup on <caption>Redencode</caption>
+  - type: set-current-row
+    target:
+      - page: lookup:Reason Code
+        runtimeRef: b462
+      - repeater: repeater
+    targetRecord:
+      relative: 3
+    description: Set current row in <caption>repeater</caption>
+  - type: invoke
+    target:
+      - page: lookup:Reason Code
+        runtimeRef: b462
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:Reason Code
+    runtimeId: b462
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: close-page
+    target:
+      - page: Try-out Quote
+        runtimeRef: b3y5
+    description: Close page <caption>Trajectofferte</caption>
+  - type: page-closed
+    source:
+      page: Try-out Quote
+    runtimeId: b3y5
+    description: Page <caption>Trajectofferte</caption> was closed.
+  - type: close-page
+    target:
+      - page: Try-out Quote List
+        runtimeRef: b3s0
+    description: Close page <caption>Trajectoffertes</caption>
+  - type: page-closed
+    source:
+      page: Try-out Quote List
+    runtimeId: b3s0
+    description: Page <caption>Trajectoffertes</caption> was closed.
+  - type: invoke
+    target:
+      - page: Try-out
+        runtimeRef: bgm
+      - field: Status
+    invokeType: Lookup
+    description: Invoke Lookup on <caption>Status</caption>
+  - type: page-shown
+    source:
+      page: lookup:Status
+    modal: false
+    runtimeId: b46o
+    description: Page <caption>Selecteren</caption> was shown.
+  - type: invoke
+    target:
+      - page: lookup:Status
+        runtimeRef: b46o
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:Status
+    runtimeId: b46o
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: input
+    target:
+      - page: Try-out
+        runtimeRef: bgm
+      - field: Order
+    value: true
+    description: Input <value>true</value> into <caption>Opdracht</caption>
+  - type: invoke
+    target:
+      - page: Try-out
+        runtimeRef: bgm
       - action: Successors
     parameters: {}
     description: Invoke <caption>Vervolgtrajecten</caption>
@@ -1104,39 +1277,31 @@ steps:
     source:
       page: Try-out Successor
     modal: false
-    runtimeId: b37z
+    runtimeId: b4pg
     description: Page <caption>Vervolgtraject</caption> was shown.
   - type: focus
     target:
       - page: Try-out Successor
-        runtimeRef: b37z
+        runtimeRef: b4pg
       - repeater: Control1210190000
       - field: Try-out No.
     description: Focus <caption>Trajectnr.</caption>
-  - type: focus
-    target:
-      - page: Try-out Successor
-        runtimeRef: b37z
-      - field: null
-        automationId: fb8cccf3-54ac-4d77-9ad8-136cec25583a
-        caption: null
-    description: Focus <caption>null</caption>
   - type: invoke
     target:
       - page: Try-out Successor
-        runtimeRef: b37z
+        runtimeRef: b4pg
       - action: Create Project
     description: Invoke <caption>Project aanmaken...</caption>
   - type: page-shown
     source:
       page: No. Series
     modal: true
-    runtimeId: b3ck
+    runtimeId: b4u1
     description: Page <caption>Nr.-reeks</caption> was shown.
   - type: invoke
     target:
       - page: No. Series
-        runtimeRef: b3ck
+        runtimeRef: b4u1
       - repeater: Control1
     parameters:
       AlwaysCommit: false
@@ -1144,90 +1309,75 @@ steps:
   - type: page-closed
     source:
       page: No. Series
-    runtimeId: b3ck
+    runtimeId: b4u1
     description: Page <caption>Nr.-reeks</caption> was closed.
   - type: page-shown
     source:
       page: Select Try-Out Successor
     modal: true
-    runtimeId: b3g3
+    runtimeId: b4xk
     description: Page <caption>Selecteer vervolgtraject</caption> was shown.
-  - type: input
-    target:
-      - page: Select Try-Out Successor
-        runtimeRef: b3g3
-      - field: Copy Documents
-    value: true
-    description: Input <value>true</value> into <caption>Kopieer documenten</caption>
   - type: invoke
     target:
       - page: Select Try-Out Successor
-        runtimeRef: b3g3
+        runtimeRef: b4xk
     invokeType: Ok
     description: Invoke Ok on <caption>Selecteer vervolgtraject</caption>
   - type: page-closed
     source:
       page: Select Try-Out Successor
-    runtimeId: b3g3
+    runtimeId: b4xk
     description: Page <caption>Selecteer vervolgtraject</caption> was closed.
   - type: message
     automationId: 8da61efd-0002-0003-0507-0b0d1113171d
-    text: Project PR00302 is aangemaakt.
-    description: "Message: <value>Project PR00302 is aangemaakt.</value>"
+    text: Project PR00311 is aangemaakt.
+    description: "Message: <value>Project PR00311 is aangemaakt.</value>"
+  - type: copy-value
+    source:
+      - page: null
+        automationId: 8da61efd-0002-0003-0507-0b0d1113171d
+        caption: null
+        runtimeRef: b4y8
+      - field: null
+    name: null - Project PR00311 is aangemaakt.
+    valueType: string
+    description: Copy value from <caption>Project PR00311 is aangemaakt.</caption>
+  - type: copy-value
+    source:
+      - page: Try-out Successor
+        runtimeRef: b4pg
+      - repeater: Control1210190000
+      - field: Project No.
+    name: Try-out Successor - Project No.
+    valueType: string
+    description: Copy value from <caption>Projectnr.</caption>
   - type: close-page
     target:
       - page: Try-out Successor
-        runtimeRef: b37z
+        runtimeRef: b4pg
     description: Close page <caption>Vervolgtraject</caption>
   - type: page-closed
     source:
       page: Try-out Successor
-    runtimeId: b37z
+    runtimeId: b4pg
     description: Page <caption>Vervolgtraject</caption> was closed.
   - type: close-page
     target:
-      - page: Try-out Quote
-        runtimeRef: b30o
-    description: Close page <caption>Trajectofferte</caption>
-  - type: page-closed
-    source:
-      page: Try-out Quote
-    runtimeId: b30o
-    description: Page <caption>Trajectofferte</caption> was closed.
-  - type: close-page
-    target:
-      - page: Try-out Quote List
-        runtimeRef: b2uj
-    description: Close page <caption>Trajectoffertes</caption>
-  - type: page-closed
-    source:
-      page: Try-out Quote List
-    runtimeId: b2uj
-    description: Page <caption>Trajectoffertes</caption> was closed.
-  - type: input
-    target:
       - page: Try-out
-        runtimeRef: bbv
-      - field: Order
-    value: true
-    description: Input <value>true</value> into <caption>Opdracht</caption>
-  - type: close-page
-    target:
-      - page: Try-out
-        runtimeRef: bbv
+        runtimeRef: bgm
     description: Close page <caption>Traject</caption>
   - type: page-closed
     source:
       page: Try-out
-    runtimeId: bbv
+    runtimeId: bgm
     description: Page <caption>Traject</caption> was closed.
   - type: close-page
     target:
       - page: Try-out List
-        runtimeRef: b7a
-    description: Close page <caption>Trajecten</caption>
+        runtimeRef: bc2
+    description: Close page <caption>Traject</caption>
   - type: page-closed
     source:
       page: Try-out List
-    runtimeId: b7a
-    description: Page <caption>Trajecten</caption> was closed.
+    runtimeId: bc2
+    description: Page <caption>Traject</caption> was closed.
