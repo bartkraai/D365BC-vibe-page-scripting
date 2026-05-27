@@ -1,0 +1,153 @@
+name: Goedkeuring inkooporder 2
+description: Test recording
+telemetryId: 50d93fda-6b3b-40c3-8dcb-e5fe36a1121c
+start:
+  profile: PROJECTLEIDER 4PS
+steps:
+  - type: invoke
+    invokeType: OpenSettings
+    description: Invoke OpenSettings
+  - type: page-shown
+    source:
+      page: User Settings
+    modal: false
+    runtimeId: b2c8
+    description: Page <caption>Mijn instellingen</caption> was shown.
+  - type: invoke
+    target:
+      - page: User Settings
+        runtimeRef: b2c8
+    invokeType: Ok
+    description: Invoke Ok on <caption>Mijn instellingen</caption>
+  - type: page-closed
+    source:
+      page: User Settings
+    runtimeId: b2c8
+    description: Page <caption>Mijn instellingen</caption> was closed.
+  - type: invoke
+    target:
+      - page: Project Engineer Role Center
+        runtimeRef: b0
+      - part: Control1100525005
+      - page: Approval Activities 4PS
+      - action: Requests to Approve
+    description: Invoke <caption>Aanvragen ter goedkeuring</caption>
+  - type: page-shown
+    source:
+      page: Approval (Compressed)
+    modal: false
+    runtimeId: b2cv
+    description: Page <caption>Goedkeuring (verdicht)</caption> was shown.
+  - type: filter
+    target:
+      - page: Approval (Compressed)
+        runtimeRef: b2cv
+    operation: add
+    column:
+      field: Document No.
+      scope: filter
+    description: Add filter for <caption>Document No.</caption> on
+      <caption>Goedkeuring (verdicht)</caption>
+  - type: input
+    target:
+      - page: Approval (Compressed)
+        runtimeRef: b2cv
+      - scope: filter
+        field: Document No.
+    description: Input <value>Parameters.'Approval (Compressed).Document
+      No.'</value> into <caption>Documentnr.</caption>
+    value: =Parameters.'Approval (Compressed).Document No.'
+  - type: invoke
+    target:
+      - page: Approval (Compressed)
+        runtimeRef: b2cv
+      - repeater: Control1100485000
+      - field: Document No.
+    invokeType: DrillDown
+    description: Invoke DrillDown on <caption>Documentnr.</caption>
+  - type: page-shown
+    source:
+      page: Purchase Order
+    modal: false
+    runtimeId: b2it
+    description: Page <caption>Inkooporder</caption> was shown.
+  - type: close-page
+    target:
+      - page: Purchase Order
+        runtimeRef: b2it
+    description: Close page <caption>Inkooporder</caption>
+  - type: page-closed
+    source:
+      page: Purchase Order
+    runtimeId: b2it
+    description: Page <caption>Inkooporder</caption> was closed.
+  - type: invoke
+    target:
+      - page: Approval (Compressed)
+        runtimeRef: b2cv
+      - action: Approve
+    parameters: {}
+    description: Invoke <caption>Goedkeuren</caption>
+  - type: page-shown
+    source:
+      page: Email Editor
+    modal: true
+    runtimeId: b3ej
+    description: Page <caption>Test Automatisch Testen - order IO230600</caption> was shown.
+  - type: invoke
+    target:
+      - page: Email Editor
+        runtimeRef: b3ej
+    invokeType: Cancel
+    description: Invoke Cancel on <caption>Test Automatisch Testen - order
+      IO230600</caption>
+  - type: page-shown
+    source:
+      page: null
+      automationId: 8da61efd-0002-0003-0507-0b0d1113171d
+      caption: Kiezen
+    modal: true
+    runtimeId: b3gc
+    description: Page <caption>Kiezen</caption> was shown.
+  - type: input
+    target:
+      - page: null
+        automationId: 8da61efd-0002-0003-0507-0b0d1113171d
+        caption: Kiezen
+        runtimeRef: b3gc
+      - field: AL:STRMENU
+    value: 1
+    description: Input <value>1</value> into <caption>AL:STRMENU</caption>
+  - type: invoke
+    target:
+      - page: null
+        automationId: 8da61efd-0002-0003-0507-0b0d1113171d
+        caption: Kiezen
+        runtimeRef: b3gc
+    invokeType: Ok
+    description: Invoke Ok on <caption>Kiezen</caption>
+  - type: page-closed
+    source:
+      page: null
+    runtimeId: b3gc
+    description: Page <caption>Kiezen</caption> was closed.
+  - type: page-closed
+    source:
+      page: Email Editor
+    runtimeId: b3ej
+    description: Page <caption>Test Automatisch Testen - order IO230600</caption>
+      was closed.
+  - type: close-page
+    target:
+      - page: Approval (Compressed)
+        runtimeRef: b2cv
+    description: Close page <caption>Goedkeuring (verdicht)</caption>
+  - type: page-closed
+    source:
+      page: Approval (Compressed)
+    runtimeId: b2cv
+    description: Page <caption>Goedkeuring (verdicht)</caption> was closed.
+parameters:
+  Approval (Compressed).Document No.:
+    type: string
+    default: IO230600

@@ -1,5 +1,5 @@
 {
-  "Acquisiteur 4PS": {
+  "Project Controller": {
     "username": "proks@fpstest018.onmicrosoft.com",
     "password": "your-password-here",
     "description": "",
@@ -23,7 +23,7 @@
     "description": "",
     "mfa_seed": "your-totp-seed-here"
   },
-  "Project Controller": {
+  "Acquisiteur 4PS": {
     "username": "proks@fpstest018.onmicrosoft.com",
     "password": "your-password-here",
     "description": "",

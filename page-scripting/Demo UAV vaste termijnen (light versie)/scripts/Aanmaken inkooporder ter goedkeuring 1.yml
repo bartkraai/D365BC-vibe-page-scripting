@@ -1,6 +1,6 @@
-name: test Inkooporder aanmaken ter goedkeuring
+name: Aanmaken inkooporder ter goedkeuring 1
 description: Test recording
-telemetryId: 43ba5065-595b-49d0-a6e5-ff851316387d
+telemetryId: 64e38a2f-ff09-4863-8fa5-759eb2d4891d
 start:
   profile: PROJECT ENGINEER 4PS
 steps:
@@ -11,63 +11,67 @@ steps:
     source:
       page: User Settings
     modal: false
-    runtimeId: b266
+    runtimeId: b1rz
     description: Page <caption>Mijn instellingen</caption> was shown.
   - type: invoke
     target:
       - page: User Settings
-        runtimeRef: b266
+        runtimeRef: b1rz
     invokeType: Ok
     description: Invoke Ok on <caption>Mijn instellingen</caption>
   - type: page-closed
     source:
       page: User Settings
-    runtimeId: b266
+    runtimeId: b1rz
     description: Page <caption>Mijn instellingen</caption> was closed.
-  - type: invoke
+  - type: navigate
     target:
       - page: Project Engineer Role Center
-        runtimeRef: b59
-      - part: Control1904661108
-      - page: Project Engineer Activities
-      - action: My Open Projects
-    description: Invoke <caption>Mijn onderhanden projecten</caption>
+      - action: Jobs
+    description: Navigate to <caption>Projecten</caption>
   - type: page-shown
     source:
-      page: Projects by Responsible Person
+      page: Job List
     modal: false
-    runtimeId: b26t
-    description: Page <caption>Projecten per verantwoordelijke</caption> was shown.
+    runtimeId: b1sm
+    description: Page <caption>Projecten</caption> was shown.
   - type: filter
     target:
-      - page: Projects by Responsible Person
-        runtimeRef: b26t
+      - page: Job List
+        runtimeRef: b1sm
     operation: add
     column:
       field: No.
       scope: filter
-    description: Add filter for <caption>No.</caption> on <caption>Projecten per
-      verantwoordelijke</caption>
+    description: Add filter for <caption>No.</caption> on <caption>Projecten</caption>
   - type: input
     target:
-      - page: Projects by Responsible Person
-        runtimeRef: b26t
+      - page: Job List
+        runtimeRef: b1sm
       - scope: filter
         field: No.
+    value: PR
     isFilterAsYouType: true
-    description: Input <value>Parameters.'Projects by Responsible
-      Person.No.'</value> into <caption>Nr.</caption>
-    value: =Parameters.'Projects by Responsible Person.No.'
+    description: Input <value>PR</value> into <caption>Nr.</caption>
   - type: page-shown
     source:
       page: lookup:No.
     modal: false
-    runtimeId: b2d9
+    runtimeId: b26b
     description: Page <caption>Selecteren</caption> was shown.
+  - type: input
+    target:
+      - page: Job List
+        runtimeRef: b1sm
+      - scope: filter
+        field: No.
+    isFilterAsYouType: true
+    description: Input <value>Parameters.'Job List.No.'</value> into <caption>Nr.</caption>
+    value: =Parameters.'Job List.No.'
   - type: invoke
     target:
       - page: lookup:No.
-        runtimeRef: b2d9
+        runtimeRef: b26b
       - repeater: repeater
     parameters:
       AlwaysCommit: true
@@ -75,26 +79,27 @@ steps:
   - type: page-closed
     source:
       page: lookup:No.
-    runtimeId: b2d9
+    runtimeId: b26b
     description: Page <caption>Selecteren</caption> was closed.
   - type: invoke
     target:
-      - page: Projects by Responsible Person
-        runtimeRef: b26t
-      - repeater: Control1100485000
+      - page: Job List
+        runtimeRef: b1sm
+      - repeater: Control1
+    invokeType: Edit
     parameters:
       AlwaysCommit: false
-    description: Invoke row on <caption>Control1100485000</caption>
+    description: Invoke row on <caption>Control1</caption>
   - type: page-shown
     source:
       page: Job Card
     modal: false
-    runtimeId: b2e2
+    runtimeId: b274
     description: Page <caption>Project</caption> was shown.
   - type: invoke
     target:
       - page: Job Card
-        runtimeRef: b2e2
+        runtimeRef: b274
       - action: Purchase Actions
     parameters: {}
     description: Invoke <caption>Inkoopacties</caption>
@@ -102,12 +107,12 @@ steps:
     source:
       page: Project Purchase Action List
     modal: false
-    runtimeId: b2uq
+    runtimeId: b2lu
     description: Page <caption>Projectinkoopacties</caption> was shown.
   - type: invoke
     target:
       - page: Project Purchase Action List
-        runtimeRef: b2uq
+        runtimeRef: b2lu
       - action: Control_New
     invokeType: New
     description: Invoke New on <caption>Nieuw</caption>
@@ -115,50 +120,45 @@ steps:
     source:
       page: Project Purchase Action
     modal: false
-    runtimeId: b2yx
+    runtimeId: b2q1
     description: Page <caption>Projectinkoopactie</caption> was shown.
   - type: focus
     target:
       - page: Project Purchase Action
-        runtimeRef: b2yx
+        runtimeRef: b2q1
       - field: Project No.
     description: Focus <caption>Projectnr.</caption>
   - type: focus
     target:
       - page: Project Purchase Action
-        runtimeRef: b2yx
+        runtimeRef: b2q1
       - field: Code
     description: Focus <caption>Inkoopactie</caption>
   - type: input
     target:
       - page: Project Purchase Action
-        runtimeRef: b2yx
+        runtimeRef: b2q1
       - field: Code
-    value: "123"
-    description: Input <value>123</value> into <caption>Inkoopactie</caption>
+    value: "1"
+    description: Input <value>1</value> into <caption>Inkoopactie</caption>
   - type: focus
     target:
       - page: Project Purchase Action
-        runtimeRef: b2yx
+        runtimeRef: b2q1
       - field: Description
     description: Focus <caption>Omschrijving</caption>
   - type: input
     target:
       - page: Project Purchase Action
-        runtimeRef: b2yx
+        runtimeRef: b2q1
       - field: Description
-    value: Inkoopactie 2
-    description: Input <value>Inkoopactie 2</value> into <caption>Omschrijving</caption>
-  - type: focus
-    target:
-      - page: Project Purchase Action
-        runtimeRef: b2yx
-      - part: PurchaseBudget
-    description: Focus <caption>Regels</caption>
+    value: Materiaal bouwveiligheid
+    description: Input <value>Materiaal bouwveiligheid</value> into
+      <caption>Omschrijving</caption>
   - type: invoke
     target:
       - page: Project Purchase Action
-        runtimeRef: b2yx
+        runtimeRef: b2q1
       - action: AssignButton
     parameters: {}
     description: Invoke <caption>Toekennen</caption>
@@ -166,84 +166,20 @@ steps:
     source:
       page: Budget to Purchase Action
     modal: true
-    runtimeId: b37v
+    runtimeId: b2yz
     description: Page <caption>Project </caption> was shown.
-  - type: invoke
-    target:
-      - page: Budget to Purchase Action
-        runtimeRef: b37v
-      - repeater: Control1
-      - field: Cost Type
-    invokeType: FilterByColumn
-    parameters:
-      UseAdvancedFiltering: true
-    description: Invoke FilterByColumn on <caption>Kostensoort</caption>
-  - type: page-shown
-    source:
-      page: null
-      automationId: f51cf5e3-31d1-4644-8a26-043efefc68d7
-      caption: Filter toepassen
-    modal: true
-    runtimeId: b3hv
-    description: Page <caption>Filter toepassen</caption> was shown.
-  - type: input
-    target:
-      - page: null
-        automationId: f51cf5e3-31d1-4644-8a26-043efefc68d7
-        caption: Filter toepassen
-        runtimeRef: b3hv
-      - field: Cost Type
-    value: 2
-    description: Input <value>2</value> into <caption>Kostensoort</caption>
-  - type: invoke
-    target:
-      - page: null
-        automationId: f51cf5e3-31d1-4644-8a26-043efefc68d7
-        caption: Filter toepassen
-        runtimeRef: b3hv
-      - action: null
-    description: Invoke <caption>OK</caption>
-  - type: page-closed
-    source:
-      page: null
-    runtimeId: b3hv
-    description: Page <caption>Filter toepassen</caption> was closed.
   - type: set-current-row
     target:
       - page: Budget to Purchase Action
-        runtimeRef: b37v
+        runtimeRef: b2yz
       - repeater: Control1
     targetRecord:
-      relative: 1
+      relative: 10
     description: Set current row in <caption>Control1</caption>
   - type: invoke
     target:
       - page: Budget to Purchase Action
-        runtimeRef: b37v
-      - repeater: Control1
-      - field: Element
-    invokeType: Lookup
-    description: Invoke Lookup on <caption>Element</caption>
-  - type: page-shown
-    source:
-      page: peek:Element
-    modal: false
-    runtimeId: b3i1
-    description: Page <caption>Selecteren</caption> was shown.
-  - type: close-page
-    target:
-      - page: peek:Element
-        runtimeRef: b3i1
-    description: Close page <caption>Selecteren</caption>
-  - type: page-closed
-    source:
-      page: peek:Element
-    runtimeId: b3i1
-    description: Page <caption>Selecteren</caption> was closed.
-  - type: invoke
-    target:
-      - page: Budget to Purchase Action
-        runtimeRef: b37v
+        runtimeRef: b2yz
       - action: AssignButton
     parameters: {}
     description: Invoke <caption>Toekennen</caption>
@@ -253,36 +189,44 @@ steps:
       automationId: 8da61efd-0002-0003-0507-0b0d1113171d
       caption: Bevestigen
     modal: true
-    runtimeId: b3ie
+    runtimeId: b38z
     description: Page <caption>Bevestigen</caption> was shown.
   - type: invoke
     target:
       - page: null
         automationId: 8da61efd-0002-0003-0507-0b0d1113171d
         caption: Bevestigen
-        runtimeRef: b3ie
+        runtimeRef: b38z
     invokeType: Yes
     description: Invoke Yes on <caption>Bevestigen</caption>
   - type: page-closed
     source:
       page: null
-    runtimeId: b3ie
+    runtimeId: b38z
     description: Page <caption>Bevestigen</caption> was closed.
   - type: invoke
     target:
       - page: Budget to Purchase Action
-        runtimeRef: b37v
+        runtimeRef: b2yz
     invokeType: CloseOk
     description: Invoke CloseOk on <caption>Project </caption>
   - type: page-closed
     source:
       page: Budget to Purchase Action
-    runtimeId: b37v
+    runtimeId: b2yz
     description: Page <caption>Project </caption> was closed.
+  - type: input
+    target:
+      - page: Project Purchase Action
+        runtimeRef: b2q1
+      - field: Control18
+    value: Bouwveiligheidsmateriaal 6 ST
+    description: Input <value>Bouwveiligheidsmateriaal 6 ST</value> into
+      <caption>Tekst</caption>
   - type: invoke
     target:
       - page: Project Purchase Action
-        runtimeRef: b2yx
+        runtimeRef: b2q1
       - action: Vendors
     parameters: {}
     description: Invoke <caption>Leveranciers</caption>
@@ -290,26 +234,26 @@ steps:
     source:
       page: Vendors by Purchase Action
     modal: false
-    runtimeId: b3ik
+    runtimeId: b395
     description: Page <caption>Leveranciers per inkoopactie</caption> was shown.
   - type: focus
     target:
       - page: Vendors by Purchase Action
-        runtimeRef: b3ik
+        runtimeRef: b395
       - repeater: Control1210190000
       - field: Type
     description: Focus <caption>Soort</caption>
   - type: focus
     target:
       - page: Vendors by Purchase Action
-        runtimeRef: b3ik
+        runtimeRef: b395
       - repeater: Control1210190000
       - field: Vendor No.
     description: Focus <caption>Leveranciersnr.</caption>
   - type: invoke
     target:
       - page: Vendors by Purchase Action
-        runtimeRef: b3ik
+        runtimeRef: b395
       - repeater: Control1210190000
       - field: Vendor No.
     invokeType: Lookup
@@ -318,12 +262,12 @@ steps:
     source:
       page: Vendor List
     modal: true
-    runtimeId: b3n3
+    runtimeId: b3do
     description: Page <caption>Leveranciers</caption> was shown.
   - type: set-current-row
     target:
       - page: Vendor List
-        runtimeRef: b3n3
+        runtimeRef: b3do
       - repeater: Control1
     targetRecord:
       relative: 1
@@ -331,7 +275,7 @@ steps:
   - type: invoke
     target:
       - page: Vendor List
-        runtimeRef: b3n3
+        runtimeRef: b3do
       - repeater: Control1
     parameters:
       AlwaysCommit: false
@@ -339,164 +283,202 @@ steps:
   - type: page-closed
     source:
       page: Vendor List
-    runtimeId: b3n3
+    runtimeId: b3do
     description: Page <caption>Leveranciers</caption> was closed.
   - type: close-page
     target:
       - page: Vendors by Purchase Action
-        runtimeRef: b3ik
+        runtimeRef: b395
     description: Close page <caption>Leveranciers per inkoopactie</caption>
   - type: page-closed
     source:
       page: Vendors by Purchase Action
-    runtimeId: b3ik
+    runtimeId: b395
     description: Page <caption>Leveranciers per inkoopactie</caption> was closed.
   - type: input
     target:
       - page: Project Purchase Action
-        runtimeRef: b2yx
+        runtimeRef: b2q1
       - field: Status
     value: 2
     description: Input <value>2</value> into <caption>Status</caption>
   - type: invoke
     target:
       - page: Project Purchase Action
-        runtimeRef: b2yx
+        runtimeRef: b2q1
       - action: CreatePurchaseOrder
     parameters: {}
     description: Invoke <caption>Aanmaken inkooporder</caption>
   - type: message
     automationId: 8da61efd-0002-0003-0507-0b0d1113171d
-    text: Inkooporder IO230598 is aangemaakt.
-    description: "Message: <value>Inkooporder IO230598 is aangemaakt.</value>"
+    text: Inkooporder IO230601 is aangemaakt.
+    description: "Message: <value>Inkooporder IO230601 is aangemaakt.</value>"
   - type: copy-value
     source:
       - page: null
         automationId: 8da61efd-0002-0003-0507-0b0d1113171d
         caption: null
-        runtimeRef: b3xa
+        runtimeRef: b3nv
       - field: null
-    name: null - Inkooporder IO230598 is aangemaakt.
+    name: null - Inkooporder IO230601 is aangemaakt.
     valueType: string
-    description: Copy value from <caption>Inkooporder IO230598 is aangemaakt.</caption>
-  - type: invoke
+    description: Copy value from <caption>Inkooporder IO230601 is aangemaakt.</caption>
+  - type: close-page
     target:
       - page: Project Purchase Action
-        runtimeRef: b2yx
-      - action: Purchase &Orders
+        runtimeRef: b2q1
+    description: Close page <caption>Projectinkoopactie</caption>
+  - type: page-closed
+    source:
+      page: Project Purchase Action
+    runtimeId: b2q1
+    description: Page <caption>Projectinkoopactie</caption> was closed.
+  - type: close-page
+    target:
+      - page: Project Purchase Action List
+        runtimeRef: b2lu
+    description: Close page <caption>Projectinkoopacties</caption>
+  - type: page-closed
+    source:
+      page: Project Purchase Action List
+    runtimeId: b2lu
+    description: Page <caption>Projectinkoopacties</caption> was closed.
+  - type: invoke
+    target:
+      - page: Job Card
+        runtimeRef: b274
+      - action: Purchase Orders
+    parameters: {}
     description: Invoke <caption>Inkooporders</caption>
   - type: page-shown
     source:
-      page: Purchase Order List
-    modal: true
-    runtimeId: b3xf
-    description: Page <caption>Inkooporders</caption> was shown.
+      page: Project Purchase Order List
+    modal: false
+    runtimeId: b3o4
+    description: Page <caption>Project inkooporders</caption> was shown.
+  - type: filter
+    target:
+      - page: Project Purchase Order List
+        runtimeRef: b3o4
+    operation: add
+    column:
+      field: No.
+      scope: filter
+    description: Add filter for <caption>No.</caption> on <caption>Project
+      inkooporders</caption>
+  - type: input
+    target:
+      - page: Project Purchase Order List
+        runtimeRef: b3o4
+      - scope: filter
+        field: No.
+    value: IO
+    isFilterAsYouType: true
+    description: Input <value>IO</value> into <caption>Nr.</caption>
+  - type: page-shown
+    source:
+      page: lookup:No.
+    modal: false
+    runtimeId: b3wc
+    description: Page <caption>Selecteren</caption> was shown.
+  - type: input
+    target:
+      - page: Project Purchase Order List
+        runtimeRef: b3o4
+      - scope: filter
+        field: No.
+    value: IO230
+    isFilterAsYouType: true
+    description: Input <value>IO230</value> into <caption>Nr.</caption>
+  - type: input
+    target:
+      - page: Project Purchase Order List
+        runtimeRef: b3o4
+      - scope: filter
+        field: No.
+    isFilterAsYouType: true
+    description: Input <value>Parameters.'Project Purchase Order List.No.'</value>
+      into <caption>Nr.</caption>
+    value: =Parameters.'Project Purchase Order List.No.'
   - type: invoke
     target:
-      - page: Purchase Order List
-        runtimeRef: b3xf
-      - repeater: Control1
-    invokeType: Edit
+      - page: lookup:No.
+        runtimeRef: b3wc
+      - repeater: repeater
     parameters:
-      AlwaysCommit: false
-    description: Invoke row on <caption>Control1</caption>
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:No.
+    runtimeId: b3wc
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: invoke
+    target:
+      - page: Project Purchase Order List
+        runtimeRef: b3o4
+      - repeater: Control1100485000
+      - field: No.
+    invokeType: DrillDown
+    description: Invoke DrillDown on <caption>Nr.</caption>
   - type: page-shown
     source:
       page: Purchase Order
-    modal: false
-    runtimeId: b534
+    modal: true
+    runtimeId: b3wx
     description: Page <caption>Inkooporder</caption> was shown.
   - type: invoke
     target:
       - page: Purchase Order
-        runtimeRef: b534
+        runtimeRef: b3wx
       - action: SendApprovalRequest
     parameters: {}
     description: Invoke <caption>Goedkeuringsaanvraag verzenden</caption>
   - type: invoke
     target:
       - page: Purchase Order
-        runtimeRef: b534
-      - action: Approvals
-    description: Invoke <caption>Goedkeuringen</caption>
-  - type: page-shown
-    source:
-      page: Approval Entries
-    modal: false
-    runtimeId: b683
-    description: Page <caption>Goedkeuringsposten</caption> was shown.
-  - type: close-page
-    target:
-      - page: Approval Entries
-        runtimeRef: b683
-    description: Close page <caption>Goedkeuringsposten</caption>
-  - type: page-closed
-    source:
-      page: Approval Entries
-    runtimeId: b683
-    description: Page <caption>Goedkeuringsposten</caption> was closed.
-  - type: close-page
-    target:
-      - page: Purchase Order
-        runtimeRef: b534
-    description: Close page <caption>Inkooporder</caption>
+        runtimeRef: b3wx
+    invokeType: Cancel
+    description: Invoke Cancel on <caption>Inkooporder</caption>
   - type: page-closed
     source:
       page: Purchase Order
-    runtimeId: b534
+    runtimeId: b3wx
     description: Page <caption>Inkooporder</caption> was closed.
-  - type: invoke
-    target:
-      - page: Purchase Order List
-        runtimeRef: b3xf
-    invokeType: Cancel
-    description: Invoke Cancel on <caption>Inkooporders</caption>
-  - type: page-closed
-    source:
-      page: Purchase Order List
-    runtimeId: b3xf
-    description: Page <caption>Inkooporders</caption> was closed.
   - type: close-page
     target:
-      - page: Project Purchase Action
-        runtimeRef: b2yx
-    description: Close page <caption>Projectinkoopactie</caption>
+      - page: Project Purchase Order List
+        runtimeRef: b3o4
+    description: Close page <caption>Project inkooporders</caption>
   - type: page-closed
     source:
-      page: Project Purchase Action
-    runtimeId: b2yx
-    description: Page <caption>Projectinkoopactie</caption> was closed.
-  - type: close-page
-    target:
-      - page: Project Purchase Action List
-        runtimeRef: b2uq
-    description: Close page <caption>Projectinkoopacties</caption>
-  - type: page-closed
-    source:
-      page: Project Purchase Action List
-    runtimeId: b2uq
-    description: Page <caption>Projectinkoopacties</caption> was closed.
+      page: Project Purchase Order List
+    runtimeId: b3o4
+    description: Page <caption>Project inkooporders</caption> was closed.
   - type: close-page
     target:
       - page: Job Card
-        runtimeRef: b2e2
+        runtimeRef: b274
     description: Close page <caption>Project</caption>
   - type: page-closed
     source:
       page: Job Card
-    runtimeId: b2e2
+    runtimeId: b274
     description: Page <caption>Project</caption> was closed.
   - type: close-page
     target:
-      - page: Projects by Responsible Person
-        runtimeRef: b26t
-    description: Close page <caption>Projecten per verantwoordelijke</caption>
+      - page: Job List
+        runtimeRef: b1sm
+    description: Close page <caption>Projecten</caption>
   - type: page-closed
     source:
-      page: Projects by Responsible Person
-    runtimeId: b26t
-    description: Page <caption>Projecten per verantwoordelijke</caption> was closed.
+      page: Job List
+    runtimeId: b1sm
+    description: Page <caption>Projecten</caption> was closed.
 parameters:
-  Projects by Responsible Person.No.:
+  Job List.No.:
     type: string
-    default: PR00305
+    default: PR00317
+  Project Purchase Order List.No.:
+    type: string
+    default: IO230601
