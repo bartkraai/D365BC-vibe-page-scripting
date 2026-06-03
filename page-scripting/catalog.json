@@ -18,6 +18,25 @@
               "workflow_path": "./Demo UAV vaste termijnen (light versie)"
             }
           ]
+        },
+        {
+          "code": "UAV-T",
+          "name": "UAV-Test",
+          "description": "UAV-Test",
+          "process_flows": [
+            {
+              "code": "UAV-PROJEC",
+              "name": "UAV Project",
+              "description": "Deze workflow beschrijft de waarde keten van de contractvorm UAV met vaste termijnen.",
+              "workflow_path": "./UAV Project"
+            },
+            {
+              "code": "UAV 3",
+              "name": "UAV Project (3)",
+              "description": "UAV project versie 3",
+              "workflow_path": "./UAV Project (3)"
+            }
+          ]
         }
       ]
     }

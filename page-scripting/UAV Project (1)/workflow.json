@@ -1,4 +1,5 @@
 {
+  "$schema": "./workflow.schema.json",
   "name": "UAV Project (1)",
   "description": "Deze workflow beschrijft de waarde keten van de contractvorm UAV met vaste termijnen.",
   "steps": [

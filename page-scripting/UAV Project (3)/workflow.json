@@ -1,0 +1,81 @@
+{
+  "$schema": "./workflow.schema.json",
+  "name": "UAV Project (3)",
+  "description": "",
+  "steps": [
+    {
+      "id": "step-1",
+      "name": "Van Traject tm vervolgtraject",
+      "user": "Acquisiteur 4PS",
+      "script": "./scripts/Van traject registratie tm vervolgtraject 3.yml",
+      "capture": {
+        "try_out_successor_project_no": "Try-out Successor - Project No."
+      }
+    },
+    {
+      "id": "step-2",
+      "name": "Projectregistratie",
+      "user": "Project Controller",
+      "script": "./scripts/Projectregistratie 3.yml",
+      "inject": {
+        "Job List.No.": "{capture.step-1.try_out_successor_project_no}"
+      },
+      "depends_on": "step-1"
+    },
+    {
+      "id": "step-3",
+      "name": "Project inrichten en eerste prognose",
+      "user": "Projectleider",
+      "script": "./scripts/Project inrichten en 1e prognose 3.yml",
+      "inject": {
+        "Job List.No.": "{capture.step-1.try_out_successor_project_no}"
+      },
+      "depends_on": "step-2"
+    },
+    {
+      "id": "step-4",
+      "name": "Aanmaken inkooporder(s)",
+      "user": "Werkvoorbereider",
+      "script": "./scripts/Aanmaken inkooporder 3.yml",
+      "capture": {
+        "null_inkooporder_io230609_is_aangemaakt": "null - Inkooporder IO230609 is aangemaakt."
+      },
+      "inject": {
+        "Job List.No.": "{capture.step-1.try_out_successor_project_no}",
+        "Project Purchase Order List.No.": ""
+      },
+      "depends_on": "step-3"
+    },
+    {
+      "id": "step-5",
+      "name": "Goedkeuring inkooporder",
+      "user": "Projectleider",
+      "script": "./scripts/Goedkeuring inkooporder 3.yml",
+      "inject": {
+        "Approval (Compressed).Document No.": "{capture.step-1.try_out_successor_project_no}"
+      },
+      "depends_on": "step-4"
+    },
+    {
+      "id": "step-6",
+      "name": "Inkooporder ontvangstregistratie",
+      "user": "Uitvoerder GWW 4PS",
+      "script": "./scripts/Inkooporder ontvangstregistratie 3.yml",
+      "inject": {
+        "Job List.No.": "{capture.step-1.try_out_successor_project_no}",
+        "Project Purchase Order List.No.": "{capture.step-4.null_inkooporder_io230609_is_aangemaakt}"
+      },
+      "depends_on": "step-5"
+    },
+    {
+      "id": "step-7",
+      "name": "Periodieke administratie",
+      "user": "Projectleider",
+      "script": "./scripts/Periodieke administratie 3.yml",
+      "inject": {
+        "Job List.No.": "{capture.step-1.try_out_successor_project_no}"
+      },
+      "depends_on": "step-6"
+    }
+  ]
+}
