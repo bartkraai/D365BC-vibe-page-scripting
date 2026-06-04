@@ -5,7 +5,7 @@
   "steps": [
     {
       "id": "step-1",
-      "name": "Van Traject tm vervolgtraject",
+      "name": "Van traject tm vervolgtraject ",
       "user": "Acquisiteur 4PS",
       "script": "./scripts/Van traject registratie tm vervolgtraject 3.yml",
       "capture": {
@@ -14,7 +14,7 @@
     },
     {
       "id": "step-2",
-      "name": "Projectregistratie",
+      "name": "Project Registratie",
       "user": "Project Controller",
       "script": "./scripts/Projectregistratie 3.yml",
       "inject": {
@@ -34,11 +34,11 @@
     },
     {
       "id": "step-4",
-      "name": "Aanmaken inkooporder(s)",
+      "name": "Aanmaken inkooporder",
       "user": "Werkvoorbereider",
       "script": "./scripts/Aanmaken inkooporder 3.yml",
       "capture": {
-        "null_inkooporder_io230609_is_aangemaakt": "null - Inkooporder IO230609 is aangemaakt."
+        "purchase_order_list_no": "Purchase Order List - No."
       },
       "inject": {
         "Job List.No.": "{capture.step-1.try_out_successor_project_no}",
@@ -48,7 +48,7 @@
     },
     {
       "id": "step-5",
-      "name": "Goedkeuring inkooporder",
+      "name": "Goedkeuren inkooporder",
       "user": "Projectleider",
       "script": "./scripts/Goedkeuring inkooporder 3.yml",
       "inject": {
@@ -58,12 +58,12 @@
     },
     {
       "id": "step-6",
-      "name": "Inkooporder ontvangstregistratie",
+      "name": "Inkooporder ontvangstregistratie ",
       "user": "Uitvoerder GWW 4PS",
       "script": "./scripts/Inkooporder ontvangstregistratie 3.yml",
       "inject": {
         "Job List.No.": "{capture.step-1.try_out_successor_project_no}",
-        "Project Purchase Order List.No.": "{capture.step-4.null_inkooporder_io230609_is_aangemaakt}"
+        "Project Purchase Order List.No.": "{capture.step-4.purchase_order_list_no}"
       },
       "depends_on": "step-5"
     },

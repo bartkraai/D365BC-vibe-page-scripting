@@ -1,8 +1,5 @@
-name: Aanmaken inkooporder 3
-description: Test recording
 telemetryId: e12dd7ca-2a78-411d-8cf0-9d5d88fe528a
-start:
-  profile: PROJECT ENGINEER 4PS
+timeout: 300
 steps:
   - type: invoke
     invokeType: OpenSettings
@@ -51,8 +48,8 @@ steps:
       - scope: filter
         field: No.
     isFilterAsYouType: true
-    description: Input <value>Parameters.'Job List.No.'</value> into <caption>Nr.</caption>
     value: =Parameters.'Job List.No.'
+    description: Input <value>Parameters.'Job List.No.'</value> into <caption>Nr.</caption>
   - type: page-shown
     source:
       page: lookup:No.
@@ -92,7 +89,6 @@ steps:
       - page: Job Card
         runtimeRef: b28y
       - action: Purchase Actions
-    parameters: {}
     description: Invoke <caption>Inkoopacties</caption>
   - type: page-shown
     source:
@@ -197,7 +193,6 @@ steps:
       - page: Budget to Purchase Action
         runtimeRef: b32u
       - action: AssignButton
-    parameters: {}
     description: Invoke <caption>Toekennen</caption>
   - type: page-shown
     source:
@@ -236,7 +231,6 @@ steps:
       - page: Project Purchase Action
         runtimeRef: b2tw
       - action: Vendors
-    parameters: {}
     description: Invoke <caption>Leveranciers</caption>
   - type: page-shown
     source:
@@ -315,22 +309,39 @@ steps:
       - page: Project Purchase Action
         runtimeRef: b2tw
       - action: CreatePurchaseOrder
-    parameters: {}
     description: Invoke <caption>Aanmaken inkooporder</caption>
-  - type: message
-    automationId: 8da61efd-0002-0003-0507-0b0d1113171d
-    text: Inkooporder IO230609 is aangemaakt.
-    description: "Message: <value>Inkooporder IO230609 is aangemaakt.</value>"
+  - type: invoke
+    target:
+      - page: Project Purchase Action
+        runtimeRef: b131
+      - action: Purchase &Orders
+    description: Invoke <caption>Inkooporders</caption>
+  - type: page-shown
+    source:
+      page: Purchase Order List
+    modal: true
+    runtimeId: b1m9
+    description: Page <caption>Inkooporders</caption> was shown.
   - type: copy-value
     source:
-      - page: null
-        automationId: 8da61efd-0002-0003-0507-0b0d1113171d
-        caption: null
-        runtimeRef: b3qg
-      - field: null
-    name: null - Inkooporder IO230609 is aangemaakt.
+      - page: Purchase Order List
+        runtimeRef: b1m9
+      - repeater: Control1
+      - field: No.
+    name: Purchase Order List - No.
     valueType: string
-    description: Copy value from <caption>Inkooporder IO230609 is aangemaakt.</caption>
+    description: Copy value from <caption>Nr.</caption>
+  - type: invoke
+    target:
+      - page: Purchase Order List
+        runtimeRef: b1m9
+    invokeType: Cancel
+    description: Invoke Cancel on <caption>Inkooporders</caption>
+  - type: page-closed
+    source:
+      page: Purchase Order List
+    runtimeId: b1m9
+    description: Page <caption>Inkooporders</caption> was closed.
   - type: close-page
     target:
       - page: Project Purchase Action
@@ -356,7 +367,6 @@ steps:
       - page: Job Card
         runtimeRef: b28y
       - action: Purchase Orders
-    parameters: {}
     description: Invoke <caption>Inkooporders</caption>
   - type: page-shown
     source:
@@ -377,72 +387,16 @@ steps:
   - type: input
     target:
       - page: Project Purchase Order List
-        runtimeRef: b3qp
+        runtimeRef: b2sj
       - scope: filter
         field: No.
-    value: I
-    isFilterAsYouType: true
-    description: Input <value>I</value> into <caption>Nr.</caption>
-  - type: page-shown
-    source:
-      page: lookup:No.
-    modal: false
-    runtimeId: b3yx
-    description: Page <caption>Selecteren</caption> was shown.
-  - type: input
-    target:
-      - page: Project Purchase Order List
-        runtimeRef: b3qp
-      - scope: filter
-        field: No.
-    value: IO
-    isFilterAsYouType: true
-    description: Input <value>IO</value> into <caption>Nr.</caption>
-  - type: input
-    target:
-      - page: Project Purchase Order List
-        runtimeRef: b3qp
-      - scope: filter
-        field: No.
-    value: IO23
-    isFilterAsYouType: true
-    description: Input <value>IO23</value> into <caption>Nr.</caption>
-  - type: input
-    target:
-      - page: Project Purchase Order List
-        runtimeRef: b3qp
-      - scope: filter
-        field: No.
-    value: IO230
-    isFilterAsYouType: true
-    description: Input <value>IO230</value> into <caption>Nr.</caption>
-  - type: input
-    target:
-      - page: Project Purchase Order List
-        runtimeRef: b3qp
-      - scope: filter
-        field: No.
-    isFilterAsYouType: true
-    description: Input <value>Parameters.'Project Purchase Order List.No.'</value>
-      into <caption>Nr.</caption>
-    value: =Parameters.'Project Purchase Order List.No.'
-  - type: invoke
-    target:
-      - page: lookup:No.
-        runtimeRef: b3yx
-      - repeater: repeater
-    parameters:
-      AlwaysCommit: true
-    description: Invoke row on <caption>repeater</caption>
-  - type: page-closed
-    source:
-      page: lookup:No.
-    runtimeId: b3yx
-    description: Page <caption>Selecteren</caption> was closed.
+    value: =Clipboard.'Purchase Order List - No.'
+    description: Input <value>Clipboard.'Purchase Order List - No.'</value> into
+      <caption>Nr.</caption>
   - type: invoke
     target:
       - page: Project Purchase Order List
-        runtimeRef: b3qp
+        runtimeRef: bzh
       - repeater: Control1100485000
       - field: No.
     invokeType: DrillDown
@@ -451,14 +405,13 @@ steps:
     source:
       page: Purchase Order
     modal: true
-    runtimeId: b3zi
+    runtimeId: b18a
     description: Page <caption>Inkooporder</caption> was shown.
   - type: invoke
     target:
       - page: Purchase Order
         runtimeRef: b3zi
       - action: SendApprovalRequest
-    parameters: {}
     description: Invoke <caption>Goedkeuringsaanvraag verzenden</caption>
   - type: invoke
     target:
@@ -501,10 +454,11 @@ steps:
       page: Job List
     runtimeId: b1ug
     description: Page <caption>Projecten</caption> was closed.
+name: Aanmaken inkooporder 3
+description: Test recording
+start:
+  profile: PROJECT ENGINEER 4PS
 parameters:
   Job List.No.:
     type: string
     default: PR00329
-  Project Purchase Order List.No.:
-    type: string
-    default: IO230609

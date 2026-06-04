@@ -31,9 +31,9 @@
               "workflow_path": "./UAV Project"
             },
             {
-              "code": "UAV 3",
+              "code": "UAV-PROJEC",
               "name": "UAV Project (3)",
-              "description": "UAV project versie 3",
+              "description": "",
               "workflow_path": "./UAV Project (3)"
             }
           ]

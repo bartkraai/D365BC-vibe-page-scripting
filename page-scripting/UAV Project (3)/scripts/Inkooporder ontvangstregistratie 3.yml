@@ -1,6 +1,7 @@
 name: Inkooporder ontvangstregistratie 3
 description: Test recording
 telemetryId: f4343c6e-8d4b-40ad-8318-8d1260646a34
+timeout: 300
 start:
   profile: SITE MANAGER CIVIL ENGIN 4PS
 steps:

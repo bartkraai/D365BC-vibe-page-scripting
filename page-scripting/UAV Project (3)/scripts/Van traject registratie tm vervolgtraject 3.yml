@@ -1,6 +1,7 @@
 name: Van traject registratie tm vervolgtraject 3
 description: Test recording
 telemetryId: 6574fdf7-1d5c-40b3-8d51-48fa96f338f5
+timeout: 300
 start:
   profile: ACQUISITIONER 4PS
 steps:

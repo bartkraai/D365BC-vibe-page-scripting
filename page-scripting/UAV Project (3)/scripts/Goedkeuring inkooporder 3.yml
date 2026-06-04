@@ -1,6 +1,7 @@
 name: Goedkeuring inkooporder 3
 description: Test recording
 telemetryId: 20b5353b-4265-4ab5-b10e-0b50d77d9d93
+timeout: 300
 start:
   profile: PROJECTLEIDER 4PS
 steps:

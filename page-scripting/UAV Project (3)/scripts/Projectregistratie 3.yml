@@ -1,4 +1,5 @@
 telemetryId: e08d5832-c9e5-4a66-933e-b8e25f6ac5f3
+timeout: 300
 steps:
   - type: invoke
     invokeType: OpenSettings
