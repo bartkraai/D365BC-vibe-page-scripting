@@ -21,20 +21,47 @@
         },
         {
           "code": "UAV-T",
-          "name": "UAV-Test",
-          "description": "UAV-Test",
+          "name": "UAV",
+          "description": "UAV",
           "process_flows": [
-            {
-              "code": "UAV-PROJEC",
-              "name": "UAV Project",
-              "description": "Deze workflow beschrijft de waarde keten van de contractvorm UAV met vaste termijnen.",
-              "workflow_path": "./UAV Project"
-            },
             {
               "code": "UAV-PROJEC",
               "name": "UAV Project (3)",
               "description": "",
               "workflow_path": "./UAV Project (3)"
+            }
+          ]
+        },
+        {
+          "code": "PRJ-VT",
+          "name": "Projecten (vaste termijnen)",
+          "description": "Projecten (vaste termijnen)",
+          "process_flows": [
+            {
+              "code": "PROJECTEN-",
+              "name": "Projecten (vaste termijnen)",
+              "description": "",
+              "workflow_path": "./Projecten (vaste termijnen)"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "SYSTEEMBHR",
+      "name": "Test Systeembeheer",
+      "description": "",
+      "types": [
+        {
+          "code": "R&P",
+          "name": "Switch Roles and Permissions",
+          "description": "",
+          "process_flows": [
+            {
+              "code": "SWITCH-ROL",
+              "name": "Switch Role and Permissions",
+              "description": "",
+              "workflow_path": "./Switch Role and Permissions"
             }
           ]
         }

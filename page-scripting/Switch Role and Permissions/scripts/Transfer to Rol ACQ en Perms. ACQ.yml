@@ -1,0 +1,179 @@
+name: Transfer to Rol ACQ en Perms. ACQ
+telemetryId: 3996878b-7656-4040-a2ae-03b87d687771
+start:
+  profile: PROJECTLEIDER 4PS
+steps:
+  - type: invoke
+    invokeType: OpenSettings
+    description: Invoke OpenSettings
+  - type: page-shown
+    source:
+      page: User Settings
+    modal: false
+    runtimeId: b7n
+    description: Page <caption>Mijn instellingen</caption> was shown.
+  - type: invoke
+    target:
+      - page: User Settings
+        runtimeRef: b7n
+      - field: UserRoleCenter
+    invokeType: AssistEdit
+    description: Invoke AssistEdit on <caption>Rol</caption>
+  - type: page-shown
+    source:
+      page: Roles
+    modal: true
+    runtimeId: b8a
+    description: Page <caption>Beschikbare rollen</caption> was shown.
+  - type: input
+    target:
+      - page: Roles
+        runtimeRef: b8a
+      - scope: filter
+        field: filter:system:search
+    value: acqui
+    isFilterAsYouType: true
+    description: Input <value>acqui</value> into <caption>Zoeken</caption>
+  - type: invoke
+    target:
+      - page: Roles
+        runtimeRef: b8a
+      - repeater: Group
+    parameters:
+      AlwaysCommit: false
+    description: Invoke row on <caption>Group</caption>
+  - type: page-closed
+    source:
+      page: Roles
+    runtimeId: b8a
+    description: Page <caption>Beschikbare rollen</caption> was closed.
+  - type: invoke
+    target:
+      - page: User Settings
+        runtimeRef: b7n
+    invokeType: Ok
+    description: Invoke Ok on <caption>Mijn instellingen</caption>
+  - type: page-closed
+    source:
+      page: User Settings
+    runtimeId: b7n
+    description: Page <caption>Mijn instellingen</caption> was closed.
+  - type: navigate
+    target:
+      - page: Users
+    description: Navigate to Gebruikers
+  - type: page-shown
+    source:
+      page: Users
+    modal: false
+    runtimeId: b6h
+    description: Page <caption>Gebruikers</caption> was shown.
+  - type: filter
+    target:
+      - page: Users
+        runtimeRef: b6h
+    operation: add
+    column:
+      field: State
+      scope: filter
+    description: Add filter for <caption>State</caption> on <caption>Gebruikers</caption>
+  - type: input
+    target:
+      - page: Users
+        runtimeRef: b6h
+      - scope: filter
+        field: State
+    value: 1
+    description: Input <value>1</value> into <caption>Status</caption>
+  - type: invoke
+    target:
+      - page: Users
+        runtimeRef: b6h
+      - repeater: Group
+    invokeType: Edit
+    parameters:
+      AlwaysCommit: false
+    description: Invoke row on <caption>Group</caption>
+  - type: page-shown
+    source:
+      page: User Card
+    modal: false
+    runtimeId: bhr
+    description: Page <caption>Gebruikerskaart</caption> was shown.
+  - type: focus
+    target:
+      - page: User Card
+        runtimeRef: bhr
+      - part: Permissions
+      - page: User Subform
+      - repeater: Group
+      - field: PermissionSet
+    description: Focus <caption>Machtigingenset</caption>
+  - type: invoke
+    target:
+      - page: User Card
+        runtimeRef: bhr
+      - part: Permissions
+      - page: User Subform
+      - repeater: Group
+      - field: PermissionSet
+    invokeType: Lookup
+    description: Invoke Lookup on <caption>Machtigingenset</caption>
+  - type: page-shown
+    source:
+      page: Lookup Permission Set
+    modal: true
+    runtimeId: bl8
+    description: Page <caption>Machtigingenset opzoeken</caption> was shown.
+  - type: input
+    target:
+      - page: Lookup Permission Set
+        runtimeRef: bl8
+      - scope: filter
+        field: filter:system:search
+    value: acq
+    isFilterAsYouType: true
+    description: Input <value>acq</value> into <caption>Zoeken</caption>
+  - type: invoke
+    target:
+      - page: Lookup Permission Set
+        runtimeRef: bl8
+      - repeater: Group
+    parameters:
+      AlwaysCommit: false
+    description: Invoke row on <caption>Group</caption>
+  - type: page-closed
+    source:
+      page: Lookup Permission Set
+    runtimeId: bl8
+    description: Page <caption>Machtigingenset opzoeken</caption> was closed.
+  - type: focus
+    target:
+      - page: User Card
+        runtimeRef: bhr
+      - part: Permissions
+      - page: User Subform
+      - repeater: Group
+      - field: PermissionSet
+    description: Focus <caption>Machtigingenset</caption>
+  - type: close-page
+    target:
+      - page: User Card
+        runtimeRef: bhr
+    description: Close page <caption>Gebruikerskaart</caption>
+  - type: page-closed
+    source:
+      page: User Card
+    runtimeId: bhr
+    description: Page <caption>Gebruikerskaart</caption> was closed.
+  - type: close-page
+    target:
+      - page: Users
+        runtimeRef: b6h
+    description: Close page <caption>Gebruikers</caption>
+  - type: page-closed
+    source:
+      page: Users
+    runtimeId: b6h
+    description: Page <caption>Gebruikers</caption> was closed.
+description: Test recording

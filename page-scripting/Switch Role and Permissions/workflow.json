@@ -1,0 +1,13 @@
+{
+  "$schema": "./workflow.schema.json",
+  "name": "Switch Role and Permissions",
+  "description": "",
+  "steps": [
+    {
+      "id": "step-1",
+      "name": "Van Projectleider naar Acquisiteur",
+      "user": "Projectleider",
+      "script": "./scripts/Transfer to Rol ACQ en Perms. ACQ.yml"
+    }
+  ]
+}
