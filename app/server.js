@@ -100,7 +100,9 @@ const watchTargets = [
 
 if (watchTargets.length) {
   chokidar.watch(watchTargets, {
-    ignored: /(node_modules|\.git|Variants)/,
+    // Generated recordings can remain locked by Playwright or a media player.
+    // They do not affect the UI file-change notifications.
+    ignored: /(node_modules|\.git|Variants|[\\/]video\.(webm|mp4)$)/i,
     ignoreInitial: true,
     persistent: true,
     awaitWriteFinish: { stabilityThreshold: 500 },
@@ -110,6 +112,9 @@ if (watchTargets.length) {
       event,
       path: path.relative(ROOT, filePath).replace(/\\/g, '/'),
     });
+  }).on('error', err => {
+    // A locked/generated file must not bring down the API server.
+    console.warn(`  [WARN] File watcher skipped an inaccessible path: ${err.message}`);
   });
 }
 
@@ -213,8 +218,30 @@ app.get('/api/environments/:name', async (req, res) => {
 
 app.post('/api/environments', async (req, res) => {
   try {
-    const { name, url, roles = [], appRegistration, companies = [] } = req.body;
+    const { name, originalName, url, roles = [], appRegistration, companies = [] } = req.body;
     if (!name || !url) return res.status(400).json({ error: 'name and url are required' });
+
+    const previousName = typeof originalName === 'string' && originalName.trim() ? originalName.trim() : name;
+    const envs = readEnvs();
+    const existingEnv = envs.find(e => e.name === previousName);
+
+    if (previousName !== name) {
+      if (!existingEnv) return res.status(404).json({ error: 'Original environment not found' });
+      if (envs.some(e => e.name === name)) return res.status(409).json({ error: `Environment "${name}" already exists` });
+
+      // Credential Manager account names include the environment name. Copy every
+      // secret to the new account before replacing the metadata entry.
+      for (const r of existingEnv.roles || []) {
+        for (const suffix of ['password', 'username', 'mfa']) {
+          const value = await readCred(`${previousName}:${r.role}:${suffix}`);
+          if (value) await saveCred(`${name}:${r.role}:${suffix}`, value);
+        }
+      }
+      for (const suffix of ['client_id', 'client_secret', 'tenant_id', 'company_id', 'company_name']) {
+        const value = await readCred(`${previousName}:app-reg:${suffix}`);
+        if (value) await saveCred(`${name}:app-reg:${suffix}`, value);
+      }
+    }
 
     for (const r of roles) {
       if (r.password)  await saveCred(`${name}:${r.role}:password`, r.password);
@@ -231,15 +258,27 @@ app.post('/api/environments', async (req, res) => {
       if (appRegistration.companyName)  await saveCred(`${name}:app-reg:company_name`,   appRegistration.companyName);
     }
 
-    const envs = readEnvs().filter(e => e.name !== name);
-    envs.push({
+    const updatedEnvs = envs.filter(e => e.name !== previousName && e.name !== name);
+    updatedEnvs.push({
       name,
       url,
       companies: companies.filter(c => typeof c === 'string' && c.trim()).map(c => c.trim()),
       roles: roles.map(r => ({ role: r.role, username: r.username, hasMfa: !!r.mfaSeed })),
       hasAppRegistration: !!(appRegistration?.clientId),
+      ...(existingEnv?.isDefault ? { isDefault: true } : {}),
     });
-    writeEnvs(envs);
+    writeEnvs(updatedEnvs);
+
+    if (previousName !== name && existingEnv) {
+      for (const r of existingEnv.roles || []) {
+        for (const suffix of ['password', 'username', 'mfa']) {
+          await deleteCred(`${previousName}:${r.role}:${suffix}`);
+        }
+      }
+      for (const suffix of ['client_id', 'client_secret', 'tenant_id', 'company_id', 'company_name']) {
+        await deleteCred(`${previousName}:app-reg:${suffix}`);
+      }
+    }
     res.json({ ok: true });
   } catch (e) {
     res.status(500).json({ error: e.message });

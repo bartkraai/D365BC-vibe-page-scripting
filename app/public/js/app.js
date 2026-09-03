@@ -327,7 +327,7 @@ async function openEnvModal(existingName) {
   if (existingName) {
     document.getElementById('modal-env-title').textContent = 'Edit Environment';
     document.getElementById('env-name').value = existingName;
-    document.getElementById('env-name').readOnly = true;
+    document.getElementById('env-name').readOnly = false;
 
     // Load existing data from server
     try {
@@ -555,7 +555,14 @@ async function saveEnv() {
   const btn = document.getElementById('btn-save-env');
   btn.disabled = true; btn.textContent = 'Saving…';
   try {
-    await POST('/environments', { name, url, roles, appRegistration, companies: modalCompanies });
+    await POST('/environments', {
+      name,
+      originalName: editingEnvName,
+      url,
+      roles,
+      appRegistration,
+      companies: modalCompanies,
+    });
     closeEnvModal();
     await loadEnvironments();
   } catch (e) {
