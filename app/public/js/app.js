@@ -668,84 +668,159 @@ async function loadRunPage() {
 
   // Build catalog tree with checkboxes
   const tree = document.getElementById('run-catalog-tree');
-  const projectSet = new Set(projects.filter(p => p.hasWorkflow).map(p => p.name));
+  const visibleCatalog = buildRunnableCatalog(cat, projects);
 
-  if (!cat || !cat.value_chains || !cat.value_chains.length) {
-    tree.innerHTML = '<p class="text-muted" style="padding:8px">No catalog loaded. Configure the catalog first.</p>';
+  if (!visibleCatalog.length) {
+    tree.innerHTML = '<div class="run-empty-state">No runnable process flows were found in the catalog yet. Finish the catalog setup first, then come back here to run workflows.</div>';
     updateRunSelectedCount();
     return;
   }
 
   let html = '';
-  for (const vc of cat.value_chains) {
-    const vcId = `run-vc-${vc.code}`;
-    html += `<div class="run-tree-vc">
-      <label class="run-tree-label run-tree-vc-label">
-        <input type="checkbox" class="run-vc-cb" data-vc="${esc(vc.code)}" id="${vcId}">
-        <strong>${esc(vc.code)}</strong> <span>${esc(vc.name)}</span>
-      </label>`;
-    for (const type of (vc.types || [])) {
-      const typeId = `run-type-${vc.code}-${type.code}`;
-      html += `<div class="run-tree-type">
-        <label class="run-tree-label">
-          <input type="checkbox" class="run-type-cb" data-vc="${esc(vc.code)}" data-type="${esc(type.code)}" id="${typeId}">
-          <strong>${esc(type.code)}</strong> <span>${esc(type.name)}</span>
-        </label>`;
-      for (const pf of (type.process_flows || [])) {
-        const projName = (pf.workflow_path || '').replace(/^\.\//, '');
-        const available = projectSet.has(projName);
-        const pfId = `run-pf-${vc.code}-${type.code}-${pf.code}`;
-        html += `<div class="run-tree-pf">
-          <label class="run-tree-label${!available ? ' run-tree-disabled' : ''}">
-            <input type="checkbox" class="run-pf-cb" data-vc="${esc(vc.code)}" data-type="${esc(type.code)}" data-project="${esc(projName)}" id="${pfId}" ${!available ? 'disabled' : ''}>
-            <code>${esc(pf.code)}</code> <span>${esc(pf.name)}</span>
-            ${!available ? '<span class="text-muted" style="font-size:11px">(no workflow)</span>' : ''}
+  for (let v = 0; v < visibleCatalog.length; v++) {
+    const vc = visibleCatalog[v];
+    html += `<section class="run-group">
+      <div class="run-group-header">
+        <label class="run-tree-label run-group-checkbox${vc.availableFlowCount ? '' : ' run-tree-disabled'}">
+          <input type="checkbox" class="run-vc-cb" data-v="${v}" ${vc.availableFlowCount ? '' : 'disabled'}>
+          <div class="run-group-meta">
+            <div class="run-group-topline">
+              ${vc.code ? `<span class="run-group-code">${esc(vc.code)}</span>` : ''}
+              <span class="run-group-count">${vc.flowCount} ${vc.flowCount === 1 ? 'flow' : 'flows'}</span>
+            </div>
+            <span class="run-group-title">${esc(vc.name || vc.code || 'Unnamed value chain')}</span>
+            ${vc.description ? `<span class="run-group-desc">${esc(vc.description)}</span>` : ''}
+          </div>
+        </label>
+      </div>
+      <div class="run-type-list">`;
+    for (let t = 0; t < vc.types.length; t++) {
+      const type = vc.types[t];
+      html += `<section class="run-type-card">
+        <div class="run-type-header">
+          <label class="run-tree-label run-type-checkbox${type.availableFlowCount ? '' : ' run-tree-disabled'}">
+            <input type="checkbox" class="run-type-cb" data-v="${v}" data-t="${t}" ${type.availableFlowCount ? '' : 'disabled'}>
+            <div class="run-type-meta">
+              <div class="run-type-topline">
+                ${type.code ? `<span class="run-type-code">${esc(type.code)}</span>` : ''}
+                <span class="run-type-count">${type.flowCount} ${type.flowCount === 1 ? 'flow' : 'flows'}</span>
+              </div>
+              <span class="run-type-title">${esc(type.name || type.code || 'Unnamed type')}</span>
+              ${type.description ? `<span class="run-type-desc">${esc(type.description)}</span>` : ''}
+            </div>
+          </label>
+        </div>
+        <div class="run-pf-list">`;
+      for (const pf of type.process_flows) {
+        html += `<div class="run-pf-item${pf.available ? '' : ' is-disabled'}">
+          <label class="run-tree-label run-pf-row${pf.available ? '' : ' run-tree-disabled'}">
+            <input type="checkbox" class="run-pf-cb" data-v="${v}" data-t="${t}" data-project="${esc(pf.projectName)}" ${pf.available ? '' : 'disabled'}>
+            <div class="run-pf-main">
+              <div class="run-pf-topline">
+                ${pf.code ? `<span class="run-pf-code">${esc(pf.code)}</span>` : ''}
+                <span class="run-pf-name">${esc(pf.name || pf.projectName || 'Unnamed process flow')}</span>
+                <span class="run-pf-status ${pf.available ? 'is-ready' : 'is-missing'}">${pf.available ? 'Ready' : 'Missing workflow'}</span>
+              </div>
+              ${pf.description ? `<span class="run-pf-desc">${esc(pf.description)}</span>` : ''}
+              ${pf.projectName ? `<span class="run-pf-path">${esc(pf.projectName)}</span>` : ''}
+            </div>
           </label>
         </div>`;
       }
-      html += `</div>`;
+      html += `</div>
+      </section>`;
     }
-    html += `</div>`;
+    html += `</div>
+    </section>`;
   }
   tree.innerHTML = html;
 
   // Wire up parent-child checkbox cascading
   tree.querySelectorAll('.run-vc-cb').forEach(cb => cb.addEventListener('change', () => {
-    const vc = cb.dataset.vc;
-    tree.querySelectorAll(`.run-type-cb[data-vc="${vc}"], .run-pf-cb[data-vc="${vc}"]`).forEach(c => { if (!c.disabled) c.checked = cb.checked; });
+    const v = cb.dataset.v;
+    tree.querySelectorAll(`.run-type-cb[data-v="${v}"], .run-pf-cb[data-v="${v}"]`).forEach(c => { if (!c.disabled) c.checked = cb.checked; });
     updateRunSelectedCount();
   }));
   tree.querySelectorAll('.run-type-cb').forEach(cb => cb.addEventListener('change', () => {
-    const vc = cb.dataset.vc, type = cb.dataset.type;
-    tree.querySelectorAll(`.run-pf-cb[data-vc="${vc}"][data-type="${type}"]`).forEach(c => { if (!c.disabled) c.checked = cb.checked; });
-    syncParentCheckbox(tree, vc);
+    const v = cb.dataset.v, t = cb.dataset.t;
+    tree.querySelectorAll(`.run-pf-cb[data-v="${v}"][data-t="${t}"]`).forEach(c => { if (!c.disabled) c.checked = cb.checked; });
+    syncParentCheckbox(tree, v);
     updateRunSelectedCount();
   }));
   tree.querySelectorAll('.run-pf-cb').forEach(cb => cb.addEventListener('change', () => {
-    const vc = cb.dataset.vc, type = cb.dataset.type;
-    syncTypeCheckbox(tree, vc, type);
-    syncParentCheckbox(tree, vc);
+    const v = cb.dataset.v, t = cb.dataset.t;
+    syncTypeCheckbox(tree, v, t);
+    syncParentCheckbox(tree, v);
     updateRunSelectedCount();
   }));
 
   updateRunSelectedCount();
 }
 
-function syncTypeCheckbox(tree, vc, type) {
-  const pfs = tree.querySelectorAll(`.run-pf-cb[data-vc="${vc}"][data-type="${type}"]:not(:disabled)`);
-  const checked = tree.querySelectorAll(`.run-pf-cb[data-vc="${vc}"][data-type="${type}"]:checked`);
-  const typeCb = tree.querySelector(`.run-type-cb[data-vc="${vc}"][data-type="${type}"]`);
+function buildRunnableCatalog(cat, projects) {
+  const projectSet = new Set(projects.filter(p => p.hasWorkflow).map(p => p.name));
+  if (!cat?.value_chains?.length) return [];
+
+  return cat.value_chains
+    .map(vc => {
+      const types = (vc.types || [])
+        .map(type => {
+          const processFlows = (type.process_flows || [])
+            .map(pf => {
+              const projectName = (pf.workflow_path || '').replace(/^\.\//, '').trim();
+              const visible = hasCatalogDisplayValue(pf.code) || hasCatalogDisplayValue(pf.name) || hasCatalogDisplayValue(pf.description) || hasCatalogDisplayValue(projectName);
+              if (!visible) return null;
+              const available = !!projectName && projectSet.has(projectName);
+              return {
+                ...pf,
+                projectName,
+                available,
+              };
+            })
+            .filter(Boolean);
+
+          if (!processFlows.length) return null;
+
+          return {
+            ...type,
+            process_flows: processFlows,
+            flowCount: processFlows.length,
+            availableFlowCount: processFlows.filter(pf => pf.available).length,
+          };
+        })
+        .filter(Boolean);
+
+      if (!types.length) return null;
+
+      return {
+        ...vc,
+        types,
+        flowCount: types.reduce((sum, type) => sum + type.flowCount, 0),
+        availableFlowCount: types.reduce((sum, type) => sum + type.availableFlowCount, 0),
+      };
+    })
+    .filter(Boolean);
+}
+
+function hasCatalogDisplayValue(value) {
+  return String(value ?? '').trim().length > 0;
+}
+
+function syncTypeCheckbox(tree, v, t) {
+  const pfs = tree.querySelectorAll(`.run-pf-cb[data-v="${v}"][data-t="${t}"]:not(:disabled)`);
+  const checked = tree.querySelectorAll(`.run-pf-cb[data-v="${v}"][data-t="${t}"]:checked`);
+  const typeCb = tree.querySelector(`.run-type-cb[data-v="${v}"][data-t="${t}"]`);
   if (typeCb) {
     typeCb.checked = pfs.length > 0 && checked.length === pfs.length;
     typeCb.indeterminate = checked.length > 0 && checked.length < pfs.length;
   }
 }
 
-function syncParentCheckbox(tree, vc) {
-  const types = tree.querySelectorAll(`.run-type-cb[data-vc="${vc}"]`);
+function syncParentCheckbox(tree, v) {
+  const types = tree.querySelectorAll(`.run-type-cb[data-v="${v}"]:not(:disabled)`);
   const checked = [...types].filter(c => c.checked);
   const indet = [...types].filter(c => c.indeterminate);
-  const vcCb = tree.querySelector(`.run-vc-cb[data-vc="${vc}"]`);
+  const vcCb = tree.querySelector(`.run-vc-cb[data-v="${v}"]`);
   if (vcCb) {
     vcCb.checked = types.length > 0 && checked.length === types.length && indet.length === 0;
     vcCb.indeterminate = (checked.length > 0 || indet.length > 0) && (checked.length < types.length || indet.length > 0);
@@ -758,12 +833,22 @@ function getSelectedRunProjects() {
 
 function updateRunSelectedCount() {
   const count = getSelectedRunProjects().length;
+  const total = document.querySelectorAll('.run-pf-cb:not(:disabled)').length;
   const el = document.getElementById('run-selected-count');
-  if (el) el.textContent = count ? `${count} process flow${count > 1 ? 's' : ''} selected` : 'No process flows selected';
+  if (!el) return;
+
+  if (!total) {
+    el.textContent = 'No runnable process flows available';
+    return;
+  }
+
+  el.textContent = count
+    ? `${count} of ${total} process flow${total > 1 ? 's' : ''} selected`
+    : `Select process flows to run (${total} available)`;
 }
 
 document.getElementById('btn-run-select-all').addEventListener('click', () => {
-  document.querySelectorAll('.run-pf-cb:not(:disabled), .run-type-cb, .run-vc-cb').forEach(cb => cb.checked = true);
+  document.querySelectorAll('.run-pf-cb:not(:disabled), .run-type-cb:not(:disabled), .run-vc-cb:not(:disabled)').forEach(cb => cb.checked = true);
   document.querySelectorAll('.run-type-cb, .run-vc-cb').forEach(cb => cb.indeterminate = false);
   updateRunSelectedCount();
 });

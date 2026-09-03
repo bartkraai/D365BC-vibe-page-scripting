@@ -151,3 +151,5 @@ venv.bak/
 ehthumbs.db
 Icon?
 Thumbs.db
+graphify-out/*
+.serena/*

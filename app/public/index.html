@@ -320,24 +320,40 @@
       <div class="run-layout">
         <!-- Left: catalog tree with checkboxes -->
         <div class="card run-catalog-panel">
-          <div class="run-catalog-header">
-            <strong>Test Catalog</strong>
+          <div class="run-panel-heading">
+            <div class="run-panel-title">
+              <strong>Test Catalog</strong>
+              <p class="run-panel-intro">Select one or more process flows to execute. Use the higher-level checkboxes to grab a whole section in one click.</p>
+            </div>
             <div class="run-catalog-actions">
               <button class="btn btn-secondary btn-sm" id="btn-run-select-all">Select All</button>
               <button class="btn btn-secondary btn-sm" id="btn-run-select-none">None</button>
             </div>
           </div>
-          <div id="run-catalog-tree"></div>
+          <div class="run-selection-hint">
+            <span id="run-selected-count" class="run-selection-pill">No process flows selected</span>
+          </div>
+          <div id="run-catalog-tree" class="run-catalog-tree"></div>
         </div>
 
         <!-- Right: options + output -->
         <div class="run-options-panel">
-          <div class="card">
-            <label style="font-weight:600;margin-bottom:6px;display:block">Environment</label>
-            <select id="run-environment" class="input" style="max-width:320px">
-              <option value="">— select environment —</option>
-            </select>
-            <div class="checkbox-group mt-md">
+          <div class="card run-controls-card">
+            <div class="run-panel-heading run-controls-heading">
+              <div class="run-panel-title">
+                <strong>Run Controls</strong>
+                <p class="run-panel-intro">Choose the environment and playback options for the workflows you selected.</p>
+              </div>
+            </div>
+            <div class="run-form-section">
+              <label class="run-field-label" for="run-environment">Environment</label>
+              <select id="run-environment" class="input run-environment-select">
+                <option value="">— select environment —</option>
+              </select>
+            </div>
+            <div class="run-form-section">
+              <div class="run-options-title">Playback Options</div>
+              <div class="checkbox-group run-checkbox-group">
               <label class="checkbox-label">
                 <input type="checkbox" id="run-headed" />
                 Show browser window (headed)
@@ -351,9 +367,9 @@
                 Dry run (validate only, no BC changes)
               </label>
             </div>
-            <div class="actions mt-md">
+            </div>
+            <div class="run-runbar">
               <button class="btn btn-primary" id="btn-run">Run Selected</button>
-              <span id="run-selected-count" class="text-muted" style="font-size:13px;margin-left:8px"></span>
             </div>
           </div>
           <div class="card mt-md" id="run-output-card" style="display:none">
