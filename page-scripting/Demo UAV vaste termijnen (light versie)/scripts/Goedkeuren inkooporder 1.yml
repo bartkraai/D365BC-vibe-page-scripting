@@ -1,0 +1,129 @@
+name: Goedkeuren inkooporder 1
+description: Test recording
+telemetryId: 9d0a04a9-a82d-401e-928d-cb2fd8070b7e
+start:
+  profile: PROJECTLEIDER 4PS
+steps:
+  - type: invoke
+    invokeType: OpenSettings
+    description: Invoke OpenSettings
+  - type: page-shown
+    source:
+      page: User Settings
+    modal: false
+    runtimeId: bc6
+    description: Page <caption>Mijn instellingen</caption> was shown.
+  - type: invoke
+    target:
+      - page: User Settings
+        runtimeRef: bc6
+    invokeType: Ok
+    description: Invoke Ok on <caption>Mijn instellingen</caption>
+  - type: page-closed
+    source:
+      page: User Settings
+    runtimeId: bc6
+    description: Page <caption>Mijn instellingen</caption> was closed.
+  - type: invoke
+    target:
+      - page: Project Engineer Role Center
+        runtimeRef: b0
+      - part: Control1100525005
+      - page: Approval Activities 4PS
+      - action: Requests to Approve
+    description: Invoke <caption>Aanvragen ter goedkeuring</caption>
+  - type: page-shown
+    source:
+      page: Approval (Compressed)
+    modal: false
+    runtimeId: bct
+    description: Page <caption>Goedkeuring (verdicht)</caption> was shown.
+  - type: filter
+    target:
+      - page: Approval (Compressed)
+        runtimeRef: bct
+    operation: add
+    column:
+      field: Document No.
+      scope: filter
+    description: Add filter for <caption>Document No.</caption> on
+      <caption>Goedkeuring (verdicht)</caption>
+  - type: input
+    target:
+      - page: Approval (Compressed)
+        runtimeRef: bct
+      - scope: filter
+        field: Document No.
+    description: Input <value>Parameters.'Approval (Compressed).Document
+      No.'</value> into <caption>Documentnr.</caption>
+    value: =Parameters.'Approval (Compressed).Document No.'
+  - type: invoke
+    target:
+      - page: Approval (Compressed)
+        runtimeRef: bct
+      - action: Approve
+    parameters: {}
+    description: Invoke <caption>Goedkeuren</caption>
+  - type: page-shown
+    source:
+      page: Email Editor
+    modal: true
+    runtimeId: bir
+    description: Page <caption>Test Automatisch Testen - order IO230601</caption> was shown.
+  - type: invoke
+    target:
+      - page: Email Editor
+        runtimeRef: bir
+    invokeType: Cancel
+    description: Invoke Cancel on <caption>Test Automatisch Testen - order
+      IO230601</caption>
+  - type: page-shown
+    source:
+      page: null
+      automationId: 8da61efd-0002-0003-0507-0b0d1113171d
+      caption: Kiezen
+    modal: true
+    runtimeId: bkk
+    description: Page <caption>Kiezen</caption> was shown.
+  - type: input
+    target:
+      - page: null
+        automationId: 8da61efd-0002-0003-0507-0b0d1113171d
+        caption: Kiezen
+        runtimeRef: bkk
+      - field: AL:STRMENU
+    value: 1
+    description: Input <value>1</value> into <caption>AL:STRMENU</caption>
+  - type: invoke
+    target:
+      - page: null
+        automationId: 8da61efd-0002-0003-0507-0b0d1113171d
+        caption: Kiezen
+        runtimeRef: bkk
+    invokeType: Ok
+    description: Invoke Ok on <caption>Kiezen</caption>
+  - type: page-closed
+    source:
+      page: null
+    runtimeId: bkk
+    description: Page <caption>Kiezen</caption> was closed.
+  - type: page-closed
+    source:
+      page: Email Editor
+    runtimeId: bir
+    description: Page <caption>Test Automatisch Testen - order IO230601</caption>
+      was closed.
+  - type: close-page
+    target:
+      - page: Approval (Compressed)
+        runtimeRef: bct
+    description: Close page <caption>Goedkeuring (verdicht)</caption>
+  - type: page-closed
+    source:
+      page: Approval (Compressed)
+    runtimeId: bct
+    description: Page <caption>Goedkeuring (verdicht)</caption> was closed.
+parameters:
+  Approval (Compressed).Document No.:
+    type: string
+    default: IO230601

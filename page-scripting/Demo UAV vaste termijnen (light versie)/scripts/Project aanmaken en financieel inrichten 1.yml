@@ -1,0 +1,487 @@
+name: Project aanmaken en financieel inrichten 1
+description: Test recording
+telemetryId: cf3e2676-7ec1-4596-8e47-2849aef62bf9
+start:
+  profile: PROJECT CONTROLLER 4PS
+steps:
+  - type: invoke
+    invokeType: OpenSettings
+    description: Invoke OpenSettings
+  - type: page-shown
+    source:
+      page: User Settings
+    modal: false
+    runtimeId: b68
+    description: Page <caption>Mijn instellingen</caption> was shown.
+  - type: invoke
+    target:
+      - page: User Settings
+        runtimeRef: b68
+    invokeType: Ok
+    description: Invoke Ok on <caption>Mijn instellingen</caption>
+  - type: page-closed
+    source:
+      page: User Settings
+    runtimeId: b68
+    description: Page <caption>Mijn instellingen</caption> was closed.
+  - type: navigate
+    target:
+      - page: Project Engineer Role Center
+      - action: Jobs
+    description: Navigate to <caption>Projecten</caption>
+  - type: page-shown
+    source:
+      page: Job List
+    modal: false
+    runtimeId: b6v
+    description: Page <caption>Projecten</caption> was shown.
+  - type: invoke
+    target:
+      - page: Job List
+        runtimeRef: b6v
+      - action: Control_New
+    invokeType: New
+    description: Invoke New on <caption>Nieuw</caption>
+  - type: page-shown
+    source:
+      page: Job Card
+    modal: false
+    runtimeId: bki
+    description: Page <caption>Nieuw - Project</caption> was shown.
+  - type: focus
+    target:
+      - page: Job Card
+        runtimeRef: bki
+      - field: No.
+    description: Focus <caption>Nr.</caption>
+  - type: focus
+    target:
+      - page: Job Card
+        runtimeRef: bki
+      - field: Description
+    description: Focus <caption>Omschrijving</caption>
+  - type: copy-value
+    source:
+      - page: Job Card
+        runtimeRef: bki
+      - field: No.
+    name: Job Card - No.
+    valueType: string
+    description: Copy value from <caption>Nr.</caption>
+  - type: input
+    target:
+      - page: Job Card
+        runtimeRef: bki
+      - field: Description
+    value: Fietsbrug AT
+    description: Input <value>Fietsbrug AT</value> into <caption>Omschrijving</caption>
+  - type: focus
+    target:
+      - page: Job Card
+        runtimeRef: bki
+      - field: Bill-to Customer No.
+    description: Focus <caption>Opdrachtgever</caption>
+  - type: invoke
+    target:
+      - page: Job Card
+        runtimeRef: bki
+      - field: Bill-to Customer No.
+    invokeType: Lookup
+    description: Invoke Lookup on <caption>Opdrachtgever</caption>
+  - type: page-shown
+    source:
+      page: null
+      automationId: 8da61efd-0002-0003-0507-0b0d1113171d
+      caption: Kiezen
+    modal: true
+    runtimeId: bym
+    description: Page <caption>Kiezen</caption> was shown.
+  - type: invoke
+    target:
+      - page: null
+        automationId: 8da61efd-0002-0003-0507-0b0d1113171d
+        caption: Kiezen
+        runtimeRef: bym
+    invokeType: Ok
+    description: Invoke Ok on <caption>Kiezen</caption>
+  - type: page-closed
+    source:
+      page: null
+    runtimeId: bym
+    description: Page <caption>Kiezen</caption> was closed.
+  - type: page-shown
+    source:
+      page: Customer List
+    modal: true
+    runtimeId: byu
+    description: Page <caption>Klanten</caption> was shown.
+  - type: set-current-row
+    target:
+      - page: Customer List
+        runtimeRef: byu
+      - repeater: Control1
+    targetRecord:
+      relative: 4
+    description: Set current row in <caption>Control1</caption>
+  - type: invoke
+    target:
+      - page: Customer List
+        runtimeRef: byu
+      - repeater: Control1
+    parameters:
+      AlwaysCommit: false
+    description: Invoke row on <caption>Control1</caption>
+  - type: page-closed
+    source:
+      page: Customer List
+    runtimeId: byu
+    description: Page <caption>Klanten</caption> was closed.
+  - type: invoke
+    target:
+      - page: Job Card
+        runtimeRef: bki
+      - field: Principal Contact Person
+    invokeType: Lookup
+    description: Invoke Lookup on <caption>Opdrachtgever contactpersoon</caption>
+  - type: page-shown
+    source:
+      page: lookup:Principal Contact Person
+    modal: false
+    runtimeId: b194
+    description: Page <caption>Selecteren</caption> was shown.
+  - type: invoke
+    target:
+      - page: lookup:Principal Contact Person
+        runtimeRef: b194
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:Principal Contact Person
+    runtimeId: b194
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: input
+    target:
+      - page: Job Card
+        runtimeRef: bki
+      - field: Bill-to Address
+    value: Fietsstraat 48
+    description: Input <value>Fietsstraat 48</value> into <caption>Adres</caption>
+  - type: focus
+    target:
+      - page: Job Card
+        runtimeRef: bki
+      - field: Bill-to Post Code
+    description: Focus <caption>Postcode</caption>
+  - type: input
+    target:
+      - page: Job Card
+        runtimeRef: bki
+      - field: Bill-to Post Code
+    value: 4848AM
+    description: Input <value>4848AM</value> into <caption>Postcode</caption>
+  - type: focus
+    target:
+      - page: Job Card
+        runtimeRef: bki
+      - field: Bill-to City
+    description: Focus <caption>Plaats</caption>
+  - type: input
+    target:
+      - page: Job Card
+        runtimeRef: bki
+      - field: Bill-to City
+    value: Amsterdam
+    description: Input <value>Amsterdam</value> into <caption>Plaats</caption>
+  - type: focus
+    target:
+      - page: Job Card
+        runtimeRef: bki
+      - field: Bill-to Country/Region Code
+    description: Focus <caption>Land/Regio</caption>
+  - type: invoke
+    target:
+      - page: Job Card
+        runtimeRef: bki
+      - field: Bill-to Country/Region Code
+    invokeType: Lookup
+    description: Invoke Lookup on <caption>Land/Regio</caption>
+  - type: page-shown
+    source:
+      page: lookup:Bill-to Country/Region Code
+    modal: false
+    runtimeId: b1a2
+    description: Page <caption>Selecteren</caption> was shown.
+  - type: set-current-row
+    target:
+      - page: lookup:Bill-to Country/Region Code
+        runtimeRef: b1a2
+      - repeater: repeater
+    targetRecord:
+      relative: 4
+    description: Set current row in <caption>repeater</caption>
+  - type: invoke
+    target:
+      - page: lookup:Bill-to Country/Region Code
+        runtimeRef: b1a2
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:Bill-to Country/Region Code
+    runtimeId: b1a2
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: input
+    target:
+      - page: Job Card
+        runtimeRef: bki
+      - field: Civil Engineering Project
+    value: true
+    description: Input <value>true</value> into <caption>GWW-project</caption>
+  - type: invoke
+    target:
+      - page: Job Card
+        runtimeRef: bki
+      - field: Global Dimension 1 Code
+    invokeType: Lookup
+    description: Invoke Lookup on <caption>Kostenplaats</caption>
+  - type: page-shown
+    source:
+      page: lookup:Global Dimension 1 Code
+    modal: false
+    runtimeId: b1ak
+    description: Page <caption>Selecteren</caption> was shown.
+  - type: invoke
+    target:
+      - page: lookup:Global Dimension 1 Code
+        runtimeRef: b1ak
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:Global Dimension 1 Code
+    runtimeId: b1ak
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: invoke
+    target:
+      - page: Job Card
+        runtimeRef: bki
+      - action: Principals
+    parameters: {}
+    description: Invoke <caption>Opdrachtgevers</caption>
+  - type: page-shown
+    source:
+      page: Project Principal List
+    modal: false
+    runtimeId: b1az
+    description: Page <caption>Project-opdrachtgevers</caption> was shown.
+  - type: invoke
+    target:
+      - page: Project Principal List
+        runtimeRef: b1az
+      - repeater: Control1
+    invokeType: Edit
+    parameters:
+      AlwaysCommit: false
+    description: Invoke row on <caption>Control1</caption>
+  - type: page-shown
+    source:
+      page: Project Principal
+    modal: false
+    runtimeId: b1iw
+    description: Page <caption>Project-opdrachtgever</caption> was shown.
+  - type: invoke
+    target:
+      - page: Project Principal
+        runtimeRef: b1iw
+      - field: Contact Person No.
+    invokeType: Lookup
+    description: Invoke Lookup on <caption>Contactpersoonnr.</caption>
+  - type: page-shown
+    source:
+      page: lookup:Contact Person No.
+    modal: false
+    runtimeId: b1ne
+    description: Page <caption>Selecteren</caption> was shown.
+  - type: invoke
+    target:
+      - page: lookup:Contact Person No.
+        runtimeRef: b1ne
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:Contact Person No.
+    runtimeId: b1ne
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: input
+    target:
+      - page: Project Principal
+        runtimeRef: b1iw
+      - field: Order No. Customer
+    value: 1257AM
+    description: Input <value>1257AM</value> into <caption>Opdrachtnr. klant</caption>
+  - type: focus
+    target:
+      - page: Project Principal
+        runtimeRef: b1iw
+      - field: Order Date
+    description: Focus <caption>Opdrachtdatum</caption>
+  - type: input
+    target:
+      - page: Project Principal
+        runtimeRef: b1iw
+      - field: Order Date
+    value: 4-5-2026
+    description: Input <value>4-5-2026</value> into <caption>Opdrachtdatum</caption>
+  - type: input
+    target:
+      - page: Project Principal
+        runtimeRef: b1iw
+      - field: Contract Amount
+    value: "200000"
+    description: Input <value>200000</value> into <caption>Aanneemsom</caption>
+  - type: input
+    target:
+      - page: Project Principal
+        runtimeRef: b1iw
+      - field: Control50
+    value: true
+    description: Input <value>true</value> into <caption>Termijnen genereren</caption>
+  - type: invoke
+    target:
+      - page: Project Principal
+        runtimeRef: b1iw
+      - field: Control46
+    invokeType: Lookup
+    description: Invoke Lookup on <caption>Termijnschema</caption>
+  - type: page-shown
+    source:
+      page: lookup:Control46
+    modal: false
+    runtimeId: b1oc
+    description: Page <caption>Selecteren</caption> was shown.
+  - type: set-current-row
+    target:
+      - page: lookup:Control46
+        runtimeRef: b1oc
+      - repeater: repeater
+    targetRecord:
+      relative: 1
+    description: Set current row in <caption>repeater</caption>
+  - type: invoke
+    target:
+      - page: lookup:Control46
+        runtimeRef: b1oc
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:Control46
+    runtimeId: b1oc
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: invoke
+    target:
+      - page: Project Principal
+        runtimeRef: b1iw
+      - action: Generate Installments
+    parameters: {}
+    description: Invoke <caption>Termijnen genereren</caption>
+  - type: page-shown
+    source:
+      page: null
+      automationId: 8da61efd-0002-0003-0507-0b0d1113171d
+      caption: Bevestigen
+    modal: true
+    runtimeId: b1ot
+    description: Page <caption>Bevestigen</caption> was shown.
+  - type: invoke
+    target:
+      - page: null
+        automationId: 8da61efd-0002-0003-0507-0b0d1113171d
+        caption: Bevestigen
+        runtimeRef: b1ot
+    invokeType: Yes
+    description: Invoke Yes on <caption>Bevestigen</caption>
+  - type: page-closed
+    source:
+      page: null
+    runtimeId: b1ot
+    description: Page <caption>Bevestigen</caption> was closed.
+  - type: message
+    automationId: 8da61efd-0002-0003-0507-0b0d1113171d
+    text: Er zijn 4 termijnen gegenereerd.
+    description: "Message: <value>Er zijn 4 termijnen gegenereerd.</value>"
+  - type: close-page
+    target:
+      - page: Project Principal
+        runtimeRef: b1iw
+    description: Close page <caption>Project-opdrachtgever</caption>
+  - type: page-closed
+    source:
+      page: Project Principal
+    runtimeId: b1iw
+    description: Page <caption>Project-opdrachtgever</caption> was closed.
+  - type: close-page
+    target:
+      - page: Project Principal List
+        runtimeRef: b1az
+    description: Close page <caption>Project-opdrachtgevers</caption>
+  - type: page-closed
+    source:
+      page: Project Principal List
+    runtimeId: b1az
+    description: Page <caption>Project-opdrachtgevers</caption> was closed.
+  - type: invoke
+    target:
+      - page: Job Card
+        runtimeRef: bki
+      - action: "&Installments"
+    parameters: {}
+    description: Invoke <caption>Termijnen</caption>
+  - type: page-shown
+    source:
+      page: Project Installments
+    modal: false
+    runtimeId: b1y4
+    description: Page <caption>Projecttermijnen</caption> was shown.
+  - type: close-page
+    target:
+      - page: Project Installments
+        runtimeRef: b1y4
+    description: Close page <caption>Projecttermijnen</caption>
+  - type: page-closed
+    source:
+      page: Project Installments
+    runtimeId: b1y4
+    description: Page <caption>Projecttermijnen</caption> was closed.
+  - type: close-page
+    target:
+      - page: Job Card
+        runtimeRef: bki
+    description: Close page <caption>Project</caption>
+  - type: page-closed
+    source:
+      page: Job Card
+    runtimeId: bki
+    description: Page <caption>Project</caption> was closed.
+  - type: close-page
+    target:
+      - page: Job List
+        runtimeRef: b6v
+    description: Close page <caption>Projecten</caption>
+  - type: page-closed
+    source:
+      page: Job List
+    runtimeId: b6v
+    description: Page <caption>Projecten</caption> was closed.

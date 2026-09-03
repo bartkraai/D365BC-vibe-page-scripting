@@ -2,73 +2,66 @@
   "$schema": "./catalog.schema.json",
   "value_chains": [
     {
-      "code": "TEST PRJ",
-      "name": "Test Projecten",
-      "description": "",
-      "types": [
-        {
-          "code": "TEST",
-          "name": "Test",
-          "description": "Projectkaart openen",
-          "process_flows": [
-            {
-              "code": "VAN-TRAJEC",
-              "name": "Van traject naar project",
-              "description": "Volledig traject: aanmaken traject, overdracht, projectkaart inrichten.",
-              "workflow_path": "./Van traject naar project"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "code": "TP",
-      "name": "Test parameter",
-      "description": "",
-      "types": [
-        {
-          "code": "TRJ",
-          "name": "Traject",
-          "description": "Traject nr.",
-          "process_flows": [
-            {
-              "code": "TRJ",
-              "name": "Traject nr. parameter",
-              "description": "Parameter testen",
-              "workflow_path": "./Traject nr. parameter"
-            }
-          ]
-        },
-        {
-          "code": "INKOOP",
-          "name": "Inkooporder",
-          "description": "Inkooporder aanmaken, goedkeuren en ontvangen",
-          "process_flows": [
-            {
-              "code": "TIK",
-              "name": "Test inkoop",
-              "description": "Inkooporder aanmaken, goedkeuren en ontvangen",
-              "workflow_path": "./Test inkoop"
-            }
-          ]
-        }
-      ]
-    },
-    {
       "code": "PRJ",
       "name": "Projecten",
       "description": "",
       "types": [
         {
-          "code": "UAV",
-          "name": "UAV Project",
-          "description": "UAV Project (Vaste termijnen)",
+          "code": "D-UAV",
+          "name": "Demo UAV vaste termijnen (light versie)",
+          "description": "",
           "process_flows": [
             {
-              "code": "UAV PRJ",
-              "name": "UAV Project",
-              "description": "UAV Project (Vaste termijnen)",
-              "workflow_path": "./UAV Project"
+              "code": "DEMO-UAV-V",
+              "name": "Demo UAV vaste termijnen (light versie)",
+              "description": "",
+              "workflow_path": "./Demo UAV vaste termijnen (light versie)"
+            }
+          ]
+        },
+        {
+          "code": "UAV-T",
+          "name": "UAV",
+          "description": "UAV",
+          "process_flows": [
+            {
+              "code": "UAV-PROJEC",
+              "name": "UAV Project (3)",
+              "description": "",
+              "workflow_path": "./UAV Project (3)"
+            }
+          ]
+        },
+        {
+          "code": "PRJ-VT",
+          "name": "Projecten (vaste termijnen)",
+          "description": "Projecten (vaste termijnen)",
+          "process_flows": [
+            {
+              "code": "PROJECTEN-",
+              "name": "Projecten (vaste termijnen)",
+              "description": "",
+              "workflow_path": "./Projecten (vaste termijnen)"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "SYSTEEMBHR",
+      "name": "Test Systeembeheer",
+      "description": "",
+      "types": [
+        {
+          "code": "R&P",
+          "name": "Switch Roles and Permissions",
+          "description": "",
+          "process_flows": [
+            {
+              "code": "SWITCH-ROL",
+              "name": "Switch Role and Permissions",
+              "description": "",
+              "workflow_path": "./Switch Role and Permissions"
             }
           ]
         }

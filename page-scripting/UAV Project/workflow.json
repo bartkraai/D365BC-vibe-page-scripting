@@ -1,15 +1,14 @@
 {
-  "$schema": "./workflow.schema.json",
-  "name": "UAV Project",
+  "name": "UAV Project (1)",
   "description": "Deze workflow beschrijft de waarde keten van de contractvorm UAV met vaste termijnen.",
   "steps": [
     {
       "id": "step-1",
       "name": "Traject",
       "user": "Acquisiteur 4PS",
-      "script": "./scripts/Van trajectregistratie tm vervolgtraject.yml",
+      "script": "./scripts/Van trajectregistratie tm vervolgtraject 2.yml",
       "capture": {
-        "null_project_pr00311_is_aangemaakt": "null - Project PR00311 is aangemaakt.",
+        "null_project_pr00316_is_aangemaakt": "null - Project PR00316 is aangemaakt.",
         "try_out_successor_project_no": "Try-out Successor - Project No."
       }
     },
@@ -17,10 +16,9 @@
       "id": "step-2",
       "name": "Projectregistratie",
       "user": "Project Controller",
-      "script": "./scripts/Projectregistratie.yml",
+      "script": "./scripts/Projectregistratie 2.yml",
       "inject": {
-        "Job List.No.": "{capture.step-1.null_project_pr00311_is_aangemaakt}",
-        "param_2": "{capture.step-1.null_project_pr00311_is_aangemaakt}"
+        "Job List.No.": "{capture.step-1.null_project_pr00316_is_aangemaakt}"
       },
       "depends_on": "step-1"
     },
@@ -28,13 +26,9 @@
       "id": "step-3",
       "name": "Project inrichten",
       "user": "Projectleider",
-      "script": "./scripts/Project inrichten en 1e prognose.yml",
-      "capture": {
-        "project_location_code": "Project Location - Code",
-        "var_2": ""
-      },
+      "script": "./scripts/Project inrichten en 1e prognose 2.yml",
       "inject": {
-        "Job List.No.": "{capture.step-1.null_project_pr00311_is_aangemaakt}"
+        "Job List.No.": "{capture.step-1.null_project_pr00316_is_aangemaakt}"
       },
       "depends_on": "step-2"
     },
@@ -42,13 +36,13 @@
       "id": "step-4",
       "name": "Aanmaken inkooporder(s)",
       "user": "Werkvoorbereider",
-      "script": "./scripts/Aanmaken inkooporder.yml",
+      "script": "./scripts/Aanmaken inkooporder 2.yml",
       "capture": {
-        "null_inkooporder_io230599_is_aangemaakt": "null - Inkooporder IO230599 is aangemaakt.",
-        "purchase_order_list_no": "Purchase Order List - No."
+        "null_inkooporder_io230600_is_aangemaakt": "null - Inkooporder IO230600 is aangemaakt."
       },
       "inject": {
-        "Job List.No.": "{capture.step-1.null_project_pr00311_is_aangemaakt}"
+        "Job List.No.": "{capture.step-1.null_project_pr00316_is_aangemaakt}",
+        "Project Purchase Order List.No.": "{capture.step-1.try_out_successor_project_no}"
       },
       "depends_on": "step-3"
     },
@@ -56,10 +50,9 @@
       "id": "step-5",
       "name": "Inkooporder goedkeuren",
       "user": "Projectleider",
-      "script": "./scripts/Goedkeuring inkooporder.yml",
+      "script": "./scripts/Goedkeuring inkooporder 2.yml",
       "inject": {
-        "Approval (Compressed).Document No.": "{capture.step-1.null_project_pr00311_is_aangemaakt}",
-        "param_2": "{capture.step-4.null_inkooporder_io230599_is_aangemaakt}"
+        "Approval (Compressed).Document No.": "{capture.step-1.null_project_pr00316_is_aangemaakt}"
       },
       "depends_on": "step-4"
     },
@@ -67,11 +60,10 @@
       "id": "step-6",
       "name": "Inkooporder ontvangst",
       "user": "Uitvoerder GWW 4PS",
-      "script": "./scripts/Inkooporder ontvangst.yml",
+      "script": "./scripts/Inkooporder ontvangst 2.yml",
       "inject": {
-        "Job List.No.": "{capture.step-1.null_project_pr00311_is_aangemaakt}",
-        "Project Purchase Order List.No.": "{capture.step-4.purchase_order_list_no}",
-        "Project Purchase Order List.No. - 1": "{capture.step-1.try_out_successor_project_no}"
+        "Job List.No.": "{capture.step-1.null_project_pr00316_is_aangemaakt}",
+        "Project Purchase Order List.No.": "{capture.step-1.try_out_successor_project_no}"
       },
       "depends_on": "step-5"
     },
@@ -79,9 +71,9 @@
       "id": "step-7",
       "name": "Periodieke administratie",
       "user": "Projectleider",
-      "script": "./scripts/Periodieke administratie.yml",
+      "script": "./scripts/Periodieke administratie 2.yml",
       "inject": {
-        "Job List.No.": "{capture.step-1.null_project_pr00311_is_aangemaakt}"
+        "Projects by Responsible Person.No.": "{capture.step-1.null_project_pr00316_is_aangemaakt}"
       },
       "depends_on": "step-6"
     }

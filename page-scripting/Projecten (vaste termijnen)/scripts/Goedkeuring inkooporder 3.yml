@@ -1,0 +1,105 @@
+name: Goedkeuring inkooporder 3
+description: Test recording
+telemetryId: 20b5353b-4265-4ab5-b10e-0b50d77d9d93
+timeout: 300
+start:
+  profile: PROJECTLEIDER 4PS
+steps:
+  - type: invoke
+    invokeType: OpenSettings
+    description: Invoke OpenSettings
+  - type: page-shown
+    source:
+      page: User Settings
+    modal: false
+    runtimeId: b9r0
+    description: Page <caption>Mijn instellingen</caption> was shown.
+  - type: invoke
+    target:
+      - page: User Settings
+        runtimeRef: b9r0
+    invokeType: Ok
+    description: Invoke Ok on <caption>Mijn instellingen</caption>
+  - type: page-closed
+    source:
+      page: User Settings
+    runtimeId: b9r0
+    description: Page <caption>Mijn instellingen</caption> was closed.
+  - type: invoke
+    target:
+      - page: Project Engineer Role Center
+        runtimeRef: b0
+      - part: Control1100525005
+      - page: Approval Activities 4PS
+      - action: Requests to Approve
+    description: Invoke <caption>Aanvragen ter goedkeuring</caption>
+  - type: page-shown
+    source:
+      page: Approval (Compressed)
+    modal: false
+    runtimeId: b9rn
+    description: Page <caption>Goedkeuring (verdicht)</caption> was shown.
+  - type: filter
+    target:
+      - page: Approval (Compressed)
+        runtimeRef: b9rn
+    operation: add
+    column:
+      field: Document No.
+      scope: filter
+    description: Add filter for <caption>Document No.</caption> on
+      <caption>Goedkeuring (verdicht)</caption>
+  - type: input
+    target:
+      - page: Approval (Compressed)
+        runtimeRef: b9rn
+      - scope: filter
+        field: Document No.
+    description: Input <value>Parameters.'Approval (Compressed).Document
+      No.'</value> into <caption>Documentnr.</caption>
+    value: =Parameters.'Approval (Compressed).Document No.'
+  - type: invoke
+    target:
+      - page: Approval (Compressed)
+        runtimeRef: b9rn
+      - repeater: Control1100485000
+      - field: Document No.
+    invokeType: DrillDown
+    description: Invoke DrillDown on <caption>Documentnr.</caption>
+  - type: page-shown
+    source:
+      page: Purchase Order
+    modal: false
+    runtimeId: b9xl
+    description: Page <caption>Inkooporder</caption> was shown.
+  - type: close-page
+    target:
+      - page: Purchase Order
+        runtimeRef: b9xl
+    description: Close page <caption>Inkooporder</caption>
+  - type: page-closed
+    source:
+      page: Purchase Order
+    runtimeId: b9xl
+    description: Page <caption>Inkooporder</caption> was closed.
+  - type: invoke
+    target:
+      - page: Approval (Compressed)
+        runtimeRef: b9rn
+      - action: Approve
+    parameters: {}
+    description: Invoke <caption>Goedkeuren</caption>
+  - type: close-page
+    target:
+      - page: Approval (Compressed)
+        runtimeRef: b9rn
+    description: Close page <caption>Goedkeuring (verdicht)</caption>
+  - type: page-closed
+    source:
+      page: Approval (Compressed)
+    runtimeId: b9rn
+    description: Page <caption>Goedkeuring (verdicht)</caption> was closed.
+parameters:
+  Approval (Compressed).Document No.:
+    type: string
+    default: IO230609

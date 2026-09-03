@@ -1,0 +1,452 @@
+telemetryId: 4009be5c-ecc4-47d6-947e-87858f6ae2b9
+timeout: 300
+steps:
+  - type: invoke
+    invokeType: OpenSettings
+    description: Invoke OpenSettings
+  - type: page-shown
+    source:
+      page: User Settings
+    modal: false
+    runtimeId: b6z
+    description: Page <caption>Mijn instellingen</caption> was shown.
+  - type: invoke
+    target:
+      - page: User Settings
+        runtimeRef: b6z
+    invokeType: Ok
+    description: Invoke Ok on <caption>Mijn instellingen</caption>
+  - type: page-closed
+    source:
+      page: User Settings
+    runtimeId: b6z
+    description: Page <caption>Mijn instellingen</caption> was closed.
+  - type: navigate
+    target:
+      - page: Project Engineer Role Center
+      - action: Jobs
+    description: Navigate to <caption>Projecten</caption>
+  - type: page-shown
+    source:
+      page: Job List
+    modal: false
+    runtimeId: bl9
+    description: Page <caption>Projecten</caption> was shown.
+  - type: filter
+    target:
+      - page: Job List
+        runtimeRef: bl9
+    operation: add
+    column:
+      field: No.
+      scope: filter
+    description: Add filter for <caption>No.</caption> on <caption>Projecten</caption>
+  - type: input
+    target:
+      - page: Job List
+        runtimeRef: bl9
+      - scope: filter
+        field: No.
+    value: P
+    isFilterAsYouType: true
+    description: Input <value>P</value> into <caption>Nr.</caption>
+  - type: page-shown
+    source:
+      page: lookup:No.
+    modal: false
+    runtimeId: byy
+    description: Page <caption>Selecteren</caption> was shown.
+  - type: input
+    target:
+      - page: Job List
+        runtimeRef: bl9
+      - scope: filter
+        field: No.
+    value: PR
+    isFilterAsYouType: true
+    description: Input <value>PR</value> into <caption>Nr.</caption>
+  - type: input
+    target:
+      - page: Job List
+        runtimeRef: bl9
+      - scope: filter
+        field: No.
+    isFilterAsYouType: true
+    value: =Parameters.'Job List.No.'
+    description: Input <value>Parameters.'Job List.No.'</value> into <caption>Nr.</caption>
+  - type: invoke
+    target:
+      - page: lookup:No.
+        runtimeRef: byy
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:No.
+    runtimeId: byy
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: invoke
+    target:
+      - page: Job List
+        runtimeRef: bl9
+      - repeater: Control1
+    invokeType: Edit
+    parameters:
+      AlwaysCommit: false
+    description: Invoke row on <caption>Control1</caption>
+  - type: page-shown
+    source:
+      page: Job Card
+    modal: false
+    runtimeId: b1dv
+    description: Page <caption>Project</caption> was shown.
+  - type: invoke
+    target:
+      - page: Job Card
+        runtimeRef: b1dv
+      - action: "&Installments"
+    description: Invoke <caption>Termijnen</caption>
+  - type: page-shown
+    source:
+      page: Project Installments
+    modal: false
+    runtimeId: b1sm
+    description: Page <caption>Projecttermijnen</caption> was shown.
+  - type: input
+    target:
+      - page: Project Installments
+        runtimeRef: b1sm
+      - repeater: Control1
+      - field: Chargeable
+    value: true
+    description: Input <value>true</value> into <caption>Factureerbaar</caption>
+  - type: invoke
+    target:
+      - page: Project Installments
+        runtimeRef: b1sm
+      - action: Create &Invoices
+    description: Invoke <caption>Facturen aanmaken...</caption>
+  - type: page-shown
+    source:
+      page: Create Project Invoices
+    modal: true
+    runtimeId: b21g
+    description: Page <caption>Projectfacturen aanmaken</caption> was shown.
+  - type: invoke
+    target:
+      - page: Create Project Invoices
+        runtimeRef: b21g
+    invokeType: Ok
+    description: Invoke Ok on <caption>Projectfacturen aanmaken</caption>
+  - type: page-closed
+    source:
+      page: Create Project Invoices
+    runtimeId: b21g
+    description: Page <caption>Projectfacturen aanmaken</caption> was closed.
+  - type: message
+    automationId: 8da61efd-0002-0003-0507-0b0d1113171d
+    text: Er zijn 1 facturen, 0 creditnota's, 1 factuurregels en 0
+      doorbelastingregels aangemaakt
+    description: "Message: <value>Er zijn 1 facturen, 0 creditnota's, 1
+      factuurregels en 0 doorbelastingregels aangemaakt</value>"
+  - type: invoke
+    target:
+      - page: Project Installments
+        runtimeRef: b1sm
+      - repeater: Control1
+      - field: Invoice in Process
+    invokeType: DrillDown
+    description: Invoke DrillDown on <caption>Factuur onderweg</caption>
+  - type: page-shown
+    source:
+      page: Sales Lines List
+    modal: false
+    runtimeId: b23c
+    description: Page <caption>Verkoopregels overzicht</caption> was shown.
+  - type: invoke
+    target:
+      - page: Sales Lines List
+        runtimeRef: b23c
+      - action: Show Document
+    description: Invoke <caption>Document tonen</caption>
+  - type: page-shown
+    source:
+      page: Sales Invoice
+    modal: false
+    runtimeId: b29o
+    description: Page <caption>Verkoopfactuur</caption> was shown.
+  - type: close-page
+    target:
+      - page: Sales Invoice
+        runtimeRef: b29o
+    description: Close page <caption>Verkoopfactuur</caption>
+  - type: page-shown
+    source:
+      page: null
+      automationId: 8da61efd-0002-0003-0507-0b0d1113171d
+      caption: Bevestigen
+    modal: true
+    runtimeId: b2z2
+    description: Page <caption>Bevestigen</caption> was shown.
+  - type: invoke
+    target:
+      - page: null
+        automationId: 8da61efd-0002-0003-0507-0b0d1113171d
+        caption: Bevestigen
+        runtimeRef: b2z2
+    invokeType: Yes
+    description: Invoke Yes on <caption>Bevestigen</caption>
+  - type: page-closed
+    source:
+      page: null
+    runtimeId: b2z2
+    description: Page <caption>Bevestigen</caption> was closed.
+  - type: page-closed
+    source:
+      page: Sales Invoice
+    runtimeId: b29o
+    description: Page <caption>Verkoopfactuur</caption> was closed.
+  - type: close-page
+    target:
+      - page: Sales Lines List
+        runtimeRef: b23c
+    description: Close page <caption>Verkoopregels overzicht</caption>
+  - type: page-closed
+    source:
+      page: Sales Lines List
+    runtimeId: b23c
+    description: Page <caption>Verkoopregels overzicht</caption> was closed.
+  - type: close-page
+    target:
+      - page: Project Installments
+        runtimeRef: b1sm
+    description: Close page <caption>Projecttermijnen</caption>
+  - type: page-closed
+    source:
+      page: Project Installments
+    runtimeId: b1sm
+    description: Page <caption>Projecttermijnen</caption> was closed.
+  - type: invoke
+    target:
+      - page: Job Card
+        runtimeRef: bbvp
+      - action: Pr&ognosis
+    parameters: {}
+    description: Invoke <caption>Prognose</caption>
+  - type: page-shown
+    source:
+      page: Prognosis List
+    modal: true
+    runtimeId: bdiw
+    description: Page <caption>Prognoses</caption> was shown.
+  - type: invoke
+    target:
+      - page: Prognosis List
+        runtimeRef: bdiw
+      - action: Control_New
+    invokeType: New
+    description: Invoke New on <caption>Nieuw</caption>
+  - type: page-shown
+    source:
+      page: Prognosis
+    modal: false
+    runtimeId: bdm3
+    description: Page <caption>Prognose</caption> was shown.
+  - type: focus
+    target:
+      - page: Prognosis
+        runtimeRef: bdm3
+      - field: Project No.
+    description: Focus <caption>Projectnr.</caption>
+  - type: focus
+    target:
+      - page: Prognosis
+        runtimeRef: bdm3
+      - field: Prognosis Date
+    description: Focus <caption>Prognosedatum</caption>
+  - type: input
+    target:
+      - page: Prognosis
+        runtimeRef: bdm3
+      - field: Prognosis Date
+    value: 5-10-2026
+    description: Input <value>5-10-2026</value> into <caption>Prognosedatum</caption>
+  - type: focus
+    target:
+      - page: Prognosis
+        runtimeRef: bdm3
+      - field: Comment
+    description: Focus <caption>Opmerking</caption>
+  - type: input
+    target:
+      - page: Prognosis
+        runtimeRef: bdm3
+      - field: Comment
+    value: 2e prognose
+    description: Input <value>2e prognose</value> into <caption>Opmerking</caption>
+  - type: input
+    target:
+      - page: Prognosis
+        runtimeRef: bdm3
+      - field: General Costs
+    value: 2
+    description: Input <value>2</value> into <caption>Algemene kosten</caption>
+  - type: input
+    target:
+      - page: Prognosis
+        runtimeRef: bdm3
+      - field: Revenues
+    value: 1
+    description: Input <value>1</value> into <caption>Opbrengsten</caption>
+  - type: input
+    target:
+      - page: Prognosis
+        runtimeRef: bdm3
+      - field: Copy Comments Prev. Prognosis
+    value: true
+    description: Input <value>true</value> into <caption>Vorige prognose opmerkingen
+      kopiëren</caption>
+  - type: invoke
+    target:
+      - page: Prognosis
+        runtimeRef: bdm3
+      - action: "&Create"
+    parameters: {}
+    description: Invoke <caption>Aanmaken</caption>
+  - type: invoke
+    target:
+      - page: Prognosis
+        runtimeRef: bdm3
+      - action: Prognosis Costs
+    parameters: {}
+    description: Invoke <caption>Prognose kosten</caption>
+  - type: page-shown
+    source:
+      page: Prognosis Costs per Element
+    modal: false
+    runtimeId: bdpp
+    description: Page <caption>Prognose kosten per element</caption> was shown.
+  - type: input
+    target:
+      - page: Prognosis Costs per Element
+        runtimeRef: bdpp
+      - repeater: Control1
+      - field: Amount
+    value: "15000"
+    description: Input <value>15000</value> into <caption>Bedrag</caption>
+  - type: set-current-row
+    target:
+      - page: Prognosis Costs per Element
+        runtimeRef: bdpp
+      - repeater: Control1
+    targetRecord:
+      relative: 1
+    description: Set current row in <caption>Control1</caption>
+  - type: input
+    target:
+      - page: Prognosis Costs per Element
+        runtimeRef: bdpp
+      - repeater: Control1
+      - field: Amount
+    value: "2500"
+    description: Input <value>2500</value> into <caption>Bedrag</caption>
+  - type: set-current-row
+    target:
+      - page: Prognosis Costs per Element
+        runtimeRef: bdpp
+      - repeater: Control1
+    targetRecord:
+      relative: 3
+    description: Set current row in <caption>Control1</caption>
+  - type: input
+    target:
+      - page: Prognosis Costs per Element
+        runtimeRef: bdpp
+      - repeater: Control1
+      - field: Amount
+    value: "1700"
+    description: Input <value>1700</value> into <caption>Bedrag</caption>
+  - type: set-current-row
+    target:
+      - page: Prognosis Costs per Element
+        runtimeRef: bdpp
+      - repeater: Control1
+    targetRecord:
+      relative: 2
+    description: Set current row in <caption>Control1</caption>
+  - type: input
+    target:
+      - page: Prognosis Costs per Element
+        runtimeRef: bdpp
+      - repeater: Control1
+      - field: Amount
+    value: "20000"
+    description: Input <value>20000</value> into <caption>Bedrag</caption>
+  - type: close-page
+    target:
+      - page: Prognosis Costs per Element
+        runtimeRef: bdpp
+    description: Close page <caption>Prognose kosten per element</caption>
+  - type: page-closed
+    source:
+      page: Prognosis Costs per Element
+    runtimeId: bdpp
+    description: Page <caption>Prognose kosten per element</caption> was closed.
+  - type: input
+    target:
+      - page: Prognosis
+        runtimeRef: bdm3
+      - field: Fixed
+    value: true
+    description: Input <value>true</value> into <caption>Bevroren</caption>
+  - type: close-page
+    target:
+      - page: Prognosis
+        runtimeRef: bdm3
+    description: Close page <caption>Prognose</caption>
+  - type: page-closed
+    source:
+      page: Prognosis
+    runtimeId: bdm3
+    description: Page <caption>Prognose</caption> was closed.
+  - type: invoke
+    target:
+      - page: Prognosis List
+        runtimeRef: bdiw
+    invokeType: CloseOk
+    description: Invoke CloseOk on <caption>Prognoses</caption>
+  - type: page-closed
+    source:
+      page: Prognosis List
+    runtimeId: bdiw
+    description: Page <caption>Prognoses</caption> was closed.
+  - type: close-page
+    target:
+      - page: Job Card
+        runtimeRef: bbvp
+    description: Close page <caption>Project</caption>
+  - type: page-closed
+    source:
+      page: Job Card
+    runtimeId: bbvp
+    description: Page <caption>Project</caption> was closed.
+  - type: close-page
+    target:
+      - page: Job List
+        runtimeRef: batd
+    description: Close page <caption>Projecten</caption>
+  - type: page-closed
+    source:
+      page: Job List
+    runtimeId: batd
+    description: Page <caption>Projecten</caption> was closed.
+name: Periodieke administratie 3
+description: Test recording
+start:
+  profile: PROJECTLEIDER 4PS
+parameters:
+  Job List.No.:
+    type: string
+    default: PR00329
