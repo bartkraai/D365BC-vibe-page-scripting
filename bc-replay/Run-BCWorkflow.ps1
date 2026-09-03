@@ -94,6 +94,37 @@ function Invoke-Npx {
     return $LASTEXITCODE
 }
 
+# A replay can return a non-zero process code when it only emits warnings.
+# The JUnit result is authoritative for the test outcome when it was written.
+function Get-NormalizedReplayExitCode {
+    param(
+        [int]$ProcessExitCode,
+        [string]$ResultDir
+    )
+
+    if ($ProcessExitCode -eq 0) { return 0 }
+
+    $resultsPath = Join-Path $ResultDir 'results.xml'
+    if (-not (Test-Path $resultsPath)) { return $ProcessExitCode }
+
+    try {
+        $junit = [xml](Get-Content $resultsPath -Raw)
+        $suite = $junit.testsuites
+        $tests = [int]($suite.tests ?? 0)
+        $failures = [int]($suite.failures ?? 0)
+        $errors = [int]($suite.errors ?? 0)
+
+        if ($tests -gt 0 -and $failures -eq 0 -and $errors -eq 0) {
+            Write-Warning "  bc-replay returned exit code $ProcessExitCode, but results.xml contains no failed tests; treating replay as passed."
+            return 0
+        }
+    } catch {
+        Write-Warning "  Could not validate results.xml after bc-replay exit code ${ProcessExitCode}: $_"
+    }
+
+    return $ProcessExitCode
+}
+
 # ── Import modules ──────────────────────────────────────────────────────────
 $scriptRoot = $PSScriptRoot
 . (Join-Path $scriptRoot "Invoke-YamlPreprocess.ps1")
@@ -905,7 +936,10 @@ foreach ($step in $workflow.steps) {
             $bcReplayDir = $PSScriptRoot
             Push-Location $bcReplayDir
             try {
-                $exitCode = Invoke-Npx -Arguments $replayArgs
+                $processExitCode = Invoke-Npx -Arguments $replayArgs
+                $exitCode = Get-NormalizedReplayExitCode `
+                    -ProcessExitCode $processExitCode `
+                    -ResultDir $scriptResultDir
             } catch {
                 Write-Warning "  bc-replay execution error: $_"
                 $exitCode = 1
