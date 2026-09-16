@@ -10,7 +10,8 @@
       "script": "./scripts/Van traject registratie tm vervolgtraject 3.yml",
       "capture": {
         "try_out_successor_project_no": "Try-out Successor - Project No."
-      }
+      },
+      "company": "TestAT"
     },
     {
       "id": "step-2",
@@ -20,7 +21,8 @@
       "inject": {
         "Job List.No.": "{capture.step-1.try_out_successor_project_no}"
       },
-      "depends_on": "step-1"
+      "depends_on": "step-1",
+      "company": "TestAT"
     },
     {
       "id": "step-3",
@@ -30,7 +32,8 @@
       "inject": {
         "Job List.No.": "{capture.step-1.try_out_successor_project_no}"
       },
-      "depends_on": "step-2"
+      "depends_on": "step-2",
+      "company": "TestAT"
     },
     {
       "id": "step-4",
@@ -43,7 +46,8 @@
       "inject": {
         "Job List.No.": "{capture.step-1.try_out_successor_project_no}"
       },
-      "depends_on": "step-3"
+      "depends_on": "step-3",
+      "company": "TestAT"
     },
     {
       "id": "step-5",
@@ -51,9 +55,10 @@
       "user": "Projectleider",
       "script": "./scripts/Goedkeuring inkooporder 3.yml",
       "inject": {
-        "Approval (Compressed).Document No.": "{capture.step-1.try_out_successor_project_no}"
+        "Approval (Compressed).Document No.": "{capture.step-4.purchase_order_list_no}"
       },
-      "depends_on": "step-4"
+      "depends_on": "step-4",
+      "company": "TestAT"
     },
     {
       "id": "step-6",
@@ -64,7 +69,8 @@
         "Job List.No.": "{capture.step-1.try_out_successor_project_no}",
         "Project Purchase Order List.No.": "{capture.step-4.purchase_order_list_no}"
       },
-      "depends_on": "step-5"
+      "depends_on": "step-5",
+      "company": "TestAT"
     },
     {
       "id": "step-7",
@@ -74,7 +80,8 @@
       "inject": {
         "Job List.No.": "{capture.step-1.try_out_successor_project_no}"
       },
-      "depends_on": "step-6"
+      "depends_on": "step-6",
+      "company": "TestAT"
     }
   ]
 }
