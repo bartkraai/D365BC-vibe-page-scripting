@@ -9,6 +9,7 @@ const fs        = require('fs');
 const { spawn, exec } = require('child_process');
 const yaml      = require('js-yaml');
 const PDFDocument = require('pdfkit');
+const { syncOptionalCredential } = require('./credential-updates');
 
 // ── Keytar (Windows Credential Manager — graceful fallback) ──────────────────
 let keytar = null;
@@ -243,10 +244,17 @@ app.post('/api/environments', async (req, res) => {
       }
     }
 
+    const mfaStateByRole = new Map();
     for (const r of roles) {
       if (r.password)  await saveCred(`${name}:${r.role}:password`, r.password);
       if (r.username)  await saveCred(`${name}:${r.role}:username`, r.username);
-      if (r.mfaSeed)   await saveCred(`${name}:${r.role}:mfa`,      r.mfaSeed);
+      const hasMfa = await syncOptionalCredential(
+        `${name}:${r.role}:mfa`,
+        r.mfaSeed,
+        saveCred,
+        deleteCred,
+      );
+      mfaStateByRole.set(r.role, hasMfa);
     }
 
     // Save app registration credentials
@@ -263,7 +271,7 @@ app.post('/api/environments', async (req, res) => {
       name,
       url,
       companies: companies.filter(c => typeof c === 'string' && c.trim()).map(c => c.trim()),
-      roles: roles.map(r => ({ role: r.role, username: r.username, hasMfa: !!r.mfaSeed })),
+      roles: roles.map(r => ({ role: r.role, username: r.username, hasMfa: mfaStateByRole.get(r.role) === true })),
       hasAppRegistration: !!(appRegistration?.clientId),
       ...(existingEnv?.isDefault ? { isDefault: true } : {}),
     });
@@ -689,17 +697,24 @@ app.post('/api/projects/:name/seed', async (req, res) => {
     const url     = wf.bc_url || '';
 
     // Save each role's credentials to the secure store
+    const mfaStateByRole = new Map();
     for (const [role, info] of Object.entries(users)) {
       if (info.username) await saveCred(`${envName}:${role}:username`, info.username);
       if (info.password) await saveCred(`${envName}:${role}:password`, info.password);
-      if (info.mfa_seed) await saveCred(`${envName}:${role}:mfa`,      info.mfa_seed);
+      const hasMfa = await syncOptionalCredential(
+        `${envName}:${role}:mfa`,
+        info.mfa_seed,
+        saveCred,
+        deleteCred,
+      );
+      mfaStateByRole.set(role, hasMfa);
     }
 
     // Upsert the environment metadata (preserve existing entries)
     const roles = Object.entries(users).map(([role, info]) => ({
       role,
       username: info.username || '',
-      hasMfa:   !!(info.mfa_seed),
+      hasMfa:   mfaStateByRole.get(role) === true,
     }));
     const envs = readEnvs().filter(e => e.name !== envName);
     envs.push({ name: envName, url, roles });

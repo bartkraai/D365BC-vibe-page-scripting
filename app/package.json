@@ -4,7 +4,8 @@
   "description": "4PS Test Automation — Local web application for customers and functional consultants",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "test": "node --test"
   },
   "dependencies": {
     "chokidar": "^3.6.0",
