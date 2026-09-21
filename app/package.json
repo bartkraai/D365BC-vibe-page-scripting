@@ -8,12 +8,12 @@
     "test": "node --test"
   },
   "dependencies": {
-    "chokidar": "^3.6.0",
-    "express": "^4.18.2",
-    "js-yaml": "^4.1.0",
-    "keytar": "^7.9.0",
-    "pdfkit": "^0.15.0",
-    "ws": "^8.16.0"
+    "chokidar": "latest",
+    "express": "latest",
+    "js-yaml": "latest",
+    "keytar": "latest",
+    "pdfkit": "latest",
+    "ws": "latest"
   },
   "engines": {
     "node": ">=18.0.0"

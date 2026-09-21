@@ -7,6 +7,11 @@
     the Express server. The app opens automatically in your default browser.
 #>
 
+param(
+    [switch]$SkipUpdate,
+    [switch]$ForceUpdate
+)
+
 $ErrorActionPreference = 'Stop'
 $root = $PSScriptRoot
 $appDir = Join-Path $root 'app'
@@ -120,8 +125,28 @@ if (-not (Get-Command pwsh -ErrorAction SilentlyContinue)) {
     Read-Host "Press Enter to exit"
     exit 0
 }
-# ── Install app dependencies if needed ───────────────────────────────────────
+# ── Determine if packages should be updated ──────────────────────────────────
 $nodeModules = Join-Path $appDir 'node_modules'
+$bcReplayDir = Join-Path $root 'bc-replay'
+$playwrightCli = Join-Path $bcReplayDir 'node_modules\@playwright\test\cli.js'
+$bcReplayMods = Join-Path $bcReplayDir 'node_modules'
+
+$shouldUpdate = $false
+if ((Test-Path $nodeModules) -and (Test-Path $bcReplayMods)) {
+    if ($ForceUpdate) {
+        $shouldUpdate = $true
+    } elseif (-not $SkipUpdate -and [Environment]::UserInteractive -and -not [Console]::IsInputRedirected) {
+        Write-Host ""
+        $answer = Read-Host "  Check and update dependencies to latest? (Y/n)"
+        if ($answer -notmatch '^(n|no)$') {
+            $shouldUpdate = $true
+        } else {
+            Write-Host "  Skipping package updates." -ForegroundColor DarkGray
+        }
+    }
+}
+
+# ── Install / update app dependencies ────────────────────────────────────────
 if (-not (Test-Path $nodeModules)) {
     Write-Host ""
     Write-Host "  Installing app dependencies (first run only)..." -ForegroundColor Cyan
@@ -133,11 +158,18 @@ if (-not (Test-Path $nodeModules)) {
         Pop-Location
     }
     Write-Host "  Done." -ForegroundColor Green
+} elseif ($shouldUpdate) {
+    Write-Host "  Updating app dependencies to latest..." -ForegroundColor Cyan
+    Push-Location $appDir
+    try {
+        npm update --silent
+    } catch { }
+    finally {
+        Pop-Location
+    }
 }
 
-# ── Install bc-replay dependencies if needed ─────────────────────────────────
-$bcReplayDir  = Join-Path $root 'bc-replay'
-$bcReplayMods = Join-Path $bcReplayDir 'node_modules'
+# ── Install / update bc-replay dependencies ──────────────────────────────────
 if (-not (Test-Path $bcReplayMods)) {
     Write-Host ""
     Write-Host "  Installing bc-replay dependencies..." -ForegroundColor Cyan
@@ -149,6 +181,21 @@ if (-not (Test-Path $bcReplayMods)) {
         Pop-Location
     }
     Write-Host "  Done." -ForegroundColor Green
+} elseif ($shouldUpdate) {
+    Write-Host "  Updating bc-replay dependencies to latest..." -ForegroundColor Cyan
+    Push-Location $bcReplayDir
+    try {
+        npm update --silent
+    } catch { }
+    finally {
+        Pop-Location
+    }
+}
+
+# Reapply the bc-replay launcher patch after installs and updates.
+if (Test-Path (Join-Path $bcReplayDir 'Patch-BcReplay.ps1')) {
+    Push-Location $bcReplayDir
+    try { & (Join-Path $bcReplayDir 'Patch-BcReplay.ps1') } finally { Pop-Location }
 }
 
 # ── Install Playwright Chromium if needed ─────────────────────────────────────
@@ -165,13 +212,27 @@ if (-not $chromiumFound) {
     Write-Host "  Installing Playwright Chromium browser..." -ForegroundColor Cyan
     Push-Location $bcReplayDir
     try {
-        npx playwright install chromium 2>&1 | Out-Null
+        node $playwrightCli install chromium 2>&1 | Out-Null
         if ($LASTEXITCODE -ne 0) { throw "Playwright install failed" }
     } finally {
         Pop-Location
     }
     Write-Host "  Done." -ForegroundColor Green
 }
+
+# ── Kill any existing process on port 3333 ───────────────────────────────────
+try {
+    $existing = Get-NetTCPConnection -LocalPort 3333 -State Listen -ErrorAction SilentlyContinue
+    if ($existing) {
+        $pids = $existing | Select-Object -ExpandProperty OwningProcess -Unique
+        foreach ($procId in $pids) {
+            if ($procId -gt 0) {
+                Write-Host "  [INFO] Stopping existing server on port 3333 (PID $procId)..." -ForegroundColor DarkGray
+                Stop-Process -Id $procId -Force -ErrorAction SilentlyContinue
+            }
+        }
+    }
+} catch { }
 
 # ── Launch ────────────────────────────────────────────────────────────────────
 Write-Host ""

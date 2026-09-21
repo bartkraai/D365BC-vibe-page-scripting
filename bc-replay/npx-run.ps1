@@ -86,4 +86,4 @@ Write-Host ""
 npx @replayArgs
 
 # ── Show report ───────────────────────────────────────────────────────────────
-npx playwright show-report
+node (Join-Path $PSScriptRoot 'node_modules\@playwright\test\cli.js') show-report

@@ -13,7 +13,9 @@
 #>
 
 param(
-    [switch]$SkipBrowser
+    [switch]$SkipBrowser,
+    [switch]$SkipUpdate,
+    [switch]$ForceUpdate
 )
 
 $ErrorActionPreference = "Stop"
@@ -45,9 +47,8 @@ function Write-Check {
 Write-Host "Checking prerequisites..." -ForegroundColor White
 $psVersion = $PSVersionTable.PSVersion
 $psOk = $psVersion.Major -ge 7
-Write-Check $psOk "PowerShell $psVersion" (
-    if (-not $psOk) { "Install PowerShell 7+ from: https://aka.ms/powershell-release" }
-)
+$psFix = if (-not $psOk) { "Install PowerShell 7+ from: https://aka.ms/powershell-release" } else { "" }
+Write-Check $psOk "PowerShell $psVersion" $psFix
 
 # ── 2. Node.js ───────────────────────────────────────────────────────────────
 $nodeOk = $false
@@ -61,12 +62,12 @@ try {
         $nodeVersion = $nodeRaw
     }
 } catch { }
-Write-Check $nodeOk "Node.js $nodeVersion (requires 16.14+)" (
-    if (-not $nodeOk) { "Install from: https://nodejs.org  (LTS version)" }
-)
+$nodeFix = if (-not $nodeOk) { "Install from: https://nodejs.org  (LTS version)" } else { "" }
+Write-Check $nodeOk "Node.js $nodeVersion (requires 16.14+)" $nodeFix
 
 # ── 3. npm install ───────────────────────────────────────────────────────────
 $bcReplayDir = Join-Path $repoRoot "bc-replay"
+$playwrightCli = Join-Path $bcReplayDir "node_modules\@playwright\test\cli.js"
 $nodeModules  = Join-Path $bcReplayDir "node_modules"
 $packageJson  = Join-Path $bcReplayDir "package.json"
 
@@ -83,10 +84,39 @@ if ($nodeOk) {
             Pop-Location
         }
     } else {
-        Write-Check $true "npm packages already installed"
+        $shouldUpdate = $false
+        if ($ForceUpdate) {
+            $shouldUpdate = $true
+        } elseif (-not $SkipUpdate -and [Environment]::UserInteractive -and -not [Console]::IsInputRedirected) {
+            $answer = Read-Host "  Update dependencies to latest? (Y/n)"
+            if ($answer -notmatch '^(n|no)$') {
+                $shouldUpdate = $true
+            }
+        }
+
+        if ($shouldUpdate) {
+            Write-Host "  [..] Updating dependencies to latest..." -ForegroundColor Yellow
+            Push-Location $bcReplayDir
+            try {
+                npm update --silent
+                Write-Check $true "bc-replay dependencies updated to latest"
+            } catch {
+                Write-Check $true "npm packages already installed"
+            } finally {
+                Pop-Location
+            }
+        } else {
+            Write-Check $true "npm packages already installed (updates skipped)"
+        }
     }
 } else {
     Write-Check $false "npm install (skipped - Node.js not found)" ""
+}
+
+# Reapply the bc-replay launcher patch after installs and updates.
+if ($nodeOk -and (Test-Path (Join-Path $bcReplayDir "Patch-BcReplay.ps1"))) {
+    Push-Location $bcReplayDir
+    try { & "$PSScriptRoot\bc-replay\Patch-BcReplay.ps1" } finally { Pop-Location }
 }
 
 # ── 4. Playwright Chromium ───────────────────────────────────────────────────
@@ -94,7 +124,7 @@ if ($nodeOk) {
     $chromiumOk = $false
     try {
         Push-Location $bcReplayDir
-        $playwrightCheck = npx playwright install --dry-run chromium 2>&1
+        $playwrightCheck = node $playwrightCli install --dry-run chromium 2>&1
         # If "already installed" or "browser chromium is installed" - it's fine
         # Safer: just check if the chromium executable exists in the playwright cache
         $playwrightCachePaths = @(
@@ -111,10 +141,10 @@ if ($nodeOk) {
         Write-Host "  [..] Installing Playwright Chromium browser..." -ForegroundColor Yellow
         Push-Location $bcReplayDir
         try {
-            npx playwright install chromium 2>&1 | Out-Null
+            node $playwrightCli install chromium 2>&1 | Out-Null
             Write-Check $true "Playwright Chromium browser installed"
         } catch {
-            Write-Check $false "Playwright Chromium" "Run manually: cd bc-replay && npx playwright install chromium"
+            Write-Check $false "Playwright Chromium" "Run manually: cd bc-replay && node node_modules/@playwright/test/cli.js install chromium"
         } finally {
             Pop-Location
         }

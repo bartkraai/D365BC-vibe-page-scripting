@@ -6,7 +6,7 @@
   "scripts": {
     "postinstall": "pwsh -NoProfile -File ./Patch-BcReplay.ps1",
     "test-auth": "node test-mfa-auth.js",
-    "install-deps": "npm install playwright otplib qrcode --save"
+    "install-deps": "npm install otplib qrcode --save"
   },
   "keywords": [
     "business-central",
@@ -21,9 +21,8 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@microsoft/bc-replay": "^0.1.119",
-    "otplib": "^12.0.1",
-    "playwright": "^1.40.0",
-    "qrcode": "^1.5.3"
+    "@microsoft/bc-replay": "latest",
+    "otplib": "latest",
+    "qrcode": "latest"
   }
 }
