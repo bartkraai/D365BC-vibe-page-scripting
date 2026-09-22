@@ -471,6 +471,18 @@
           <img id="lightbox-img" src="" alt="Screenshot" />
         </div>
       </div>
+
+      <div id="video-lightbox" class="lightbox hidden" role="dialog" aria-modal="true" aria-labelledby="video-lightbox-title">
+        <div class="video-lightbox-backdrop lightbox-backdrop"></div>
+        <div class="video-lightbox-box">
+          <div class="video-lightbox-header">
+            <h2 id="video-lightbox-title">Recording</h2>
+            <a id="video-lightbox-new-tab" class="btn btn-secondary btn-sm" target="_blank" rel="noopener">Open in new tab</a>
+          </div>
+          <button class="lightbox-close" id="video-lightbox-close" aria-label="Close recording">&#x2715;</button>
+          <video id="video-lightbox-player" controls playsinline preload="metadata" aria-labelledby="video-lightbox-title"></video>
+        </div>
+      </div>
     </section>
 
     <!-- ── TIPS & TRICKS ── -->

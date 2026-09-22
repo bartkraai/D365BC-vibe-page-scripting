@@ -779,6 +779,7 @@ label small { font-weight: 400; color: var(--text-muted); }
 .step-badge.failed  { background: var(--error); }
 .step-badge.skipped { background: var(--warning); }
 .step-badge.dry-run { background: #6b7280; }
+.step-badge.not-recorded { background: #6b7280; }
 
 .step-report-link {
   color: var(--primary); font-weight: 600; font-size: 12px;
@@ -810,6 +811,7 @@ label small { font-weight: 400; color: var(--text-muted); }
 }
 .step-actions-table tr:last-child td { border-bottom: none; }
 .step-actions-table tbody tr:hover td { background: #f7f7f7; }
+.action-error { margin-top: 4px; color: var(--error); font-size: 11px; line-height: 1.4; }
 
 .action-type {
   display: inline-block; padding: 1px 6px; border-radius: 3px;
@@ -847,6 +849,10 @@ label small { font-weight: 400; color: var(--text-muted); }
   display: flex; align-items: center; justify-content: center;
   box-shadow: 0 2px 6px rgba(0,0,0,.3);
 }
+.video-lightbox-box { position: relative; width: min(960px, 90vw); max-height: 90vh; }
+.video-lightbox-header { display: flex; align-items: center; gap: 12px; margin: 0 0 10px; color: #fff; }
+.video-lightbox-header h2 { margin: 0; font-size: 16px; flex: 1; }
+.video-lightbox-box video { display: block; width: 100%; max-height: calc(90vh - 56px); border-radius: 6px; background: #000; box-shadow: 0 8px 40px rgba(0,0,0,.5); }
 
 /* ── Empty state ─────────────────────────────────────────────────────────── */
 .empty-state {

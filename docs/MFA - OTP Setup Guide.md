@@ -167,6 +167,6 @@ For the multi-user workflow runner, add the seed to your `users.json`:
 
 ## Related Documentation
 
-- [BC_REPLAY_QUICK_START.md — MFA section](../bc-replay/BC_REPLAY_QUICK_START.md#-mfa-support-native-totp) — full bc-replay parameter reference
+- [BC-REPLAY-QUICK-START.md — MFA section](BC-REPLAY-QUICK-START.md#-mfa-support-native-totp) — full bc-replay parameter reference
 - [bc-replay README](../bc-replay/README.md) — overview and quick start
 - [Microsoft account security settings](https://account.microsoft.com/security)

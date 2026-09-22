@@ -8,7 +8,7 @@ This repository contains Business Central page automation scripts and tools. Bef
 
 ### 1. Authentication Credentials
 
-**Files Affected:** `npx-run.ps1`, `PO Post Prep-3 PS Variants/npx-run.ps1`
+**Files Affected:** `bc-replay/npx-run.ps1` and project-specific runner scripts
 
 **What to Update:**
 ```powershell
@@ -23,7 +23,7 @@ $env:BC_AAD_USERNAME = "test.runner@yourcompany.onmicrosoft.com"
 
 ### 2. Environment URLs
 
-**Files Affected:** `npx-run.ps1`, `PO Post Prep-3 PS Variants/npx-run.ps1`
+**Files Affected:** `bc-replay/npx-run.ps1` and project-specific runner scripts
 
 **What to Update:**
 ```powershell
@@ -36,7 +36,7 @@ $env:BC_AAD_USERNAME = "test.runner@yourcompany.onmicrosoft.com"
 
 ### 3. File Paths
 
-**Files Affected:** `Generate-BC-Script-Variants.ps1`
+**Files Affected:** `page-scripting/Generate-BC-Script-Variants.ps1`
 
 The script now uses relative paths (`.\Script Prompts\Run Me`). If your folder structure differs:
 
@@ -180,9 +180,8 @@ npx replay .\recordings\*.yml `
 - No security exceptions needed
 - No patches or workarounds - fully built into bc-replay
 
-**Full Documentation:** See [bc-replay/BC_REPLAY_QUICK_START.md - MFA section](bc-replay/BC_REPLAY_QUICK_START.md#-mfa-support-native-totp).
+**Full Documentation:** See the [bc-replay MFA section](docs/BC-REPLAY-QUICK-START.md#-mfa-support-native-totp).
 
 ---
 
-**Last Updated:** February 2026  
-**Maintainer:** Project Team
+**Last Updated:** September 2026

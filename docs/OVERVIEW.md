@@ -95,10 +95,10 @@ Some processes span multiple users — for example, a **purchaser** creates a Pu
 
 | I want to… | Go here |
 |------------|---------|
-| Get set up fast | [GETTING_STARTED.md](../GETTING_STARTED.md) |
+| Get set up fast | [GETTING_STARTED.md](GETTING_STARTED.md) |
 | Design a workflow visually | [tools/workflow-builder/index.html](../tools/workflow-builder/index.html) |
-| Record my first script | [page-scripting/PAGE_SCRIPTING_QUICK_START.md](../page-scripting/PAGE_SCRIPTING_QUICK_START.md) |
-| Run scripts in a pipeline | [bc-replay/BC_REPLAY_QUICK_START.md](../bc-replay/BC_REPLAY_QUICK_START.md) |
+| Record my first script | [PAGE-SCRIPTING-QUICK-START.md](PAGE-SCRIPTING-QUICK-START.md) |
+| Run scripts in a pipeline | [BC-REPLAY-QUICK-START.md](BC-REPLAY-QUICK-START.md) |
 
 ---
 

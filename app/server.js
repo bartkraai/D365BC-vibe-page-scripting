@@ -7,9 +7,10 @@ const chokidar  = require('chokidar');
 const path      = require('path');
 const fs        = require('fs');
 const { spawn, exec } = require('child_process');
-const yaml      = require('js-yaml');
 const PDFDocument = require('pdfkit');
 const { syncOptionalCredential } = require('./credential-updates');
+const { readActionOutcomes } = require('./action-outcomes');
+const { findReplayVideo, isWithinDirectory } = require('./result-artifacts');
 
 // ── Keytar (Windows Credential Manager — graceful fallback) ──────────────────
 let keytar = null;
@@ -924,7 +925,17 @@ app.get('/api/results/detail', (req, res) => {
               screenshots.push('/result-files/' + rel);
             });
         }
-        return { ...step, reportUrl, screenshots };
+        const resultsRoot = path.join(ROOT, 'page-scripting');
+        const videoAbs = isWithinDirectory(resultsRoot, step.report_dir)
+          ? findReplayVideo(step.report_dir)
+          : null;
+        const videoRel = videoAbs
+          ? path.relative(resultsRoot, videoAbs).replace(/\\/g, '/')
+          : null;
+        const videoUrl = videoRel && !videoRel.startsWith('../') && !path.isAbsolute(videoRel)
+          ? '/result-files/' + videoRel
+          : null;
+        return { ...step, reportUrl, screenshots, videoUrl };
       });
     }
     res.json(data);
@@ -941,51 +952,10 @@ app.get('/api/results/step-data', (req, res) => {
   const reportDir = req.query.dir;
   if (!reportDir) return res.status(400).json({ error: 'dir query param required' });
 
-  const dataDir = path.join(reportDir, 'playwright-report', 'data');
-  if (!fs.existsSync(dataDir)) return res.status(404).json({ error: 'No playwright-report/data found' });
-
   try {
-    const ymlFiles = fs.readdirSync(dataDir).filter(f => /\.ya?ml$/i.test(f));
-    let testDef = null;
-    let execLog = null;
-
-    for (const f of ymlFiles) {
-      const content = yaml.load(fs.readFileSync(path.join(dataDir, f), 'utf8'));
-      if (content && content.name && content.steps) {
-        testDef = content; // test definition (has name + steps without log)
-      } else if (content && content.steps && content.steps[0]?.log) {
-        execLog = content; // execution log (has steps with log.start/duration)
-      }
-    }
-
-    // Merge: combine test def descriptions with execution timing
-    const steps = [];
-    const defSteps = testDef?.steps || [];
-    const logSteps = execLog?.steps || [];
-    const maxLen = Math.max(defSteps.length, logSteps.length);
-
-    for (let i = 0; i < maxLen; i++) {
-      const ds = defSteps[i] || {};
-      const ls = logSteps[i] || {};
-      // Clean up description HTML tags
-      const desc = (ls.description || ds.description || '').replace(/<[^>]+>/g, '');
-      steps.push({
-        index: i + 1,
-        type:        ls.type || ds.type || '',
-        description: desc,
-        target:      ds.target || ls.target || null,
-        value:       ds.value || ls.value || null,
-        start:       ls.log?.start || null,
-        duration_ms: ls.log?.duration ?? null,
-      });
-    }
-
-    res.json({
-      name: testDef?.name || '',
-      telemetryId: testDef?.telemetryId || execLog?.telemetryId || '',
-      totalSteps: steps.length,
-      steps,
-    });
+    const outcomes = readActionOutcomes(reportDir);
+    if (!outcomes) return res.status(404).json({ error: 'No playwright-report/data found' });
+    res.json(outcomes);
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
@@ -1282,6 +1252,34 @@ app.get('/api/results/pdf', (req, res) => {
               .text(`  • ${sub.label || sub.script || ''}${dur}`, L + 16, doc.y, { width: W - 110, continued: true });
             doc.font('Helvetica-Bold').fontSize(8.5).fillColor(ssc)
               .text(`  ${sst.toUpperCase()}`, { continued: false });
+          }
+          doc.moveDown(0.4);
+        }
+
+        // Recorded action outcomes
+        let actionOutcomes = null;
+        try { actionOutcomes = readActionOutcomes(step.report_dir); } catch { /* omit unreadable action data */ }
+        if (actionOutcomes?.steps.length) {
+          if (doc.y > 710) { doc.addPage(); doc.y = 64; }
+          doc.font('Helvetica-Bold').fontSize(8.5).fillColor(C_MID).text('Action Outcomes', L + 4);
+          doc.moveDown(0.2);
+          for (const action of actionOutcomes.steps) {
+            const actionColor = action.status === 'passed' ? C_PASS : action.status === 'failed' ? C_FAIL : C_SKIP;
+            const actionText = `${action.index}. ${action.description || action.type || 'Unnamed action'}`;
+            const actionHeight = doc.font('Helvetica').fontSize(7.5)
+              .heightOfString(actionText, { width: W - 135 });
+            const errorHeight = action.error_message
+              ? doc.font('Courier').fontSize(7).heightOfString(`    ${action.error_message}`, { width: W - 32 })
+              : 0;
+            if (doc.y + actionHeight + errorHeight + 12 > 790) { doc.addPage(); doc.y = 64; }
+            doc.font('Helvetica').fontSize(7.5).fillColor(C_DARK)
+              .text(actionText, L + 16, doc.y, { width: W - 135, continued: true });
+            doc.font('Helvetica-Bold').fontSize(7.5).fillColor(actionColor)
+              .text(`  ${action.status.toUpperCase()}`);
+            if (action.error_message) {
+              doc.font('Courier').fontSize(7).fillColor(C_FAIL)
+                .text(`    ${action.error_message}`, L + 24, doc.y, { width: W - 32 });
+            }
           }
           doc.moveDown(0.4);
         }

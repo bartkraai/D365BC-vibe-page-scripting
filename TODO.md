@@ -92,7 +92,7 @@
 ### Phase 8 — Documentation and distribution updates
 
 - [ ] Update `README.md`: replace PowerShell-first quick start with "double-click `start.bat`, follow the setup wizard"
-- [ ] Update `GETTING_STARTED.md`: condense to 3 steps — install Node.js → double-click start.bat → follow the wizard
+- [ ] Review `docs/GETTING_STARTED.md`: condense to 3 steps — install Node.js → double-click start.bat → follow the wizard
 - [ ] Add disclaimer footnote to `README.md`: "for demo and research purposes only, use at your own risk"
 - [ ] Update `docs/OVERVIEW.md` screenshots to reflect the new UI
 - [ ] Review and update `SECURITY.md` to reflect keytar credential storage

@@ -2,7 +2,7 @@
 
 A practical guide to executing Business Central page scripts in automated pipelines using the bc-replay test runner.
 
-![Playwright HTML test report](../docs/images/04-playwright-report.png)
+![Playwright HTML test report](images/04-playwright-report.png)
 
 ## What is BC-Replay?
 
@@ -424,7 +424,7 @@ results/
   step-approve-po/         # Per-step Playwright report
 ```
 
-See [PO Approval Workflow](../page-scripting/PO%20Approval%20Workflow/) for a complete example and [MULTI-USER-WORKFLOW-PLAN.md](../docs/MULTI-USER-WORKFLOW-PLAN.md) for architecture details.
+See [PO Approval Workflow](../page-scripting/PO%20Approval%20Workflow/) for a complete example and [MULTI-USER-WORKFLOW-PLAN.md](MULTI-USER-WORKFLOW-PLAN.md) for architecture details.
 
 ## Best Practices
 
@@ -445,7 +445,7 @@ See [PO Approval Workflow](../page-scripting/PO%20Approval%20Workflow/) for a co
 
 ## Next Steps
 
-1. **Record your first script** - See `../page-scripting/PAGE_SCRIPTING_QUICK_START.md`
+1. **Record your first script** - See [PAGE-SCRIPTING-QUICK-START.md](PAGE-SCRIPTING-QUICK-START.md)
 2. **Generate variants** - Use PowerShell scripts in `../page-scripting/`
 3. **Multi-user workflows** - See `Run-BCWorkflow.ps1` and the [PO Approval Workflow](../page-scripting/PO%20Approval%20Workflow/) example
 4. **Set up CI/CD** - Integrate bc-replay into your build pipeline
@@ -460,8 +460,8 @@ See [PO Approval Workflow](../page-scripting/PO%20Approval%20Workflow/) for a co
 
 **This Repository:**
 - `../README.md` - Complete project documentation
-- `../GETTING_STARTED.md` - Repository quick start
-- `../page-scripting/PAGE_SCRIPTING_QUICK_START.md` - How to record BC scripts
+- `GETTING_STARTED.md` - Repository quick start
+- `PAGE-SCRIPTING-QUICK-START.md` - How to record BC scripts
 - `../page-scripting/` - Script generation and variant automation
 - `../.github/copilot-instructions.md` - YAML patterns and project conventions
 

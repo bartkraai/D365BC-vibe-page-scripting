@@ -1130,10 +1130,8 @@ $reportPath = Join-Path $ResultDir 'workflow-summary.html'
 Write-Host "  Report : $reportPath" -ForegroundColor Cyan
 Write-Host ""
 
-# Open the HTML report in the default browser
-if (Test-Path $reportPath) {
-    Start-Process $reportPath
-}
+# The local app receives the completion event and opens its Results view.
+# Keep workflow-summary.html as a portable report artifact for CI and offline review.
 
 # Exit with failure code if any step failed
 if ($failed -gt 0) { exit 1 }

@@ -895,8 +895,8 @@ function onRunDone(msg) {
 
   const line = msg.code === 0 ? '\n--- Run complete. ---\n' : `\n--- Run failed (exit ${msg.code})${msg.error ? ': ' + msg.error : ''} ---\n`;
   appendOutput('run-output', line);
-  // After a run completes, auto-refresh results so the new run appears immediately
-  if (document.getElementById('tab-results').classList.contains('active')) loadResults();
+  // Show the newly completed run instead of leaving the user on the Run screen.
+  activateTab('results');
 }
 
 // ── Results ───────────────────────────────────────────────────────────────────
@@ -976,6 +976,9 @@ async function showRunDetail(runId, cardEl) {
     const screenshotBtn   = screenshotCount
       ? `<button class="btn btn-secondary btn-sm" style="margin-left:6px" onclick="showStepScreenshots(${JSON.stringify(JSON.stringify(step.screenshots))})">&#128247; ${screenshotCount}</button>`
       : '';
+    const recordingBtn = step.videoUrl
+      ? `<button class="btn ${status === 'failed' ? 'btn-danger' : 'btn-secondary'} btn-sm step-video-btn" data-video-url="${esc(step.videoUrl)}" data-step-name="${esc(step.name || step.id)}">&#9654; Watch recording</button>`
+      : '';
 
     const hasReportDir = !!step.report_dir;
     const expandBtn = hasReportDir
@@ -990,7 +993,7 @@ async function showRunDetail(runId, cardEl) {
         <td style="font-size:12px">${esc(step.user || '')}</td>
         <td><span class="step-badge ${esc(status)}">${esc(status)}</span></td>
         <td style="white-space:nowrap;font-size:12px">${step.duration_s != null ? step.duration_s + 's' : '—'}</td>
-        <td style="white-space:nowrap">${expandBtn} ${reportBtn}${screenshotBtn}</td>
+        <td style="white-space:nowrap">${expandBtn} ${recordingBtn} ${reportBtn}${screenshotBtn}</td>
       </tr>
       <tr class="step-detail-row hidden" id="step-detail-${stepIdx}">
         <td colspan="6" class="step-detail-cell">
@@ -1049,6 +1052,9 @@ async function showRunDetail(runId, cardEl) {
   content.querySelectorAll('.step-expand-btn').forEach(btn => {
     btn.addEventListener('click', () => toggleStepDetail(btn));
   });
+  content.querySelectorAll('.step-video-btn').forEach(btn => {
+    btn.addEventListener('click', () => openReplayVideo(btn.dataset.videoUrl, btn.dataset.stepName));
+  });
 }
 
 // Step detail expand/collapse
@@ -1097,15 +1103,21 @@ function renderStepDetail(detailRow, data) {
   let html = '<div class="step-actions-list">';
   html += `<div class="step-actions-header">${esc(data.name || 'Test')} &mdash; ${data.totalSteps} actions</div>`;
   html += '<table class="step-actions-table">';
-  html += '<thead><tr><th>#</th><th>Type</th><th>Description</th><th>Duration</th></tr></thead><tbody>';
+  html += '<thead><tr><th>#</th><th>Type</th><th>Description</th><th>Status</th><th>Duration</th></tr></thead><tbody>';
 
   for (const s of data.steps) {
     const durText = s.duration_ms != null ? `${s.duration_ms}ms` : '';
     const typeClass = s.type === 'input' ? 'type-input' : s.type === 'invoke' ? 'type-invoke' : s.type === 'navigate' ? 'type-navigate' : '';
+    const status = s.status || 'not-recorded';
+    const statusLabel = status === 'not-recorded' ? 'Not recorded' : status;
+    const failureDetail = s.error_message
+      ? `<div class="action-error"><strong>Failure:</strong> ${esc(s.error_message)}</div>`
+      : '';
     html += `<tr>
       <td style="font-size:11px;color:var(--text-muted)">${s.index}</td>
       <td><span class="action-type ${typeClass}">${esc(s.type)}</span></td>
-      <td style="font-size:12px">${esc(s.description)}${s.value ? ` = <strong>${esc(s.value)}</strong>` : ''}</td>
+      <td style="font-size:12px">${esc(s.description)}${s.value ? ` = <strong>${esc(s.value)}</strong>` : ''}${failureDetail}</td>
+      <td><span class="step-badge ${esc(status)}" aria-label="Action status: ${esc(statusLabel)}">${esc(statusLabel)}</span></td>
       <td style="font-size:11px;white-space:nowrap;color:var(--text-muted)">${durText}</td>
     </tr>`;
   }
@@ -1141,7 +1153,58 @@ function closeLightbox() {
 }
 document.getElementById('lightbox-close').addEventListener('click', closeLightbox);
 document.querySelector('.lightbox-backdrop').addEventListener('click', closeLightbox);
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+
+let replayVideoTrigger = null;
+function openReplayVideo(url, stepName) {
+  const overlay = document.getElementById('video-lightbox');
+  const video = document.getElementById('video-lightbox-player');
+  replayVideoTrigger = document.activeElement;
+  document.getElementById('video-lightbox-title').textContent = `Recording — ${stepName}`;
+  document.getElementById('video-lightbox-new-tab').href = url;
+  video.src = url;
+  overlay.classList.remove('hidden');
+  document.getElementById('video-lightbox-close').focus();
+  video.play().catch(() => {});
+}
+function closeReplayVideo() {
+  const overlay = document.getElementById('video-lightbox');
+  const video = document.getElementById('video-lightbox-player');
+  if (overlay.classList.contains('hidden')) return;
+  video.pause();
+  video.removeAttribute('src');
+  video.load();
+  overlay.classList.add('hidden');
+  if (replayVideoTrigger?.isConnected) replayVideoTrigger.focus();
+  replayVideoTrigger = null;
+}
+document.getElementById('video-lightbox-close').addEventListener('click', closeReplayVideo);
+document.querySelector('.video-lightbox-backdrop').addEventListener('click', closeReplayVideo);
+document.addEventListener('focusin', event => {
+  const overlay = document.getElementById('video-lightbox');
+  if (!overlay.classList.contains('hidden') && !overlay.contains(event.target)) {
+    document.getElementById('video-lightbox-close').focus();
+  }
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    closeLightbox();
+    closeReplayVideo();
+    return;
+  }
+  if (e.key !== 'Tab' || document.getElementById('video-lightbox').classList.contains('hidden')) return;
+
+  const focusable = [...document.querySelectorAll('#video-lightbox a[href], #video-lightbox button:not(:disabled), #video-lightbox video[controls]')];
+  const first = focusable[0];
+  const last = focusable.at(-1);
+  if (!first || !last) return;
+  if (e.shiftKey && document.activeElement === first) {
+    e.preventDefault();
+    last.focus();
+  } else if (!e.shiftKey && document.activeElement === last) {
+    e.preventDefault();
+    first.focus();
+  }
+});
 
 document.getElementById('btn-refresh-results').addEventListener('click', () => {
   activeRunId = null;

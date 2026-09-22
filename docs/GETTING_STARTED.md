@@ -18,7 +18,7 @@ From the repo root, run:
 
 This checks your environment, installs dependencies, and opens the **Workflow Builder** in your browser.
 
-> If you prefer to check requirements manually, see [bc-replay/BC_REPLAY_QUICK_START.md](bc-replay/BC_REPLAY_QUICK_START.md).
+> If you prefer to check requirements manually, see the [bc-replay guide](BC-REPLAY-QUICK-START.md).
 
 ## Step 2 — Design Your Workflow (Workflow Builder)
 
@@ -50,7 +50,7 @@ Open any BC page → **Settings ⚙️ → Page Scripting** → Record your proc
 
 For workflows that capture values (e.g. PO number), add a `copy-value` step at the end of the recording.
 
-See [page-scripting/PAGE_SCRIPTING_QUICK_START.md](page-scripting/PAGE_SCRIPTING_QUICK_START.md) for full recording instructions.
+See the [page scripting guide](PAGE-SCRIPTING-QUICK-START.md) for full recording instructions.
 
 ## Step 5 — Run
 
@@ -89,7 +89,7 @@ cd ..\bc-replay
 
 - **`tools/workflow-builder/`** - Visual Workflow Builder (open `index.html` in browser)
 
-- **`docs/`** - Visual overview and architecture
+- **`docs/`** - User guides, architecture, and operational documentation
 
 ## Test Catalog
 
@@ -116,10 +116,10 @@ The Workflow Builder includes a **Catalog** button (header) to view the full hie
 
 ## Next Steps
 
-- **[docs/OVERVIEW.md](docs/OVERVIEW.md)** - Visual walkthrough with screenshots
-- **[page-scripting/PAGE_SCRIPTING_QUICK_START.md](page-scripting/PAGE_SCRIPTING_QUICK_START.md)** - BC recording guide
-- **[bc-replay/BC_REPLAY_QUICK_START.md](bc-replay/BC_REPLAY_QUICK_START.md)** - Execution and MFA setup
-- **[SECURITY.md](SECURITY.md)** - Security guidelines
+- **[OVERVIEW.md](OVERVIEW.md)** - Visual walkthrough with screenshots
+- **[PAGE-SCRIPTING-QUICK-START.md](PAGE-SCRIPTING-QUICK-START.md)** - BC recording guide
+- **[BC-REPLAY-QUICK-START.md](BC-REPLAY-QUICK-START.md)** - Execution and MFA setup
+- **[../SECURITY.md](../SECURITY.md)** - Security guidelines
 - **[page-scripting/PO Approval Workflow/](page-scripting/PO%20Approval%20Workflow/)** - Working multi-user example
 
 ## Quick Troubleshooting

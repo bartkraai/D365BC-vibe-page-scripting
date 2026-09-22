@@ -19,7 +19,7 @@ npx playwright show-report
 
 ### Complete Guide
 
-📖 **[BC_REPLAY_QUICK_START.md](BC_REPLAY_QUICK_START.md)** - Full setup, authentication options, troubleshooting
+📖 **[BC-REPLAY-QUICK-START.md](../docs/BC-REPLAY-QUICK-START.md)** - Full setup, authentication options, troubleshooting
 
 ---
 
@@ -46,7 +46,7 @@ cd bc-replay
 - Captures values using BC's native `copy-value` step (reads from replay log)
 - Injects captured values into the next step's native BC `parameters:` section
 - Generates per-step Playwright reports + workflow summary (HTML + JSON)
-- Auto-opens the HTML report in browser on completion
+- Shows the local app's **Results** screen on completion; the HTML summary remains available for offline review
 
 ### Multi-Script Steps
 
@@ -104,7 +104,7 @@ npx replay .\recordings\*.yml `
   -MultiFactorSecretKey BC_MFA_SEED
 ```
 
-**Requires a TOTP seed** captured once during account MFA setup. See [BC_REPLAY_QUICK_START.md - MFA section](BC_REPLAY_QUICK_START.md#-mfa-support-native-totp) for the full setup guide.
+**Requires a TOTP seed** captured once during account MFA setup. See the [bc-replay MFA section](../docs/BC-REPLAY-QUICK-START.md#-mfa-support-native-totp) for the full setup guide.
 
 ---
 
@@ -112,7 +112,7 @@ npx replay .\recordings\*.yml `
 
 | Guide | Purpose |
 |-------|---------|
-| **[BC_REPLAY_QUICK_START.md](BC_REPLAY_QUICK_START.md)** | Standard bc-replay usage and MFA setup |
+| **[BC-REPLAY-QUICK-START.md](../docs/BC-REPLAY-QUICK-START.md)** | Standard bc-replay usage and MFA setup |
 | **[bc-replay-capture-solution/](bc-replay-capture-solution/)** | Value capture (superseded by native `copy-value`) |
 | **[MULTI-USER-WORKFLOW-PLAN.md](../docs/MULTI-USER-WORKFLOW-PLAN.md)** | Workflow architecture and plan |
 
@@ -120,9 +120,9 @@ npx replay .\recordings\*.yml `
 
 ## 🆘 Need Help?
 
-**Standard bc-replay:** See [BC_REPLAY_QUICK_START.md](BC_REPLAY_QUICK_START.md) troubleshooting section
+**Standard bc-replay:** See the [bc-replay guide](../docs/BC-REPLAY-QUICK-START.md) troubleshooting section
 
-**MFA setup:** See [MFA section in BC_REPLAY_QUICK_START.md](BC_REPLAY_QUICK_START.md#-mfa-support-native-totp)
+**MFA setup:** See the [MFA section in the bc-replay guide](../docs/BC-REPLAY-QUICK-START.md#-mfa-support-native-totp)
 
 **Resources:**
 - [BC-Replay npm Package](https://www.npmjs.com/package/@microsoft/bc-replay)
@@ -139,7 +139,6 @@ bc-replay/
 ├── Invoke-YamlPreprocess.ps1    # YAML parameter preprocessor (updates BC native defaults)
 ├── New-WorkflowReport.ps1       # Workflow summary report generator
 ├── bc-replay-capture-solution/  # Value capture (superseded by native copy-value)
-├── BC_REPLAY_QUICK_START.md     # Standard bc-replay guide
 ├── README.md                    # This file
 └── setup-local-env.ps1.template # Credential template
 ```
@@ -149,4 +148,4 @@ bc-replay/
 
 ---
 
-**Ready to automate BC testing?** Start here: **[BC_REPLAY_QUICK_START.md](BC_REPLAY_QUICK_START.md)**
+**Ready to automate BC testing?** Start with the [bc-replay guide](../docs/BC-REPLAY-QUICK-START.md).

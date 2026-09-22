@@ -13,10 +13,10 @@ Automate Business Central page testing using YAML-based scripts executed via Pla
 
 1. **Setup** — Run `.\setup.ps1` from the repo root to check prerequisites and open the Workflow Builder
 2. **Design your workflow** — Open [tools/workflow-builder/index.html](tools/workflow-builder/index.html) in a browser: add user roles, drag in scripts, and export `workflow.json`
-3. **Record scripts** — See [page-scripting/PAGE_SCRIPTING_QUICK_START.md](page-scripting/PAGE_SCRIPTING_QUICK_START.md) for recording in BC
-4. **Run** — See [bc-replay/BC_REPLAY_QUICK_START.md](bc-replay/BC_REPLAY_QUICK_START.md) for execution options
+3. **Record scripts** — See [the page scripting guide](docs/PAGE-SCRIPTING-QUICK-START.md) for recording in BC
+4. **Run** — See [the bc-replay guide](docs/BC-REPLAY-QUICK-START.md) for execution options
 5. **Examples** — Study `page-scripting/PO Post DirectionsEMEA/` (single-user) or `page-scripting/PO Approval Workflow/` (multi-user)
-6. **Full Guide** — [GETTING_STARTED.md](GETTING_STARTED.md)
+6. **Full Guide** — [Getting started](docs/GETTING_STARTED.md)
 
 ## Project Structure
 
@@ -25,14 +25,14 @@ Automate Business Central page testing using YAML-based scripts executed via Pla
 - Project folders with BASE recordings and data files
 - **Workflow projects** with multi-user step definitions
 - **`catalog.json`** — 3-level test hierarchy (Waardeketen > Type > Procesflow)
-- [PAGE_SCRIPTING_QUICK_START.md](page-scripting/PAGE_SCRIPTING_QUICK_START.md) - Recording guide
+- [PAGE-SCRIPTING-QUICK-START.md](docs/PAGE-SCRIPTING-QUICK-START.md) - Recording guide
 
 **`bc-replay/`** - Test execution including multi-user workflows
 - Script runner for automated pipelines
 - **Workflow orchestrator** for multi-user sequential execution
 - **Catalog runner** for executing workflows by hierarchy filter
 - **Native value capture** via BC's `copy-value` step (reads from replay log)
-- 📖 [BC_REPLAY_QUICK_START.md](bc-replay/BC_REPLAY_QUICK_START.md) - Execution guide
+- 📖 [BC-REPLAY-QUICK-START.md](docs/BC-REPLAY-QUICK-START.md) - Execution guide
 - 📖 [bc-replay-capture-solution/](bc-replay/bc-replay-capture-solution/) - Value capture (superseded by native `copy-value`)
 
 **`tools/`** - Visual tools
@@ -40,7 +40,7 @@ Automate Business Central page testing using YAML-based scripts executed via Pla
 
 **`docs/`** - Architecture and planning
 - [OVERVIEW.md](docs/OVERVIEW.md) - Visual solution overview
-- [MULTI-USER-WORKFLOW-PLAN.md](docs/MULTI-USER-WORKFLOW-PLAN.md) - Developer reference: research, architecture, implementation details
+- [Documentation index](docs/README.md) - Guides, architecture, security, and operational references
 
 ## 👥 Multi-User Workflows
 
@@ -99,8 +99,9 @@ The catalog is defined in [page-scripting/catalog.json](page-scripting/catalog.j
 
 | Guide | Purpose |
 |-------|---------|
+| **[docs/README.md](docs/README.md)** | Documentation index |
 | **[docs/OVERVIEW.md](docs/OVERVIEW.md)** | Visual overview — start here |
-| **[GETTING_STARTED.md](GETTING_STARTED.md)** | Step-by-step setup walkthrough |
+| **[docs/GETTING_STARTED.md](docs/GETTING_STARTED.md)** | Step-by-step setup walkthrough |
 | **[tools/workflow-builder/index.html](tools/workflow-builder/index.html)** | Visual Workflow Builder (open in browser) |
 | **[SECURITY.md](SECURITY.md)** | Security guidelines and TOTP account setup |
 | **[page-scripting/](page-scripting/)** | Recording scripts and variant generation |

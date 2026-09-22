@@ -25,7 +25,7 @@ Page scripting records your interactions with Business Central pages (opening pa
 - Select **Settings** ⚙️ > **Page Scripting**
 - Pane opens on the right side
 
-![BC Page Scripting pane open during a recording](../docs/images/01-bc-page-scripting-pane.png)
+![BC Page Scripting pane open during a recording](images/01-bc-page-scripting-pane.png)
 
 ### 2. Start Recording
 - Click **Start new** or **New recording** 📹
@@ -135,7 +135,7 @@ npx playwright show-report .\results\playwright-report
 ```
 
 📖 **For complete bc-replay setup, authentication options, CI/CD integration, and troubleshooting, see:**
-- **`../bc-replay/BC_REPLAY_QUICK_START.md`** - Comprehensive bc-replay guide
+- **[BC-REPLAY-QUICK-START.md](BC-REPLAY-QUICK-START.md)** - Comprehensive bc-replay guide
 
 ## Best Practices
 
@@ -256,7 +256,7 @@ PO Approval Workflow/
   Process.md                     # Business process documentation
 ```
 
-See [PO Approval Workflow](PO%20Approval%20Workflow/) for a complete example and [MULTI-USER-WORKFLOW-PLAN.md](../docs/MULTI-USER-WORKFLOW-PLAN.md) for architecture details.
+See [PO Approval Workflow](../page-scripting/PO%20Approval%20Workflow/) for a complete example and [MULTI-USER-WORKFLOW-PLAN.md](MULTI-USER-WORKFLOW-PLAN.md) for architecture details.
 
 ## Resources
 
@@ -267,9 +267,9 @@ See [PO Approval Workflow](PO%20Approval%20Workflow/) for a complete example and
 
 **This Repository:**
 - `../README.md` - Complete project documentation
-- `../GETTING_STARTED.md` - Repository quick start
-- `../bc-replay/BC_REPLAY_QUICK_START.md` - Pipeline execution guide
-- `../docs/MULTI-USER-WORKFLOW-PLAN.md` - Multi-user workflow architecture
+- `GETTING_STARTED.md` - Repository quick start
+- `BC-REPLAY-QUICK-START.md` - Pipeline execution guide
+- `MULTI-USER-WORKFLOW-PLAN.md` - Multi-user workflow architecture
 - `../.github/copilot-instructions.md` - YAML patterns and conventions
 
 ---

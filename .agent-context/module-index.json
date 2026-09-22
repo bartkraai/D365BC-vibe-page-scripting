@@ -1,0 +1,104 @@
+{
+  "modules": [
+    {
+      "id": "app-server-result-api",
+      "paths": ["app/server.js"],
+      "purpose": "Runs the local Express/WebSocket server and exposes workflow result data.",
+      "interfaces": [
+        "GET /api/results",
+        "GET /api/results/detail?id=...",
+        "GET /api/results/step-data?dir=...",
+        "GET /api/results/pdf?id=...",
+        "DELETE /api/results",
+        "WebSocket files-changed notifications"
+      ],
+      "responsibilities": [
+        "Discovers workflow-summary.json files under page-scripting results directories.",
+        "Annotates workflow steps with Playwright report and screenshot URLs.",
+        "Merges Playwright definition and execution YAML for action detail data.",
+        "Generates PDF reports with workflow, step, sub-result, capture, and failure details."
+      ],
+      "dependencies": ["express", "ws", "chokidar", "js-yaml", "pdfkit"]
+    },
+    {
+      "id": "app-results-ui",
+      "paths": ["app/public/js/app.js", "app/public/index.html", "app/public/css/app.css"],
+      "purpose": "Provides the browser Results tab for browsing and inspecting workflow runs.",
+      "interfaces": [
+        "Results list and run-detail DOM views",
+        "Step detail expand/collapse controls",
+        "GET /api/results, /api/results/detail, and /api/results/step-data",
+        "PDF download link via /api/results/pdf",
+        "Screenshot lightbox and result refresh/reset actions"
+      ],
+      "responsibilities": [
+        "Loads and displays run status, counts, timestamps, and durations.",
+        "Fetches and renders detailed actions on demand with cached step data.",
+        "Displays action type, description, value, and duration from the result API.",
+        "Refreshes results after workflow completion and responds to file-change events."
+      ],
+      "dependencies": ["app/server.js", "WebSocket"]
+    },
+    {
+      "id": "app-action-outcomes-parser",
+      "paths": ["app/action-outcomes.js", "app/action-outcomes.test.js"],
+      "purpose": "Parses Playwright action definitions and execution logs into report-ready outcomes.",
+      "interfaces": ["mergeActionOutcomes(testDefinition, executionLog)", "readActionOutcomes(reportDir)"],
+      "responsibilities": [
+        "Merges action definitions and execution logs by step index.",
+        "Reports passed, failed, and not-recorded action statuses with recorded errors and metadata.",
+        "Reads YAML report data and supports shared API and PDF report generation.",
+        "Tests passed, failed, not-recorded, and log-only action scenarios."
+      ],
+      "dependencies": ["fs", "path", "js-yaml", "node:test", "node:assert/strict"]
+    },
+    {
+      "id": "app-result-artifacts",
+      "paths": ["app/result-artifacts.js", "app/result-artifacts.test.js"],
+      "purpose": "Finds retained Playwright replay video artifacts for workflow result steps.",
+      "interfaces": ["findReplayVideo(reportDir)"],
+      "responsibilities": [
+        "Recursively scans a step result directory for video.webm or video.mp4 recordings.",
+        "Returns the first matching artifact path in deterministic directory order.",
+        "Returns null when the result directory or retained recording does not exist.",
+        "Tests nested WebM discovery and missing-recording behavior."
+      ],
+      "dependencies": ["fs", "path", "node:test", "node:assert/strict"]
+    },
+    {
+      "id": "bc-replay-workflow-runner-and-reports",
+      "paths": [
+        "bc-replay/Run-BCWorkflow.ps1",
+        "bc-replay/New-WorkflowReport.ps1",
+        "bc-replay/Invoke-YamlPreprocess.ps1",
+        "bc-replay/npx-run.ps1"
+      ],
+      "purpose": "Executes BC page-script workflows and produces machine-readable and HTML summaries.",
+      "interfaces": [
+        "Run-BCWorkflow.ps1 workflow, users, environment, execution, and result parameters",
+        "workflow.json, users.json, app-registrations.json, and page-script YAML inputs",
+        "workflow-summary.json, workflow-summary.html, workflow-state.json, and step result directories"
+      ],
+      "responsibilities": [
+        "Validates workflow steps, credentials, scripts, captures, injections, and dependencies.",
+        "Runs bc-replay or BC API steps sequentially with optional stop-on-failure, headed, and dry-run modes.",
+        "Preprocesses YAML substitutions and carries captured state between steps.",
+        "Normalizes replay exit codes using results.xml and records step/sub-result metadata.",
+        "Generates JSON and HTML workflow reports with statuses, durations, and Playwright links."
+      ],
+      "dependencies": ["@microsoft/bc-replay", "PowerShell 7", "Playwright", "workflow.json"]
+    },
+    {
+      "id": "app-tests",
+      "paths": ["app/credential-updates.test.js", "app/credential-updates.js"],
+      "purpose": "Tests the credential synchronization helper used by the app server.",
+      "interfaces": ["npm test in app/"],
+      "responsibilities": [
+        "Verifies non-empty credentials are trimmed and saved.",
+        "Verifies empty, whitespace-only, and missing credentials are deleted.",
+        "Uses Node's built-in test and strict assertion modules."
+      ],
+      "dependencies": ["node:test", "node:assert/strict"]
+    }
+  ]
+}
