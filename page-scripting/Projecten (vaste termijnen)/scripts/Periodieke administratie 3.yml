@@ -1,4 +1,4 @@
-telemetryId: 4009be5c-ecc4-47d6-947e-87858f6ae2b9
+telemetryId: 61ef7345-d573-497f-828d-50dff20db47e
 timeout: 300
 steps:
   - type: navigate
@@ -85,6 +85,110 @@ steps:
   - type: invoke
     target:
       - page: Job Card
+        runtimeRef: bkm
+      - action: Action1100525047
+    parameters: {}
+    description: Invoke <caption>Projectbewaking</caption>
+  - type: page-shown
+    source:
+      page: Project Control
+    modal: false
+    runtimeId: b10m
+    description: Page <caption>Projectbewaking</caption> was shown.
+  - type: invoke
+    target:
+      - page: Project Control
+        runtimeRef: b10m
+      - action: "&Element"
+    parameters: {}
+    description: Invoke <caption>Element</caption>
+  - type: page-shown
+    source:
+      page: Project/Element Control
+    modal: false
+    runtimeId: b19p
+    description: Page <caption>Bewaking Project/element</caption> was shown.
+  - type: invoke
+    target:
+      - page: Project/Element Control
+        runtimeRef: b19p
+      - repeater: Control1
+      - field: Element
+    invokeType: FilterByColumn
+    parameters:
+      UseAdvancedFiltering: true
+    description: Invoke FilterByColumn on <caption>Element</caption>
+  - type: input
+    target:
+      - page: Project/Element Control
+        runtimeRef: b19p
+      - scope: filter
+        field: Element
+    value: 00.00.00
+    isFilterAsYouType: true
+    description: Input <value>00.00.00</value> into <caption>Element</caption>
+  - type: page-shown
+    source:
+      page: lookup:Element
+    modal: false
+    runtimeId: b1ha
+    description: Page <caption>Selecteren</caption> was shown.
+  - type: invoke
+    target:
+      - page: lookup:Element
+        runtimeRef: b1ha
+      - repeater: repeater
+    parameters:
+      AlwaysCommit: true
+    description: Invoke row on <caption>repeater</caption>
+  - type: page-closed
+    source:
+      page: lookup:Element
+    runtimeId: b1ha
+    description: Page <caption>Selecteren</caption> was closed.
+  - type: validate
+    target:
+      - page: Project/Element Control
+        runtimeRef: b19p
+      - repeater: Control1
+      - field: Received/Not Invoiced
+    operation: =
+    value: 3000
+    description: <caption>Ontvangen/Niet gefactureerd</caption>
+      <operation>is</operation> <value>3,000.00</value> valideren
+  - type: validate
+    target:
+      - page: Project/Element Control
+        runtimeRef: b19p
+      - repeater: Control1
+      - field: TotCostDec
+    operation: =
+    value: 3000
+    description: <caption>Totale kosten</caption> <operation>is</operation>
+      <value>3,000.00</value> valideren
+  - type: close-page
+    target:
+      - page: Project/Element Control
+        runtimeRef: b19p
+    description: Close page <caption>Bewaking Project/element</caption>
+  - type: page-closed
+    source:
+      page: Project/Element Control
+    runtimeId: b19p
+    description: Page <caption>Bewaking Project/element</caption> was closed.
+  - type: close-page
+    target:
+      - page: Project Control
+        runtimeRef: b10m
+    description: Close page <caption>Projectbewaking</caption>
+  - type: page-closed
+    source:
+      page: Project Control
+    runtimeId: b10m
+    description: Page <caption>Projectbewaking</caption> was closed.
+  - type: invoke
+    target:
+      - page: Job Card
         runtimeRef: b1dv
       - action: "&Installments"
     description: Invoke <caption>Termijnen</caption>
@@ -102,12 +206,6 @@ steps:
       - field: Chargeable
     value: true
     description: Input <value>true</value> into <caption>Factureerbaar</caption>
-  - type: message
-    unexpected: true
-    automationId: 8da61efd-0002-0003-0507-0b0d1113171d
-    text: Gaat u een factuur maken met Bedrag = 0.
-    description: "Unexpected message: <value>Gaat u een factuur maken met Bedrag =
-      0.</value>"
   - type: invoke
     target:
       - page: Project Installments

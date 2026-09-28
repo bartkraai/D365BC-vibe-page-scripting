@@ -1,4 +1,4 @@
-telemetryId: e08d5832-c9e5-4a66-933e-b8e25f6ac5f3
+telemetryId: 5ad9e0ff-f6e6-45fe-bf8a-d573b596daf9
 timeout: 300
 steps:
   - type: invoke
@@ -323,6 +323,21 @@ steps:
     modal: false
     runtimeId: b1b8
     description: Page <caption>Projecttermijnen</caption> was shown.
+  - type: invoke
+    target:
+      - page: Project Installments
+        runtimeRef: b9im
+    invokeType: ViewList
+    description: Invoke ViewList on <caption>Projecttermijnen</caption>
+  - type: validate
+    target:
+      - page: Project Installments
+        runtimeRef: b9im
+      - repeater: Control1
+    operation: =
+    value: 4
+    description: <caption>Control1</caption> aantal rijen  <operation>is</operation>
+      <value>4</value> valideren
   - type: close-page
     target:
       - page: Project Installments

@@ -1,9 +1,5 @@
-name: Van traject registratie tm vervolgtraject 3
-description: Test recording
-telemetryId: 6574fdf7-1d5c-40b3-8d51-48fa96f338f5
+telemetryId: bde174ee-8aa7-47c9-a106-77faa80ad78e
 timeout: 300
-start:
-  profile: ACQUISITIONER 4PS
 steps:
   - type: invoke
     invokeType: OpenSettings
@@ -162,6 +158,15 @@ steps:
     parameters:
       AlwaysCommit: false
     description: Invoke row on <caption>Control1</caption>
+  - type: validate
+    target:
+      - page: Try-out
+        runtimeRef: b3sr
+      - field: Salesperson Name
+    value: ="Gerard de Graaf"
+    description: <caption>Naam in/verkoper</caption> <operation>is</operation>
+      <value>"Cornelis Bos"</value> valideren
+    operation: =
   - type: page-closed
     source:
       page: Contact List
@@ -413,7 +418,6 @@ steps:
       - page: Try-out
         runtimeRef: b9hp
       - action: "&Features"
-    parameters: {}
     description: Invoke <caption>Kenmerken</caption>
   - type: page-shown
     source:
@@ -769,9 +773,67 @@ steps:
   - type: invoke
     target:
       - page: Try-out
+        runtimeRef: bs7
+      - part: sub
+      - page: Try-out Lines SF
+      - action: Create Try-out Quote
+    description: Invoke <caption>Trajectofferte aanmaken</caption>
+  - type: page-shown
+    source:
+      page: null
+      automationId: 8da61efd-0002-0003-0507-0b0d1113171d
+      caption: Kiezen
+    modal: true
+    runtimeId: byx
+    description: Page <caption>Kiezen</caption> was shown.
+  - type: input
+    target:
+      - page: null
+        automationId: 8da61efd-0002-0003-0507-0b0d1113171d
+        caption: Kiezen
+        runtimeRef: byx
+      - field: AL:STRMENU
+    value: 0
+    description: Input <value>0</value> into <caption>AL:STRMENU</caption>
+  - type: invoke
+    target:
+      - page: null
+        automationId: 8da61efd-0002-0003-0507-0b0d1113171d
+        caption: Kiezen
+        runtimeRef: byx
+    invokeType: Ok
+    description: Invoke Ok on <caption>Kiezen</caption>
+  - type: page-closed
+    source:
+      page: null
+    runtimeId: byx
+    description: Page <caption>Kiezen</caption> was closed.
+  - type: page-shown
+    source:
+      page: No. Series
+    modal: true
+    runtimeId: bz3
+    description: Page <caption>Nr.-reeks</caption> was shown.
+  - type: invoke
+    target:
+      - page: No. Series
+        runtimeRef: bz3
+    invokeType: LookupOk
+    description: Invoke LookupOk on <caption>Nr.-reeks</caption>
+  - type: page-closed
+    source:
+      page: No. Series
+    runtimeId: bz3
+    description: Page <caption>Nr.-reeks</caption> was closed.
+  - type: message
+    automationId: 8da61efd-0002-0003-0507-0b0d1113171d
+    text: Trajectofferte TR-OFT10128 is aangemaakt.
+    description: "Message: <value>Trajectofferte TR-OFT10128 is aangemaakt.</value>"
+  - type: invoke
+    target:
+      - page: Try-out
         runtimeRef: b9hp
       - action: Try-out Quotes
-    parameters: {}
     description: Invoke <caption>Trajectoffertes</caption>
   - type: page-shown
     source:
@@ -782,103 +844,18 @@ steps:
   - type: invoke
     target:
       - page: Try-out Quote List
-        runtimeRef: bada
-      - action: Control_New
-    invokeType: New
-    description: Invoke New on <caption>Nieuw</caption>
+        runtimeRef: b12x
+      - repeater: Control1
+    invokeType: Edit
+    parameters:
+      AlwaysCommit: false
+    description: Invoke row on <caption>Control1</caption>
   - type: page-shown
     source:
       page: Try-out Quote
     modal: false
-    runtimeId: bajf
-    description: Page <caption>Nieuw - Trajectofferte</caption> was shown.
-  - type: focus
-    target:
-      - page: Try-out Quote
-        runtimeRef: bajf
-      - field: Code
-    description: Focus <caption>Code</caption>
-  - type: focus
-    target:
-      - page: Try-out Quote
-        runtimeRef: bajf
-      - field: Description
-    description: Focus <caption>Omschrijving</caption>
-  - type: close-page
-    target:
-      - page: lookup:Contact Type
-        runtimeRef: b9xw
-    description: Close page <caption>Selecteren</caption>
-  - type: close-page
-    target:
-      - page: lookup:Country/Region Code
-        runtimeRef: ba0t
-    description: Close page <caption>Selecteren</caption>
-  - type: input
-    target:
-      - page: Try-out Quote
-        runtimeRef: bajf
-      - field: Description
-    value: Fietsbrug AT
-    description: Input <value>Fietsbrug AT</value> into <caption>Omschrijving</caption>
-  - type: focus
-    target:
-      - page: Try-out Quote
-        runtimeRef: bajf
-      - field: Contact No.
-    description: Focus <caption>Relatienr.</caption>
-  - type: invoke
-    target:
-      - page: Try-out Quote
-        runtimeRef: bajf
-      - field: Contact No.
-    invokeType: Lookup
-    description: Invoke Lookup on <caption>Relatienr.</caption>
-  - type: page-shown
-    source:
-      page: Contact List
-    modal: true
-    runtimeId: baqb
-    description: Page <caption>Contacten</caption> was shown.
-  - type: invoke
-    target:
-      - page: Contact List
-        runtimeRef: baqb
-      - repeater: Control1
-    parameters:
-      AlwaysCommit: false
-    description: Invoke row on <caption>Control1</caption>
-  - type: page-closed
-    source:
-      page: Contact List
-    runtimeId: baqb
-    description: Page <caption>Contacten</caption> was closed.
-  - type: invoke
-    target:
-      - page: Try-out Quote
-        runtimeRef: bajf
-      - field: Contact Person No.
-    invokeType: Lookup
-    description: Invoke Lookup on <caption>Contactpersoonnr.</caption>
-  - type: page-shown
-    source:
-      page: lookup:Contact Person No.
-    modal: false
-    runtimeId: bazz
-    description: Page <caption>Selecteren</caption> was shown.
-  - type: invoke
-    target:
-      - page: lookup:Contact Person No.
-        runtimeRef: bazz
-      - repeater: repeater
-    parameters:
-      AlwaysCommit: true
-    description: Invoke row on <caption>repeater</caption>
-  - type: page-closed
-    source:
-      page: lookup:Contact Person No.
-    runtimeId: bazz
-    description: Page <caption>Selecteren</caption> was closed.
+    runtimeId: b1h1
+    description: Page <caption>Trajectofferte</caption> was shown.
   - type: invoke
     target:
       - page: Try-out Quote
@@ -925,13 +902,6 @@ steps:
       - field: Cost Price
     value: "150000"
     description: Input <value>150000</value> into <caption>Kostprijs</caption>
-  - type: input
-    target:
-      - page: Try-out Quote
-        runtimeRef: bajf
-      - field: Scoring Percentage
-    value: "65"
-    description: Input <value>65</value> into <caption>Scoringskans</caption>
   - type: input
     target:
       - page: Try-out Quote
@@ -1290,7 +1260,6 @@ steps:
       - page: Try-out
         runtimeRef: b9hp
       - action: Try-out Quotes
-    parameters: {}
     description: Invoke <caption>Trajectoffertes</caption>
   - type: page-shown
     source:
@@ -1420,7 +1389,6 @@ steps:
       - page: Try-out
         runtimeRef: b9hp
       - action: Try-out Quotes
-    parameters: {}
     description: Invoke <caption>Trajectoffertes</caption>
   - type: page-shown
     source:
@@ -1448,7 +1416,6 @@ steps:
       - page: Try-out Quote
         runtimeRef: bc79
       - action: Successors
-    parameters: {}
     description: Invoke <caption>Vervolgtrajecten</caption>
   - type: page-shown
     source:
@@ -1576,3 +1543,7 @@ steps:
       page: Try-out List
     runtimeId: b9d6
     description: Page <caption>Traject</caption> was closed.
+name: Van traject registratie tm vervolgtraject 3
+description: Test recording
+start:
+  profile: ACQUISITIONER 4PS
