@@ -10,17 +10,19 @@
       "script": "./scripts/Project aanmaken en financieel inrichten 1.yml",
       "capture": {
         "job_card_no": "Job Card - No."
-      }
+      },
+      "company": "TestAT"
     },
     {
       "id": "step-2",
       "name": "Project inrichting",
       "user": "Projectleider",
-      "script": "./scripts/Project inrichten en eerste prognose 1.yml",
+      "script": "./scripts/Project inrichten en 1e prognose 3.yml",
       "inject": {
         "Job List.No.": "{capture.step-1.job_card_no}"
       },
-      "depends_on": "step-1"
+      "depends_on": "step-1",
+      "company": "TestAT"
     },
     {
       "id": "step-3",
@@ -28,13 +30,13 @@
       "user": "Werkvoorbereider",
       "script": "./scripts/Aanmaken inkooporder ter goedkeuring 1.yml",
       "capture": {
-        "null_inkooporder_io230601_is_aangemaakt": "null - Inkooporder IO230601 is aangemaakt."
+        "purchase_order_list_no": "Purchase Order List - No."
       },
       "inject": {
-        "Job List.No.": "{capture.step-1.job_card_no}",
-        "Project Purchase Order List.No.": ""
+        "Job List.No.": "{capture.step-1.job_card_no}"
       },
-      "depends_on": "step-2"
+      "depends_on": "step-2",
+      "company": "TestAT"
     },
     {
       "id": "step-4",
@@ -42,9 +44,10 @@
       "user": "Projectleider",
       "script": "./scripts/Goedkeuren inkooporder 1.yml",
       "inject": {
-        "Approval (Compressed).Document No.": "{capture.step-1.job_card_no}"
+        "Approval (Compressed).Document No.": "{capture.step-3.purchase_order_list_no}"
       },
-      "depends_on": "step-3"
+      "depends_on": "step-3",
+      "company": "TestAT"
     },
     {
       "id": "step-5",
@@ -53,9 +56,10 @@
       "script": "./scripts/ontvangst boeken inkooporder 1.yml",
       "inject": {
         "Job List.No.": "{capture.step-1.job_card_no}",
-        "Project Purchase Order List.No.": "{capture.step-3.null_inkooporder_io230601_is_aangemaakt}"
+        "Project Purchase Order List.No.": "{capture.step-3.purchase_order_list_no}"
       },
-      "depends_on": "step-4"
+      "depends_on": "step-4",
+      "company": "TestAT"
     },
     {
       "id": "step-6",
@@ -65,7 +69,8 @@
       "inject": {
         "Job List.No.": "{capture.step-1.job_card_no}"
       },
-      "depends_on": "step-5"
+      "depends_on": "step-5",
+      "company": "TestAT"
     }
   ]
 }

@@ -1,8 +1,4 @@
-name: Aanmaken inkooporder ter goedkeuring 1
-description: Test recording
 telemetryId: 64e38a2f-ff09-4863-8fa5-759eb2d4891d
-start:
-  profile: PROJECT ENGINEER 4PS
 steps:
   - type: invoke
     invokeType: OpenSettings
@@ -66,8 +62,8 @@ steps:
       - scope: filter
         field: No.
     isFilterAsYouType: true
-    description: Input <value>Parameters.'Job List.No.'</value> into <caption>Nr.</caption>
     value: =Parameters.'Job List.No.'
+    description: Input <value>Parameters.'Job List.No.'</value> into <caption>Nr.</caption>
   - type: invoke
     target:
       - page: lookup:No.
@@ -101,7 +97,6 @@ steps:
       - page: Job Card
         runtimeRef: b274
       - action: Purchase Actions
-    parameters: {}
     description: Invoke <caption>Inkoopacties</caption>
   - type: page-shown
     source:
@@ -160,7 +155,6 @@ steps:
       - page: Project Purchase Action
         runtimeRef: b2q1
       - action: AssignButton
-    parameters: {}
     description: Invoke <caption>Toekennen</caption>
   - type: page-shown
     source:
@@ -181,7 +175,6 @@ steps:
       - page: Budget to Purchase Action
         runtimeRef: b2yz
       - action: AssignButton
-    parameters: {}
     description: Invoke <caption>Toekennen</caption>
   - type: page-shown
     source:
@@ -228,7 +221,6 @@ steps:
       - page: Project Purchase Action
         runtimeRef: b2q1
       - action: Vendors
-    parameters: {}
     description: Invoke <caption>Leveranciers</caption>
   - type: page-shown
     source:
@@ -307,174 +299,118 @@ steps:
       - page: Project Purchase Action
         runtimeRef: b2q1
       - action: CreatePurchaseOrder
-    parameters: {}
     description: Invoke <caption>Aanmaken inkooporder</caption>
   - type: message
     automationId: 8da61efd-0002-0003-0507-0b0d1113171d
     text: Inkooporder IO230601 is aangemaakt.
     description: "Message: <value>Inkooporder IO230601 is aangemaakt.</value>"
-  - type: copy-value
-    source:
-      - page: null
-        automationId: 8da61efd-0002-0003-0507-0b0d1113171d
-        caption: null
-        runtimeRef: b3nv
-      - field: null
-    name: null - Inkooporder IO230601 is aangemaakt.
-    valueType: string
-    description: Copy value from <caption>Inkooporder IO230601 is aangemaakt.</caption>
-  - type: close-page
-    target:
-      - page: Project Purchase Action
-        runtimeRef: b2q1
-    description: Close page <caption>Projectinkoopactie</caption>
-  - type: page-closed
-    source:
-      page: Project Purchase Action
-    runtimeId: b2q1
-    description: Page <caption>Projectinkoopactie</caption> was closed.
-  - type: close-page
-    target:
-      - page: Project Purchase Action List
-        runtimeRef: b2lu
-    description: Close page <caption>Projectinkoopacties</caption>
-  - type: page-closed
-    source:
-      page: Project Purchase Action List
-    runtimeId: b2lu
-    description: Page <caption>Projectinkoopacties</caption> was closed.
   - type: invoke
     target:
-      - page: Job Card
-        runtimeRef: b274
-      - action: Purchase Orders
-    parameters: {}
+      - page: Project Purchase Action
+        runtimeRef: b6s8
+      - action: Purchase &Orders
     description: Invoke <caption>Inkooporders</caption>
   - type: page-shown
     source:
-      page: Project Purchase Order List
-    modal: false
-    runtimeId: b3o4
-    description: Page <caption>Project inkooporders</caption> was shown.
-  - type: filter
-    target:
-      - page: Project Purchase Order List
-        runtimeRef: b3o4
-    operation: add
-    column:
-      field: No.
-      scope: filter
-    description: Add filter for <caption>No.</caption> on <caption>Project
-      inkooporders</caption>
-  - type: input
-    target:
-      - page: Project Purchase Order List
-        runtimeRef: b3o4
-      - scope: filter
-        field: No.
-    value: IO
-    isFilterAsYouType: true
-    description: Input <value>IO</value> into <caption>Nr.</caption>
-  - type: page-shown
+      page: Purchase Order List
+    modal: true
+    runtimeId: b7qs
+    description: Page <caption>Inkooporders</caption> was shown.
+  - type: copy-value
     source:
-      page: lookup:No.
-    modal: false
-    runtimeId: b3wc
-    description: Page <caption>Selecteren</caption> was shown.
-  - type: input
-    target:
-      - page: Project Purchase Order List
-        runtimeRef: b3o4
-      - scope: filter
-        field: No.
-    value: IO230
-    isFilterAsYouType: true
-    description: Input <value>IO230</value> into <caption>Nr.</caption>
-  - type: input
-    target:
-      - page: Project Purchase Order List
-        runtimeRef: b3o4
-      - scope: filter
-        field: No.
-    isFilterAsYouType: true
-    description: Input <value>Parameters.'Project Purchase Order List.No.'</value>
-      into <caption>Nr.</caption>
-    value: =Parameters.'Project Purchase Order List.No.'
-  - type: invoke
-    target:
-      - page: lookup:No.
-        runtimeRef: b3wc
-      - repeater: repeater
-    parameters:
-      AlwaysCommit: true
-    description: Invoke row on <caption>repeater</caption>
-  - type: page-closed
-    source:
-      page: lookup:No.
-    runtimeId: b3wc
-    description: Page <caption>Selecteren</caption> was closed.
-  - type: invoke
-    target:
-      - page: Project Purchase Order List
-        runtimeRef: b3o4
-      - repeater: Control1100485000
+      - page: Purchase Order List
+        runtimeRef: b7qs
+      - repeater: Control1
       - field: No.
-    invokeType: DrillDown
-    description: Invoke DrillDown on <caption>Nr.</caption>
+    name: Purchase Order List - No.
+    valueType: string
+    description: Copy value from <caption>Nr.</caption>
+  - type: invoke
+    target:
+      - page: Purchase Order List
+        runtimeRef: b81b
+      - repeater: Control1
+    invokeType: Edit
+    parameters:
+      AlwaysCommit: false
+    description: Invoke row on <caption>Control1</caption>
   - type: page-shown
     source:
       page: Purchase Order
-    modal: true
-    runtimeId: b3wx
+    modal: false
+    runtimeId: b8bs
     description: Page <caption>Inkooporder</caption> was shown.
   - type: invoke
     target:
       - page: Purchase Order
         runtimeRef: b3wx
       - action: SendApprovalRequest
-    parameters: {}
     description: Invoke <caption>Goedkeuringsaanvraag verzenden</caption>
-  - type: invoke
+  - type: close-page
     target:
       - page: Purchase Order
-        runtimeRef: b3wx
-    invokeType: Cancel
-    description: Invoke Cancel on <caption>Inkooporder</caption>
+        runtimeRef: b9b3
+    description: Close page <caption>Inkooporder</caption>
   - type: page-closed
     source:
       page: Purchase Order
-    runtimeId: b3wx
+    runtimeId: b9b3
     description: Page <caption>Inkooporder</caption> was closed.
-  - type: close-page
+  - type: invoke
     target:
-      - page: Project Purchase Order List
-        runtimeRef: b3o4
-    description: Close page <caption>Project inkooporders</caption>
+      - page: Purchase Order List
+        runtimeRef: b90m
+    invokeType: Cancel
+    description: Invoke Cancel on <caption>Inkooporders</caption>
   - type: page-closed
     source:
-      page: Project Purchase Order List
-    runtimeId: b3o4
-    description: Page <caption>Project inkooporders</caption> was closed.
+      page: Purchase Order List
+    runtimeId: b90m
+    description: Page <caption>Inkooporders</caption> was closed.
+  - type: close-page
+    target:
+      - page: Project Purchase Action
+        runtimeRef: b7xj
+    description: Close page <caption>Projectinkoopactie</caption>
+  - type: page-closed
+    source:
+      page: Project Purchase Action
+    runtimeId: b7xj
+    description: Page <caption>Projectinkoopactie</caption> was closed.
+  - type: close-page
+    target:
+      - page: Project Purchase Action List
+        runtimeRef: b7tb
+    description: Close page <caption>Projectinkoopacties</caption>
+  - type: page-closed
+    source:
+      page: Project Purchase Action List
+    runtimeId: b7tb
+    description: Page <caption>Projectinkoopacties</caption> was closed.
   - type: close-page
     target:
       - page: Job Card
-        runtimeRef: b274
+        runtimeRef: b7cr
     description: Close page <caption>Project</caption>
   - type: page-closed
     source:
       page: Job Card
-    runtimeId: b274
+    runtimeId: b7cr
     description: Page <caption>Project</caption> was closed.
   - type: close-page
     target:
       - page: Job List
-        runtimeRef: b1sm
+        runtimeRef: b6xj
     description: Close page <caption>Projecten</caption>
   - type: page-closed
     source:
       page: Job List
-    runtimeId: b1sm
+    runtimeId: b6xj
     description: Page <caption>Projecten</caption> was closed.
+name: Aanmaken inkooporder ter goedkeuring 1
+description: Test recording
+start:
+  profile: PROJECT ENGINEER 4PS
 parameters:
   Job List.No.:
     type: string

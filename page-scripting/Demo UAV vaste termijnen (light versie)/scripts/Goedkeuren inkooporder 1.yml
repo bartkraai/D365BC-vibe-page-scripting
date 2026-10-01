@@ -1,8 +1,4 @@
-name: Goedkeuren inkooporder 1
-description: Test recording
 telemetryId: 9d0a04a9-a82d-401e-928d-cb2fd8070b7e
-start:
-  profile: PROJECTLEIDER 4PS
 steps:
   - type: invoke
     invokeType: OpenSettings
@@ -54,65 +50,15 @@ steps:
         runtimeRef: bct
       - scope: filter
         field: Document No.
+    value: =Parameters.'Approval (Compressed).Document No.'
     description: Input <value>Parameters.'Approval (Compressed).Document
       No.'</value> into <caption>Documentnr.</caption>
-    value: =Parameters.'Approval (Compressed).Document No.'
   - type: invoke
     target:
       - page: Approval (Compressed)
         runtimeRef: bct
       - action: Approve
-    parameters: {}
     description: Invoke <caption>Goedkeuren</caption>
-  - type: page-shown
-    source:
-      page: Email Editor
-    modal: true
-    runtimeId: bir
-    description: Page <caption>Test Automatisch Testen - order IO230601</caption> was shown.
-  - type: invoke
-    target:
-      - page: Email Editor
-        runtimeRef: bir
-    invokeType: Cancel
-    description: Invoke Cancel on <caption>Test Automatisch Testen - order
-      IO230601</caption>
-  - type: page-shown
-    source:
-      page: null
-      automationId: 8da61efd-0002-0003-0507-0b0d1113171d
-      caption: Kiezen
-    modal: true
-    runtimeId: bkk
-    description: Page <caption>Kiezen</caption> was shown.
-  - type: input
-    target:
-      - page: null
-        automationId: 8da61efd-0002-0003-0507-0b0d1113171d
-        caption: Kiezen
-        runtimeRef: bkk
-      - field: AL:STRMENU
-    value: 1
-    description: Input <value>1</value> into <caption>AL:STRMENU</caption>
-  - type: invoke
-    target:
-      - page: null
-        automationId: 8da61efd-0002-0003-0507-0b0d1113171d
-        caption: Kiezen
-        runtimeRef: bkk
-    invokeType: Ok
-    description: Invoke Ok on <caption>Kiezen</caption>
-  - type: page-closed
-    source:
-      page: null
-    runtimeId: bkk
-    description: Page <caption>Kiezen</caption> was closed.
-  - type: page-closed
-    source:
-      page: Email Editor
-    runtimeId: bir
-    description: Page <caption>Test Automatisch Testen - order IO230601</caption>
-      was closed.
   - type: close-page
     target:
       - page: Approval (Compressed)
@@ -123,6 +69,10 @@ steps:
       page: Approval (Compressed)
     runtimeId: bct
     description: Page <caption>Goedkeuring (verdicht)</caption> was closed.
+name: Goedkeuren inkooporder 1
+description: Test recording
+start:
+  profile: PROJECTLEIDER 4PS
 parameters:
   Approval (Compressed).Document No.:
     type: string
