@@ -1364,6 +1364,7 @@ function renderCatalog() {
           ${type.description ? '<span class="text-muted" style="font-size:12px;margin-left:6px">' + esc(type.description) + '</span>' : ''}
           <div class="cat-actions">
             <button class="btn btn-secondary btn-sm" onclick="catEditType(${v},${t})">Edit</button>
+            <button class="btn btn-secondary btn-sm" onclick="catDuplicateType(${v},${t})">Duplicate</button>
             <button class="btn btn-secondary btn-sm" onclick="catRemoveType(${v},${t})" style="color:var(--error)">Remove</button>
           </div>
         </div>`;
@@ -1425,14 +1426,42 @@ function renderCatalog() {
 }
 
 // CRUD
-function catEditVc(v) { syncCatalogMeta(); catEditNode = { level: 'vc', v }; renderCatalog(); }
+function catCommitActiveEdit() {
+  if (!catEditNode) return true;
+  const { level, v, t, p } = catEditNode;
+  if (level === 'vc') {
+    const vc = catalog.types[v];
+    vc.code = (document.getElementById('cat-ed-vc-code').value || '').toUpperCase().trim();
+    vc.name = document.getElementById('cat-ed-vc-name').value.trim();
+    vc.description = document.getElementById('cat-ed-vc-desc').value.trim();
+    if (!vc.code) { alert('Code is required'); return false; }
+  } else if (level === 'type') {
+    const type = catalog.types[v].value_chains[t];
+    type.code = (document.getElementById('cat-ed-type-code').value || '').toUpperCase().trim();
+    type.name = document.getElementById('cat-ed-type-name').value.trim();
+    type.description = document.getElementById('cat-ed-type-desc').value.trim();
+    if (!type.code) { alert('Code is required'); return false; }
+  } else if (level === 'pf') {
+    const pf = catalog.types[v].value_chains[t].process_flows[p];
+    pf.code = (document.getElementById('cat-ed-pf-code').value || '').toUpperCase().trim();
+    pf.name = document.getElementById('cat-ed-pf-name').value.trim();
+    pf.description = document.getElementById('cat-ed-pf-desc').value.trim();
+    if (!pf.code) { alert('Code is required'); return false; }
+  }
+  return true;
+}
+
+function catBeginEdit(node) {
+  syncCatalogMeta();
+  if (!catCommitActiveEdit()) return;
+  catEditNode = node;
+  renderCatalog();
+}
+
+function catEditVc(v) { catBeginEdit({ level: 'vc', v }); }
 function catSaveVc(v) {
   syncCatalogMeta();
-  const vc = catalog.types[v];
-  vc.code = (document.getElementById('cat-ed-vc-code').value || '').toUpperCase().trim();
-  vc.name = document.getElementById('cat-ed-vc-name').value.trim();
-  vc.description = document.getElementById('cat-ed-vc-desc').value.trim();
-  if (!vc.code) { alert('Code is required'); return; }
+  if (!catCommitActiveEdit()) return;
   catEditNode = null; renderCatalog();
 }
 function catRemoveVc(v) {
@@ -1441,21 +1470,38 @@ function catRemoveVc(v) {
 }
 function catAddVc() {
   syncCatalogMeta();
+  if (!catCommitActiveEdit()) return;
   if (!catalog) catalog = { name: '', description: '', types: [] };
   if (!catalog.types) catalog.types = [];
   catalog.types.push({ code: '', name: '', description: '', value_chains: [] });
   catEditNode = { level: 'vc', v: catalog.types.length - 1 }; renderCatalog();
 }
 
-function catEditType(v, t) { syncCatalogMeta(); catEditNode = { level: 'type', v, t }; renderCatalog(); }
+function catEditType(v, t) { catBeginEdit({ level: 'type', v, t }); }
 function catSaveType(v, t) {
   syncCatalogMeta();
-  const type = catalog.types[v].value_chains[t];
-  type.code = (document.getElementById('cat-ed-type-code').value || '').toUpperCase().trim();
-  type.name = document.getElementById('cat-ed-type-name').value.trim();
-  type.description = document.getElementById('cat-ed-type-desc').value.trim();
-  if (!type.code) { alert('Code is required'); return; }
+  if (!catCommitActiveEdit()) return;
   catEditNode = null; renderCatalog();
+}
+function catDuplicateType(v, t) {
+  syncCatalogMeta();
+  if (!catCommitActiveEdit()) return;
+  const valueChains = catalog.types[v].value_chains;
+  const source = valueChains[t];
+  const copy = JSON.parse(JSON.stringify(source));
+  const usedCodes = new Set(valueChains.map(valueChain => valueChain.code));
+  const suffix = '-COPY';
+  const baseCode = (source.code || 'VC').slice(0, 10 - suffix.length);
+  let code = `${baseCode}${suffix}`;
+  for (let index = 2; usedCodes.has(code); index++) {
+    const numberedSuffix = `-COPY${index}`;
+    code = `${(source.code || 'VC').slice(0, 10 - numberedSuffix.length)}${numberedSuffix}`;
+  }
+  copy.code = code;
+  copy.name = `${source.name || 'Value Chain'} (Copy)`;
+  valueChains.splice(t + 1, 0, copy);
+  catEditNode = { level: 'type', v, t: t + 1 };
+  renderCatalog();
 }
 function catRemoveType(v, t) {
   if (!confirm(`Remove type "${catalog.types[v].value_chains[t].code || '(unnamed)'}" and all its process flows?`)) return;
@@ -1463,31 +1509,24 @@ function catRemoveType(v, t) {
 }
 function catAddType(v) {
   syncCatalogMeta();
+  if (!catCommitActiveEdit()) return;
   if (!catalog.types[v].value_chains) catalog.types[v].value_chains = [];
   catalog.types[v].value_chains.push({ code: '', name: '', description: '', process_flows: [] });
   catEditNode = { level: 'type', v, t: catalog.types[v].value_chains.length - 1 }; renderCatalog();
 }
 
-function catEditPf(v, t, p) { syncCatalogMeta(); catEditNode = { level: 'pf', v, t, p }; renderCatalog(); }
+function catEditPf(v, t, p) { catBeginEdit({ level: 'pf', v, t, p }); }
 function catSavePf(v, t, p) {
   syncCatalogMeta();
-  const pf = catalog.types[v].value_chains[t].process_flows[p];
-  pf.code = (document.getElementById('cat-ed-pf-code').value || '').toUpperCase().trim();
-  pf.name = document.getElementById('cat-ed-pf-name').value.trim();
-  pf.description = document.getElementById('cat-ed-pf-desc').value.trim();
-  if (!pf.code) { alert('Code is required'); return; }
-  pf.workflow_path = pf.name ? './' + pf.name : '';
+  if (!catCommitActiveEdit()) return;
   catEditNode = null; renderCatalog();
 }
 async function catSavePfAndOpen(v, t, p) {
   syncCatalogMeta();
+  if (!catCommitActiveEdit()) return;
   const pf = catalog.types[v].value_chains[t].process_flows[p];
-  pf.code = (document.getElementById('cat-ed-pf-code').value || '').toUpperCase().trim();
-  pf.name = document.getElementById('cat-ed-pf-name').value.trim();
-  pf.description = document.getElementById('cat-ed-pf-desc').value.trim();
-  if (!pf.code) { alert('Code is required'); return; }
   if (!pf.name) { alert('Name is required'); return; }
-  pf.workflow_path = './' + pf.name;
+  if (!pf.workflow_path) pf.workflow_path = './' + pf.name;
   catEditNode = null; renderCatalog();
   // Save catalog first
   try { await POST('/catalog', catalog); } catch (e) { alert('Save failed: ' + e.message); return; }
@@ -1500,6 +1539,7 @@ function catRemovePf(v, t, p) {
 }
 function catAddPf(v, t) {
   syncCatalogMeta();
+  if (!catCommitActiveEdit()) return;
   if (!catalog.types[v].value_chains[t].process_flows) catalog.types[v].value_chains[t].process_flows = [];
   catalog.types[v].value_chains[t].process_flows.push({ code: '', name: '', description: '', workflow_path: '' });
   catEditNode = { level: 'pf', v, t, p: catalog.types[v].value_chains[t].process_flows.length - 1 }; renderCatalog();
@@ -1508,6 +1548,7 @@ function catAddPf(v, t) {
 /** Show the existing-workflow picker, fetching projects from the server */
 async function catLinkExisting(v, t) {
   syncCatalogMeta();
+  if (!catCommitActiveEdit()) return;
   const pickerId = `cat-existing-picker-${v}-${t}`;
   const selectId = `cat-existing-select-${v}-${t}`;
   const pickerEl = document.getElementById(pickerId);
@@ -1598,6 +1639,7 @@ async function catOpenPfWorkflow(v, t, p) {
 // Save / Import / Export
 document.getElementById('btn-cat-save').addEventListener('click', async () => {
   syncCatalogMeta();
+  if (!catCommitActiveEdit()) return;
   try {
     await POST('/catalog', catalog);
     alert('Catalog saved to server.');
