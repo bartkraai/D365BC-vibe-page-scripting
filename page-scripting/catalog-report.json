@@ -1,95 +1,153 @@
 {
-  "value_chains": [
+  "totals": {
+    "not_run": 3,
+    "process_flows": 4,
+    "passed": 0,
+    "failed": 1
+  },
+  "types": [
     {
-      "types": [
-        {
-          "name": "Vastgoed",
-          "code": "VG",
-          "totals": {
-            "passed": 0,
-            "process_flows": 1,
-            "not_run": 0,
-            "failed": 1
-          },
-          "composite_code": "PRJ-VG",
-          "description": "Vastgoedprojecten — traject, projectkaart, overdracht.",
-          "process_flows": [
-            {
-              "name": "Van traject naar project",
-              "workflow_path": "./Van traject naar project",
-              "code": "TRAJECT",
-              "composite_code": "PRJ-VG-TRAJECT",
-              "report_path": ".\\Van traject naar project\\results\\workflow-summary.html",
-              "failed_steps": 1,
-              "breadcrumb": "Projecten > Vastgoed > Van traject naar project",
-              "status": "failed",
-              "total_steps": 1,
-              "overall": "FAILED",
-              "passed_steps": 0,
-              "last_run": "2026-03-12T10:49:43.5225685+01:00",
-              "duration_s": 41.1
-            }
-          ]
-        }
-      ],
+      "code": "PRJ",
       "name": "Projecten",
       "totals": {
+        "not_run": 2,
+        "process_flows": 3,
         "passed": 0,
-        "process_flows": 1,
-        "not_run": 0,
         "failed": 1
       },
-      "code": "PRJ",
-      "description": "Projectmatige bedrijfsprocessen — van acquisitie tot oplevering."
-    },
-    {
-      "types": [
+      "description": "",
+      "value_chains": [
         {
-          "name": "Purchase Orders",
-          "code": "PO",
-          "totals": {
-            "passed": 0,
-            "process_flows": 1,
-            "not_run": 0,
-            "failed": 1
-          },
-          "composite_code": "INK-PO",
-          "description": "Inkooporder workflows.",
           "process_flows": [
             {
-              "name": "PO Approval",
-              "workflow_path": "./PO Approval Workflow",
-              "code": "APPR",
-              "composite_code": "INK-PO-APPR",
-              "report_path": ".\\PO Approval Workflow\\results\\workflow-summary.html",
-              "failed_steps": 1,
-              "breadcrumb": "Inkoop > Purchase Orders > PO Approval",
-              "status": "failed",
-              "total_steps": 1,
-              "overall": "FAILED",
+              "failed_steps": 0,
+              "report_path": null,
+              "code": "DEMO-UAV-V",
+              "total_steps": 0,
+              "composite_code": "PRJ-D-UAV-DEMO-UAV-V",
+              "duration_s": null,
+              "overall": null,
+              "name": "Demo UAV vaste termijnen (light versie)",
+              "status": "not_run",
+              "last_run": null,
+              "breadcrumb": "Projecten > Demo UAV vaste termijnen (light versie) > Demo UAV vaste termijnen (light versie)",
               "passed_steps": 0,
-              "last_run": "2026-03-12T12:55:02.1977398+01:00",
-              "duration_s": 24.9
+              "workflow_path": "./Demo UAV vaste termijnen (light versie)"
             }
-          ]
+          ],
+          "code": "D-UAV",
+          "totals": {
+            "not_run": 1,
+            "process_flows": 1,
+            "passed": 0,
+            "failed": 0
+          },
+          "name": "Demo UAV vaste termijnen (light versie)",
+          "description": "",
+          "composite_code": "PRJ-D-UAV"
+        },
+        {
+          "process_flows": [
+            {
+              "failed_steps": 0,
+              "report_path": null,
+              "code": "UAV-PROJEC",
+              "total_steps": 0,
+              "composite_code": "PRJ-UAV-T-UAV-PROJEC",
+              "duration_s": null,
+              "overall": null,
+              "name": "UAV Project (3)",
+              "status": "not_run",
+              "last_run": null,
+              "breadcrumb": "Projecten > UAV > UAV Project (3)",
+              "passed_steps": 0,
+              "workflow_path": "./UAV Project (3)"
+            }
+          ],
+          "code": "UAV-T",
+          "totals": {
+            "not_run": 1,
+            "process_flows": 1,
+            "passed": 0,
+            "failed": 0
+          },
+          "name": "UAV",
+          "description": "UAV",
+          "composite_code": "PRJ-UAV-T"
+        },
+        {
+          "process_flows": [
+            {
+              "failed_steps": 1,
+              "report_path": ".\\Projecten (vaste termijnen)\\results\\workflow-summary.html",
+              "code": "PROJECTEN-",
+              "total_steps": 5,
+              "composite_code": "PRJ-PRJ-VT-PROJECTEN-",
+              "duration_s": 250.2,
+              "overall": "FAILED",
+              "name": "Projecten (vaste termijnen)",
+              "status": "failed",
+              "last_run": "2026-09-22T11:28:14.2780035+02:00",
+              "breadcrumb": "Projecten > Projecten (vaste termijnen) > Projecten (vaste termijnen)",
+              "passed_steps": 4,
+              "workflow_path": "./Projecten (vaste termijnen)"
+            }
+          ],
+          "code": "PRJ-VT",
+          "totals": {
+            "not_run": 0,
+            "process_flows": 1,
+            "passed": 0,
+            "failed": 1
+          },
+          "name": "Projecten (vaste termijnen)",
+          "description": "Projecten (vaste termijnen)",
+          "composite_code": "PRJ-PRJ-VT"
         }
-      ],
-      "name": "Inkoop",
+      ]
+    },
+    {
+      "code": "SYSTEEMBHR",
+      "name": "Test Systeembeheer",
       "totals": {
-        "passed": 0,
+        "not_run": 1,
         "process_flows": 1,
-        "not_run": 0,
-        "failed": 1
+        "passed": 0,
+        "failed": 0
       },
-      "code": "INK",
-      "description": "Inkoopprocessen — bestelling, goedkeuring, ontvangst."
+      "description": "",
+      "value_chains": [
+        {
+          "process_flows": [
+            {
+              "failed_steps": 0,
+              "report_path": null,
+              "code": "SWITCH-ROL",
+              "total_steps": 0,
+              "composite_code": "SYSTEEMBHR-R&P-SWITCH-ROL",
+              "duration_s": null,
+              "overall": null,
+              "name": "Switch Role and Permissions",
+              "status": "not_run",
+              "last_run": null,
+              "breadcrumb": "Test Systeembeheer > Switch Roles and Permissions > Switch Role and Permissions",
+              "passed_steps": 0,
+              "workflow_path": "./Switch Role and Permissions"
+            }
+          ],
+          "code": "R&P",
+          "totals": {
+            "not_run": 1,
+            "process_flows": 1,
+            "passed": 0,
+            "failed": 0
+          },
+          "name": "Switch Roles and Permissions",
+          "description": "",
+          "composite_code": "SYSTEEMBHR-R&P"
+        }
+      ]
     }
   ],
-  "totals": {
-    "passed": 0,
-    "process_flows": 2,
-    "not_run": 0,
-    "failed": 2
-  },
-  "generated_at": "2026-04-10T11:10:07.7988597+02:00"
+  "generated_at": "2026-10-01T14:52:40.1246764+02:00"
 }

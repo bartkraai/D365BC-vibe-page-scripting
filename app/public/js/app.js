@@ -695,14 +695,14 @@ async function loadRunPage() {
               ${vc.code ? `<span class="run-group-code">${esc(vc.code)}</span>` : ''}
               <span class="run-group-count">${vc.flowCount} ${vc.flowCount === 1 ? 'flow' : 'flows'}</span>
             </div>
-            <span class="run-group-title">${esc(vc.name || vc.code || 'Unnamed value chain')}</span>
+            <span class="run-group-title">${esc(vc.name || vc.code || 'Unnamed type')}</span>
             ${vc.description ? `<span class="run-group-desc">${esc(vc.description)}</span>` : ''}
           </div>
         </label>
       </div>
       <div class="run-type-list">`;
-    for (let t = 0; t < vc.types.length; t++) {
-      const type = vc.types[t];
+    for (let t = 0; t < vc.value_chains.length; t++) {
+      const type = vc.value_chains[t];
       html += `<section class="run-type-card">
         <div class="run-type-header">
           <label class="run-tree-label run-type-checkbox${type.availableFlowCount ? '' : ' run-tree-disabled'}">
@@ -712,7 +712,7 @@ async function loadRunPage() {
                 ${type.code ? `<span class="run-type-code">${esc(type.code)}</span>` : ''}
                 <span class="run-type-count">${type.flowCount} ${type.flowCount === 1 ? 'flow' : 'flows'}</span>
               </div>
-              <span class="run-type-title">${esc(type.name || type.code || 'Unnamed type')}</span>
+              <span class="run-type-title">${esc(type.name || type.code || 'Unnamed value chain')}</span>
               ${type.description ? `<span class="run-type-desc">${esc(type.description)}</span>` : ''}
             </div>
           </label>
@@ -766,11 +766,11 @@ async function loadRunPage() {
 
 function buildRunnableCatalog(cat, projects) {
   const projectSet = new Set(projects.filter(p => p.hasWorkflow).map(p => p.name));
-  if (!cat?.value_chains?.length) return [];
+  if (!cat?.types?.length) return [];
 
-  return cat.value_chains
+  return cat.types
     .map(vc => {
-      const types = (vc.types || [])
+      const types = (vc.value_chains || [])
         .map(type => {
           const processFlows = (type.process_flows || [])
             .map(pf => {
@@ -801,7 +801,7 @@ function buildRunnableCatalog(cat, projects) {
 
       return {
         ...vc,
-        types,
+        value_chains: types,
         flowCount: types.reduce((sum, type) => sum + type.flowCount, 0),
         availableFlowCount: types.reduce((sum, type) => sum + type.availableFlowCount, 0),
       };
@@ -1311,7 +1311,7 @@ async function loadCatalog() {
   try {
     catalog = await GET('/catalog');
   } catch {
-    catalog = { name: '', description: '', value_chains: [] };
+    catalog = { name: '', description: '', types: [] };
   }
   document.getElementById('cat-name').value = catalog.name || '';
   document.getElementById('cat-desc').value = catalog.description || '';
@@ -1326,16 +1326,16 @@ function syncCatalogMeta() {
 
 function renderCatalog() {
   const container = document.getElementById('cat-tree-container');
-  if (!catalog || !catalog.value_chains) { container.innerHTML = '<p class="text-muted" style="text-align:center;padding:24px">No value chains yet. Click "+ Add Value Chain" to start.</p>'; return; }
+  if (!catalog || !catalog.types) { container.innerHTML = '<p class="text-muted" style="text-align:center;padding:24px">No types yet. Click "+ Add Type" to start.</p>'; return; }
 
   let html = '';
-  for (let v = 0; v < catalog.value_chains.length; v++) {
-    const vc = catalog.value_chains[v];
+  for (let v = 0; v < catalog.types.length; v++) {
+    const vc = catalog.types[v];
     const vcEditing = catEditNode && catEditNode.level === 'vc' && catEditNode.v === v;
     html += `<div class="card cat-vc-card">`;
     html += `<div class="cat-vc-header">
       <code>${esc(vc.code || '?')}</code>
-      <strong>${esc(vc.name || '(unnamed)')}</strong>
+      <strong>Type: ${esc(vc.name || '(unnamed)')}</strong>
       ${vc.description ? '<span class="text-muted" style="font-size:12px;margin-left:8px">' + esc(vc.description) + '</span>' : ''}
       <div class="cat-actions">
         <button class="btn btn-secondary btn-sm" onclick="catEditVc(${v})">Edit</button>
@@ -1346,21 +1346,21 @@ function renderCatalog() {
     if (vcEditing) {
       html += `<div class="cat-edit-form">
         <input class="input input-sm" id="cat-ed-vc-code" value="${esc(vc.code || '')}" placeholder="Code (e.g. PRJ)" maxlength="10" style="width:100px;text-transform:uppercase" title="Short uppercase code (max 10 chars). Used as composite code prefix, e.g. PRJ.">
-        <input class="input input-sm" id="cat-ed-vc-name" value="${esc(vc.name || '')}" placeholder="Name" style="flex:1" title="Display name for this value chain, e.g. Projecten.">
-        <input class="input input-sm" id="cat-ed-vc-desc" value="${esc(vc.description || '')}" placeholder="Description" style="flex:1" title="Optional description of this value chain.">
+        <input class="input input-sm" id="cat-ed-vc-name" value="${esc(vc.name || '')}" placeholder="Type name" style="flex:1" title="Display name for this type, e.g. Projecten.">
+        <input class="input input-sm" id="cat-ed-vc-desc" value="${esc(vc.description || '')}" placeholder="Description" style="flex:1" title="Optional description of this type.">
         <button class="btn btn-primary btn-sm" onclick="catSaveVc(${v})">Done</button>
       </div>`;
     }
 
-    // Types within this VC
-    for (let t = 0; t < (vc.types || []).length; t++) {
-      const type = vc.types[t];
+    // Value chains within this type
+    for (let t = 0; t < (vc.value_chains || []).length; t++) {
+      const type = vc.value_chains[t];
       const typeEditing = catEditNode && catEditNode.level === 'type' && catEditNode.v === v && catEditNode.t === t;
 
       html += `<div class="cat-type-block">
         <div class="cat-type-header">
           <code>${esc(vc.code)}-${esc(type.code || '?')}</code>
-          <strong>${esc(type.name || '(unnamed)')}</strong>
+          <strong>Value chain: ${esc(type.name || '(unnamed)')}</strong>
           ${type.description ? '<span class="text-muted" style="font-size:12px;margin-left:6px">' + esc(type.description) + '</span>' : ''}
           <div class="cat-actions">
             <button class="btn btn-secondary btn-sm" onclick="catEditType(${v},${t})">Edit</button>
@@ -1371,8 +1371,8 @@ function renderCatalog() {
       if (typeEditing) {
         html += `<div class="cat-edit-form">
           <input class="input input-sm" id="cat-ed-type-code" value="${esc(type.code || '')}" placeholder="Code" maxlength="10" style="width:100px;text-transform:uppercase" title="Short uppercase code (max 10 chars). Combined with parent, e.g. PRJ-TM.">
-          <input class="input input-sm" id="cat-ed-type-name" value="${esc(type.name || '')}" placeholder="Name" style="flex:1" title="Display name for this type, e.g. Termijnmotivering.">
-          <input class="input input-sm" id="cat-ed-type-desc" value="${esc(type.description || '')}" placeholder="Description" style="flex:1" title="Optional description of this project type.">
+          <input class="input input-sm" id="cat-ed-type-name" value="${esc(type.name || '')}" placeholder="Value chain name" style="flex:1" title="Display name for this value chain, e.g. Termijnmotivering.">
+          <input class="input input-sm" id="cat-ed-type-desc" value="${esc(type.description || '')}" placeholder="Description" style="flex:1" title="Optional description of this value chain.">
           <button class="btn btn-primary btn-sm" onclick="catSaveType(${v},${t})">Done</button>
         </div>`;
       }
@@ -1418,7 +1418,7 @@ function renderCatalog() {
       </div>`;
       html += `</div>`; // type-block
     }
-    html += `<div class="cat-add-link" onclick="catAddType(${v})">+ Type</div>`;
+    html += `<div class="cat-add-link" onclick="catAddType(${v})">+ Value Chain</div>`;
     html += `</div>`; // vc-card
   }
   container.innerHTML = html;
@@ -1428,7 +1428,7 @@ function renderCatalog() {
 function catEditVc(v) { syncCatalogMeta(); catEditNode = { level: 'vc', v }; renderCatalog(); }
 function catSaveVc(v) {
   syncCatalogMeta();
-  const vc = catalog.value_chains[v];
+  const vc = catalog.types[v];
   vc.code = (document.getElementById('cat-ed-vc-code').value || '').toUpperCase().trim();
   vc.name = document.getElementById('cat-ed-vc-name').value.trim();
   vc.description = document.getElementById('cat-ed-vc-desc').value.trim();
@@ -1436,21 +1436,21 @@ function catSaveVc(v) {
   catEditNode = null; renderCatalog();
 }
 function catRemoveVc(v) {
-  if (!confirm(`Remove value chain "${catalog.value_chains[v].code || '(unnamed)'}" and all its contents?`)) return;
-  syncCatalogMeta(); catalog.value_chains.splice(v, 1); catEditNode = null; renderCatalog();
+  if (!confirm(`Remove value chain "${catalog.types[v].code || '(unnamed)'}" and all its contents?`)) return;
+  syncCatalogMeta(); catalog.types.splice(v, 1); catEditNode = null; renderCatalog();
 }
 function catAddVc() {
   syncCatalogMeta();
-  if (!catalog) catalog = { name: '', description: '', value_chains: [] };
-  if (!catalog.value_chains) catalog.value_chains = [];
-  catalog.value_chains.push({ code: '', name: '', description: '', types: [] });
-  catEditNode = { level: 'vc', v: catalog.value_chains.length - 1 }; renderCatalog();
+  if (!catalog) catalog = { name: '', description: '', types: [] };
+  if (!catalog.types) catalog.types = [];
+  catalog.types.push({ code: '', name: '', description: '', value_chains: [] });
+  catEditNode = { level: 'vc', v: catalog.types.length - 1 }; renderCatalog();
 }
 
 function catEditType(v, t) { syncCatalogMeta(); catEditNode = { level: 'type', v, t }; renderCatalog(); }
 function catSaveType(v, t) {
   syncCatalogMeta();
-  const type = catalog.value_chains[v].types[t];
+  const type = catalog.types[v].value_chains[t];
   type.code = (document.getElementById('cat-ed-type-code').value || '').toUpperCase().trim();
   type.name = document.getElementById('cat-ed-type-name').value.trim();
   type.description = document.getElementById('cat-ed-type-desc').value.trim();
@@ -1458,20 +1458,20 @@ function catSaveType(v, t) {
   catEditNode = null; renderCatalog();
 }
 function catRemoveType(v, t) {
-  if (!confirm(`Remove type "${catalog.value_chains[v].types[t].code || '(unnamed)'}" and all its process flows?`)) return;
-  syncCatalogMeta(); catalog.value_chains[v].types.splice(t, 1); catEditNode = null; renderCatalog();
+  if (!confirm(`Remove type "${catalog.types[v].value_chains[t].code || '(unnamed)'}" and all its process flows?`)) return;
+  syncCatalogMeta(); catalog.types[v].value_chains.splice(t, 1); catEditNode = null; renderCatalog();
 }
 function catAddType(v) {
   syncCatalogMeta();
-  if (!catalog.value_chains[v].types) catalog.value_chains[v].types = [];
-  catalog.value_chains[v].types.push({ code: '', name: '', description: '', process_flows: [] });
-  catEditNode = { level: 'type', v, t: catalog.value_chains[v].types.length - 1 }; renderCatalog();
+  if (!catalog.types[v].value_chains) catalog.types[v].value_chains = [];
+  catalog.types[v].value_chains.push({ code: '', name: '', description: '', process_flows: [] });
+  catEditNode = { level: 'type', v, t: catalog.types[v].value_chains.length - 1 }; renderCatalog();
 }
 
 function catEditPf(v, t, p) { syncCatalogMeta(); catEditNode = { level: 'pf', v, t, p }; renderCatalog(); }
 function catSavePf(v, t, p) {
   syncCatalogMeta();
-  const pf = catalog.value_chains[v].types[t].process_flows[p];
+  const pf = catalog.types[v].value_chains[t].process_flows[p];
   pf.code = (document.getElementById('cat-ed-pf-code').value || '').toUpperCase().trim();
   pf.name = document.getElementById('cat-ed-pf-name').value.trim();
   pf.description = document.getElementById('cat-ed-pf-desc').value.trim();
@@ -1481,7 +1481,7 @@ function catSavePf(v, t, p) {
 }
 async function catSavePfAndOpen(v, t, p) {
   syncCatalogMeta();
-  const pf = catalog.value_chains[v].types[t].process_flows[p];
+  const pf = catalog.types[v].value_chains[t].process_flows[p];
   pf.code = (document.getElementById('cat-ed-pf-code').value || '').toUpperCase().trim();
   pf.name = document.getElementById('cat-ed-pf-name').value.trim();
   pf.description = document.getElementById('cat-ed-pf-desc').value.trim();
@@ -1495,14 +1495,14 @@ async function catSavePfAndOpen(v, t, p) {
   catOpenPfWorkflow(v, t, p);
 }
 function catRemovePf(v, t, p) {
-  if (!confirm(`Remove process flow "${catalog.value_chains[v].types[t].process_flows[p].code || '(unnamed)'}"?`)) return;
-  syncCatalogMeta(); catalog.value_chains[v].types[t].process_flows.splice(p, 1); catEditNode = null; renderCatalog();
+  if (!confirm(`Remove process flow "${catalog.types[v].value_chains[t].process_flows[p].code || '(unnamed)'}"?`)) return;
+  syncCatalogMeta(); catalog.types[v].value_chains[t].process_flows.splice(p, 1); catEditNode = null; renderCatalog();
 }
 function catAddPf(v, t) {
   syncCatalogMeta();
-  if (!catalog.value_chains[v].types[t].process_flows) catalog.value_chains[v].types[t].process_flows = [];
-  catalog.value_chains[v].types[t].process_flows.push({ code: '', name: '', description: '', workflow_path: '' });
-  catEditNode = { level: 'pf', v, t, p: catalog.value_chains[v].types[t].process_flows.length - 1 }; renderCatalog();
+  if (!catalog.types[v].value_chains[t].process_flows) catalog.types[v].value_chains[t].process_flows = [];
+  catalog.types[v].value_chains[t].process_flows.push({ code: '', name: '', description: '', workflow_path: '' });
+  catEditNode = { level: 'pf', v, t, p: catalog.types[v].value_chains[t].process_flows.length - 1 }; renderCatalog();
 }
 
 /** Show the existing-workflow picker, fetching projects from the server */
@@ -1517,9 +1517,9 @@ async function catLinkExisting(v, t) {
 
   // Collect already-cataloged workflow paths
   const cataloged = new Set();
-  if (catalog && catalog.value_chains) {
-    for (const vc of catalog.value_chains)
-      for (const tp of (vc.types || []))
+  if (catalog && catalog.types) {
+    for (const vc of catalog.types)
+      for (const tp of (vc.value_chains || []))
         for (const pf of (tp.process_flows || []))
           if (pf.workflow_path) cataloged.add(pf.workflow_path.replace(/^\.\//,''));
   }
@@ -1555,19 +1555,19 @@ async function catApplyExisting(v, t, projectName) {
 
   const autoCode = projectName.toUpperCase().replace(/[^A-Z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 10);
 
-  if (!catalog.value_chains[v].types[t].process_flows)
-    catalog.value_chains[v].types[t].process_flows = [];
-  catalog.value_chains[v].types[t].process_flows.push({
+  if (!catalog.types[v].value_chains[t].process_flows)
+    catalog.types[v].value_chains[t].process_flows = [];
+  catalog.types[v].value_chains[t].process_flows.push({
     code: autoCode, name: wfName, description: wfDesc, workflow_path: './' + projectName
   });
-  const idx = catalog.value_chains[v].types[t].process_flows.length - 1;
+  const idx = catalog.types[v].value_chains[t].process_flows.length - 1;
   catEditNode = { level: 'pf', v, t, p: idx };
   renderCatalog();
 }
 
 // Open an existing process flow workflow in the Workflow Designer
 async function catOpenPfWorkflow(v, t, p) {
-  const pf = catalog.value_chains[v].types[t].process_flows[p];
+  const pf = catalog.types[v].value_chains[t].process_flows[p];
   if (!pf.workflow_path) { alert('No workflow path set for this process flow.'); return; }
   const projectName = pf.workflow_path.replace(/^\.\//, '');
   // Ensure environments are loaded so we can find the default
@@ -1619,7 +1619,7 @@ document.getElementById('btn-cat-import').addEventListener('click', () => {
     const file = e.target.files[0]; if (!file) return;
     try {
       const data = JSON.parse(await file.text());
-      if (!data.value_chains) { alert('Invalid catalog — missing value_chains'); return; }
+      if (!data.types) { alert('Invalid catalog — missing types'); return; }
       catalog = data;
       document.getElementById('cat-name').value = catalog.name || '';
       document.getElementById('cat-desc').value = catalog.description || '';

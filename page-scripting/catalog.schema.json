@@ -1,30 +1,30 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://github.com/4PS-development/D365BC-vibe-page-scripting/catalog.schema.json",
-  "title": "BC Test Catalog",
-  "description": "Schema for catalog.json — a 3-level hierarchy (Waardeketen > Type > Procesflow) that organises BC workflow test projects into a traceable structure.",
+  "title": "4PS Test Catalog",
+  "description": "Schema for catalog.json — a 3-level hierarchy (Type > Value Chain > Process Flow) that organises BC workflow test projects into a traceable structure.",
   "type": "object",
-  "required": ["value_chains"],
+  "required": ["types"],
   "additionalProperties": false,
   "properties": {
     "$schema": {
       "type": "string",
       "description": "Optional: reference to this schema file for VS Code IntelliSense."
     },
-    "value_chains": {
+    "types": {
       "type": "array",
-      "description": "Top-level grouping of business processes (e.g. Projecten, Service). Each value chain contains one or more types.",
+      "description": "Top-level grouping of business processes (e.g. Projecten, Service). Each Type contains one or more Value Chains.",
       "minItems": 1,
       "items": {
-        "$ref": "#/definitions/value_chain"
+        "$ref": "#/definitions/type"
       }
     }
   },
   "definitions": {
-    "value_chain": {
+    "type": {
       "type": "object",
-      "description": "Level 1 — a business value chain (waardeketen). Groups related project types.",
-      "required": ["code", "name", "types"],
+      "description": "Level 1 — a project Type. Groups related Value Chains.",
+      "required": ["code", "name", "value_chains"],
       "additionalProperties": false,
       "properties": {
         "code": {
@@ -35,26 +35,26 @@
         },
         "name": {
           "type": "string",
-          "description": "Display name for this value chain.",
+          "description": "Display name for this Type.",
           "examples": ["Projecten", "Service", "Inkoop"]
         },
         "description": {
           "type": "string",
-          "description": "Optional description of this value chain."
+          "description": "Optional description of this Type."
         },
-        "types": {
+        "value_chains": {
           "type": "array",
-          "description": "Project types within this value chain (e.g. Termijnmotivering, Regie).",
+          "description": "Value Chains within this Type (e.g. Termijnmotivering, Regie).",
           "minItems": 1,
           "items": {
-            "$ref": "#/definitions/type"
+            "$ref": "#/definitions/value_chain"
           }
         }
       }
     },
-    "type": {
+    "value_chain": {
       "type": "object",
-      "description": "Level 2 — a project type within a value chain. Groups related process flows.",
+      "description": "Level 2 — a business value chain within a Type. Groups related process flows.",
       "required": ["code", "name", "process_flows"],
       "additionalProperties": false,
       "properties": {
@@ -66,16 +66,16 @@
         },
         "name": {
           "type": "string",
-          "description": "Display name for this type.",
+          "description": "Display name for this Value Chain.",
           "examples": ["Termijnmotivering", "Regie", "Vastgoed"]
         },
         "description": {
           "type": "string",
-          "description": "Optional description of this type."
+          "description": "Optional description of this Value Chain."
         },
         "process_flows": {
           "type": "array",
-          "description": "Process flows (test workflows) within this type.",
+          "description": "Process flows (test workflows) within this Value Chain.",
           "minItems": 1,
           "items": {
             "$ref": "#/definitions/process_flow"

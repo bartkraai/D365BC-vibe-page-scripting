@@ -5,7 +5,7 @@
 .DESCRIPTION
     Reads catalog.json and scans each process flow's results/workflow-summary.json
     to produce a unified HTML + JSON report showing the 3-level hierarchy
-    (Waardeketen > Type > Procesflow) with pass/fail status per entry.
+    (Type > Value Chain > Process Flow) with pass/fail status per entry.
 
 .PARAMETER CatalogPath
     Path to catalog.json. Defaults to ..\page-scripting\catalog.json relative to this script.
@@ -50,31 +50,31 @@ $catalog = Get-Content $CatalogPath -Raw | ConvertFrom-Json
 # ── Collect results ─────────────────────────────────────────────────────────
 $reportData = @{
     generated_at   = (Get-Date).ToString("o")
-    value_chains   = @()
+    types          = @()
     totals         = @{ process_flows = 0; passed = 0; failed = 0; not_run = 0 }
 }
 
-foreach ($vc in $catalog.value_chains) {
-    $vcData = @{
-        code           = $vc.code
-        name           = $vc.name
-        description    = $vc.description
-        types          = @()
+foreach ($typ in $catalog.types) {
+    $typData = @{
+        code           = $typ.code
+        name           = $typ.name
+        description    = $typ.description
+        value_chains   = @()
         totals         = @{ process_flows = 0; passed = 0; failed = 0; not_run = 0 }
     }
 
-    foreach ($type in $vc.types) {
-        $typeData = @{
-            code           = $type.code
-            name           = $type.name
-            composite_code = "$($vc.code)-$($type.code)"
-            description    = $type.description
+    foreach ($vc in $typ.value_chains) {
+        $vcData = @{
+            code           = $vc.code
+            name           = $vc.name
+            composite_code = "$($typ.code)-$($vc.code)"
+            description    = $vc.description
             process_flows  = @()
             totals         = @{ process_flows = 0; passed = 0; failed = 0; not_run = 0 }
         }
 
-        foreach ($pf in $type.process_flows) {
-            $compositeCode = "$($vc.code)-$($type.code)-$($pf.code)"
+        foreach ($pf in $vc.process_flows) {
+            $compositeCode = "$($typ.code)-$($vc.code)-$($pf.code)"
             $workflowFolder = Join-Path $pageScriptingRoot $pf.workflow_path
             $summaryPath = Join-Path $workflowFolder "results\workflow-summary.json"
 
@@ -82,7 +82,7 @@ foreach ($vc in $catalog.value_chains) {
                 code           = $pf.code
                 name           = $pf.name
                 composite_code = $compositeCode
-                breadcrumb     = "$($vc.name) > $($type.name) > $($pf.name)"
+                breadcrumb     = "$($typ.name) > $($vc.name) > $($pf.name)"
                 workflow_path  = $pf.workflow_path
                 status         = "not_run"
                 overall        = $null
@@ -110,28 +110,28 @@ foreach ($vc in $catalog.value_chains) {
                 }
             }
 
-            $typeData.process_flows += $pfData
-            $typeData.totals.process_flows++
+            $vcData.process_flows += $pfData
+            $vcData.totals.process_flows++
 
             switch ($pfData.status) {
-                "passed"  { $typeData.totals.passed++ }
-                "failed"  { $typeData.totals.failed++ }
-                default   { $typeData.totals.not_run++ }
+                "passed"  { $vcData.totals.passed++ }
+                "failed"  { $vcData.totals.failed++ }
+                default   { $vcData.totals.not_run++ }
             }
         }
 
-        $vcData.types += $typeData
-        $vcData.totals.process_flows += $typeData.totals.process_flows
-        $vcData.totals.passed        += $typeData.totals.passed
-        $vcData.totals.failed        += $typeData.totals.failed
-        $vcData.totals.not_run       += $typeData.totals.not_run
+        $typData.value_chains += $vcData
+        $typData.totals.process_flows += $vcData.totals.process_flows
+        $typData.totals.passed        += $vcData.totals.passed
+        $typData.totals.failed        += $vcData.totals.failed
+        $typData.totals.not_run       += $vcData.totals.not_run
     }
 
-    $reportData.value_chains += $vcData
-    $reportData.totals.process_flows += $vcData.totals.process_flows
-    $reportData.totals.passed        += $vcData.totals.passed
-    $reportData.totals.failed        += $vcData.totals.failed
-    $reportData.totals.not_run       += $vcData.totals.not_run
+    $reportData.types += $typData
+    $reportData.totals.process_flows += $typData.totals.process_flows
+    $reportData.totals.passed        += $typData.totals.passed
+    $reportData.totals.failed        += $typData.totals.failed
+    $reportData.totals.not_run       += $typData.totals.not_run
 }
 
 # ── Write JSON report ───────────────────────────────────────────────────────
@@ -167,12 +167,12 @@ function Get-TotalsBadges {
 $totalsPF     = $reportData.totals
 $overallColor = if ($totalsPF.failed -gt 0) { "#D0021B" } elseif ($totalsPF.not_run -eq $totalsPF.process_flows) { "#6b7280" } else { "#22c55e" }
 
-$vcSections = ""
-foreach ($vc in $reportData.value_chains) {
-    $typeSections = ""
-    foreach ($type in $vc.types) {
+$typeSections = ""
+foreach ($typ in $reportData.types) {
+    $vcSections = ""
+    foreach ($vc in $typ.value_chains) {
         $pfRows = ""
-        foreach ($pf in $type.process_flows) {
+        foreach ($pf in $vc.process_flows) {
             $durationCell = if ($pf.duration_s) { "$($pf.duration_s)s" } else { "-" }
             $lastRunCell  = if ($pf.last_run) {
                 try { ([datetime]$pf.last_run).ToString("yyyy-MM-dd HH:mm") } catch { $pf.last_run }
@@ -194,13 +194,13 @@ foreach ($vc in $reportData.value_chains) {
 "@
         }
 
-        $typeSections += @"
+        $vcSections += @"
         <div style="margin-bottom:16px">
             <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
-                <h3 style="margin:0;font-size:16px;color:#334155">$($type.composite_code) &mdash; $($type.name)</h3>
-                <span style="font-size:13px;color:#64748b">$(Get-TotalsBadges $type.totals)</span>
+                <h3 style="margin:0;font-size:16px;color:#334155">$($vc.composite_code) &mdash; $($vc.name)</h3>
+                <span style="font-size:13px;color:#64748b">$(Get-TotalsBadges $vc.totals)</span>
             </div>
-            $(if ($type.description) { "<p style=`"margin:0 0 8px 0;font-size:13px;color:#64748b`">$($type.description)</p>" })
+            $(if ($vc.description) { "<p style=`"margin:0 0 8px 0;font-size:13px;color:#64748b`">$($vc.description)</p>" })
             <table style="width:100%;border-collapse:collapse;border:1px solid #e2e8f0;border-radius:6px;overflow:hidden">
                 <thead>
                     <tr style="background:#f8fafc">
@@ -221,14 +221,14 @@ $pfRows
 "@
     }
 
-    $vcSections += @"
+    $typeSections += @"
     <section style="margin-bottom:32px;padding:20px;background:#fff;border:1px solid #e2e8f0;border-radius:8px">
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
-            <h2 style="margin:0;font-size:20px;color:#1e293b">$($vc.code) &mdash; $($vc.name)</h2>
-            <span style="font-size:13px">$(Get-TotalsBadges $vc.totals)</span>
+            <h2 style="margin:0;font-size:20px;color:#1e293b">$($typ.code) &mdash; $($typ.name)</h2>
+            <span style="font-size:13px">$(Get-TotalsBadges $typ.totals)</span>
         </div>
-        $(if ($vc.description) { "<p style=`"margin:0 0 16px 0;font-size:14px;color:#64748b`">$($vc.description)</p>" })
-$typeSections
+        $(if ($typ.description) { "<p style=`"margin:0 0 16px 0;font-size:14px;color:#64748b`">$($typ.description)</p>" })
+$vcSections
     </section>
 "@
 }
@@ -260,7 +260,7 @@ $html = @"
 <body>
     <div class="header">
         <h1>Test Catalog Report</h1>
-        <div class="subtitle">Generated: $((Get-Date).ToString("yyyy-MM-dd HH:mm:ss")) &mdash; Waardeketen &gt; Type &gt; Procesflow</div>
+        <div class="subtitle">Generated: $((Get-Date).ToString("yyyy-MM-dd HH:mm:ss")) &mdash; Type &gt; Value Chain &gt; Process Flow</div>
     </div>
 
     <div class="summary">
@@ -283,7 +283,7 @@ $html = @"
     </div>
 
     <div class="content">
-$vcSections
+$typeSections
     </div>
 </body>
 </html>

@@ -1,11 +1,11 @@
 {
   "$schema": "./catalog.schema.json",
-  "value_chains": [
+  "types": [
     {
       "code": "PRJ",
       "name": "Projecten",
       "description": "",
-      "types": [
+      "value_chains": [
         {
           "code": "D-UAV",
           "name": "Demo UAV vaste termijnen (light versie)",
@@ -51,7 +51,7 @@
       "code": "SYSTEEMBHR",
       "name": "Test Systeembeheer",
       "description": "",
-      "types": [
+      "value_chains": [
         {
           "code": "R&P",
           "name": "Switch Roles and Permissions",

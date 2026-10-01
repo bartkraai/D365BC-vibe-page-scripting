@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BC Workflow Builder</title>
+<title>4PS Test Flow Builder</title>
 <style>
 /* ── Reset & Variables ──────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -636,7 +636,7 @@ textarea { resize: vertical; min-height: 50px; }
 <div id="project-picker" class="project-picker-screen">
   <div class="project-picker-header">
     <img src="https://www.4ps.nl/wp-content/uploads/sites/2/4PS_Endorsement-2024_RGB_stacked.png" alt="4PS" style="height:36px;margin-bottom:16px">
-    <h1><span style="color:var(--primary)">BC</span> Workflow Builder</h1>
+    <h1><span style="color:var(--primary)">4PS</span> Test Flow Builder</h1>
     <p>Select an existing project to continue editing, or create a new one.</p>
   </div>
 
@@ -669,7 +669,7 @@ textarea { resize: vertical; min-height: 50px; }
 <!-- ── Header ──────────────────────────────────────────────────────── -->
 <header>
   <img src="https://www.4ps.nl/wp-content/uploads/sites/2/4PS_Endorsement-2024_RGB_stacked.png" alt="4PS" style="height:32px">
-  <h1><span>BC</span> Workflow Builder</h1>
+  <h1><span>4PS</span> Test Flow Builder</h1>
   <span class="text-sm text-muted" id="workflow-title-display"></span>
   <div id="current-project-badge" style="display:none;align-items:center;gap:6px;
     background:rgba(255,255,255,0.1);padding:4px 10px;border-radius:var(--radius);
@@ -721,7 +721,7 @@ textarea { resize: vertical; min-height: 50px; }
 
     <!-- Test Catalog -->
     <div class="sidebar-section" id="catalog-section">
-      <h3>Catalog Position <span class="field-tip" tabindex="0">?<span class="field-tip-text">Assign this workflow to a position in the 3-level test catalog (Waardeketen > Type > Procesflow). Click a process flow to link the current workflow.</span></span></h3>
+      <h3>Catalog Position <span class="field-tip" tabindex="0">?<span class="field-tip-text">Assign this workflow to a position in the 3-level test catalog (Type &gt; Value Chain &gt; Process Flow). Click a process flow to link the current workflow.</span></span></h3>
       <div id="catalog-tree" class="cat-tree">
         <!-- populated by renderCatalogSidebar() -->
       </div>
@@ -865,10 +865,10 @@ textarea { resize: vertical; min-height: 50px; }
 
       <!-- OVERVIEW -->
       <div class="help-section active" id="help-section-intro">
-        <h2>BC Workflow Builder</h2>
-        <p class="help-section-lead">The BC Workflow Builder is a visual tool for composing multi-user Business Central test workflows — without editing JSON by hand. You wire together recorded <code>.yml</code> page scripts, define who runs each step, and let the tool export the files that <code>Run-BCWorkflow.ps1</code> needs to execute the full workflow.</p>
+        <h2>4PS Test Flow Builder</h2>
+        <p class="help-section-lead">The 4PS Test Flow Builder is a visual tool for composing multi-user Business Central test workflows — without editing JSON by hand. You wire together recorded <code>.yml</code> page scripts, define who runs each step, and let the tool export the files that <code>Run-BCWorkflow.ps1</code> needs to execute the full workflow.</p>
         <h3>What problem does it solve?</h3>
-        <p>Business Central processes often span multiple users — a purchaser creates a PO, an approver reviews it, finance posts it. Each individual action can be recorded as a <code>.yml</code> script using BC's page scripting recorder. The Workflow Builder stitches those individual scripts into a single, reproducible workflow where data automatically flows between steps.</p>
+        <p>Business Central processes often span multiple users — a purchaser creates a PO, an approver reviews it, finance posts it. Each individual action can be recorded as a <code>.yml</code> script using BC's page scripting recorder. The Test Flow Builder stitches those individual scripts into a single, reproducible workflow where data automatically flows between steps.</p>
         <h3>Core concepts</h3>
         <table class="help-table">
           <thead><tr><th>Concept</th><th>What it means</th></tr></thead>
@@ -1334,7 +1334,7 @@ const ROLE_COLORS = [
 
 let state = {
   workflow: { name: '', description: '', bc_url: '', steps: [], catalog: null },
-  catalog: null,        // loaded catalog.json data (value_chains array)
+  catalog: null,        // loaded catalog.json data (types array)
   users: {},          // roleName -> { description, color }
   scripts: {},        // filename -> { name, content, parameters:[], captures:[], pages:[] }
   appRegistrations: {}, // regName -> { client_id, client_secret_hint, tenant_id, environment_name, company_id }
@@ -1448,7 +1448,7 @@ function renderCatalogSidebar() {
   const cat = state.catalog;
   const cur = state.workflow.catalog || {};
 
-  if (!cat || !cat.value_chains || !cat.value_chains.length) {
+  if (!cat || !cat.types || !cat.types.length) {
     container.innerHTML = `<div class="cat-tree-empty">No catalog loaded<br>
       <a href="#" onclick="showCatalogEditor();return false" style="color:var(--primary)">Create one</a> or
       <a href="#" onclick="loadCatalogFromServer();return false" style="color:var(--primary)">load from server</a></div>`;
@@ -1457,12 +1457,12 @@ function renderCatalogSidebar() {
   }
 
   let html = '';
-  for (const vc of cat.value_chains) {
-    html += `<div class="cat-tree-vc"><div class="cat-tree-vc-label"><code>${escHtml(vc.code)}</code> ${escHtml(vc.name)}</div>`;
-    for (const t of (vc.types || [])) {
-      html += `<div class="cat-tree-type"><div class="cat-tree-type-label"><code>${escHtml(t.code)}</code> ${escHtml(t.name)}</div>`;
+  for (const vc of cat.types) {
+    html += `<div class="cat-tree-vc"><div class="cat-tree-vc-label"><code>${escHtml(vc.code)}</code> Type: ${escHtml(vc.name)}</div>`;
+    for (const t of (vc.value_chains || [])) {
+      html += `<div class="cat-tree-type"><div class="cat-tree-type-label"><code>${escHtml(t.code)}</code> Value chain: ${escHtml(t.name)}</div>`;
       for (const pf of (t.process_flows || [])) {
-        const isActive = cur.value_chain === vc.code && cur.type === t.code && cur.process_flow === pf.code;
+        const isActive = cur.type === vc.code && cur.value_chain === t.code && cur.process_flow === pf.code;
         html += `<div class="cat-tree-pf${isActive ? ' active' : ''}" onclick="assignCatalogPosition('${escHtml(vc.code)}','${escHtml(t.code)}','${escHtml(pf.code)}')" title="${escHtml(pf.workflow_path || '')}">
           <span class="dot"></span><code>${escHtml(pf.code)}</code> ${escHtml(pf.name)}</div>`;
       }
@@ -1473,12 +1473,12 @@ function renderCatalogSidebar() {
   container.innerHTML = html;
 
   // Show composite code if position set
-  const parts = [cur.value_chain, cur.type, cur.process_flow].filter(Boolean);
+  const parts = [cur.type, cur.value_chain, cur.process_flow].filter(Boolean);
   compositeEl.textContent = parts.length ? parts.join('-') : '';
 }
 
-function assignCatalogPosition(vcCode, typeCode, pfCode) {
-  state.workflow.catalog = { value_chain: vcCode, type: typeCode, process_flow: pfCode };
+function assignCatalogPosition(typeCode, valueChainCode, pfCode) {
+  state.workflow.catalog = { type: typeCode, value_chain: valueChainCode, process_flow: pfCode };
   renderCatalogSidebar();
 }
 
@@ -1507,7 +1507,7 @@ function loadCatalogFile() {
     try {
       const text = await file.text();
       const data = JSON.parse(text);
-      if (!data.value_chains) { toast('Invalid catalog — missing value_chains', 'error'); return; }
+      if (!data.types) { toast('Invalid catalog — missing types', 'error'); return; }
       state.catalog = data;
       renderCatalogSidebar();
       toast('Catalog loaded from file', 'success');
@@ -3244,7 +3244,7 @@ function importWorkflow() {
           toast('Loaded users config', 'success');
         }
 
-        if (file.name === 'catalog.json' || data.value_chains) {
+        if (file.name === 'catalog.json' || data.types) {
           state.catalog = data;
           populateCatalogDropdowns();
           toast('Loaded catalog.json', 'success');
@@ -4187,7 +4187,7 @@ async function showCatalogEditor() {
   }
   // If still nothing, start with an empty catalog
   if (!state.catalog) {
-    state.catalog = { name: '', description: '', value_chains: [] };
+    state.catalog = { name: '', description: '', types: [] };
   }
   _catEditNode = null;
   renderCatalogEditor();
@@ -4217,15 +4217,15 @@ function renderCatalogEditor() {
     <div class="field-group"><label>Description ${fieldTip('Optional description of the catalog scope or purpose.')}</label><input id="cat-ed-desc" value="${escHtml(cat.description || '')}" placeholder="Optional description"></div>
   </div>`;
 
-  if (!cat.value_chains) cat.value_chains = [];
+  if (!cat.types) cat.types = [];
 
-  for (let v = 0; v < cat.value_chains.length; v++) {
-    const vc = cat.value_chains[v];
+  for (let v = 0; v < cat.types.length; v++) {
+    const vc = cat.types[v];
     const vcEditing = _catEditNode && _catEditNode.level === 'vc' && _catEditNode.v === v;
 
     html += `<div class="cat-ed-section">`;
     html += `<div class="cat-ed-vc-header">
-      <code>${escHtml(vc.code || '?')}</code> ${escHtml(vc.name || '(unnamed)')}
+      <code>${escHtml(vc.code || '?')}</code> Type: ${escHtml(vc.name || '(unnamed)')}
       ${vc.description ? '<span style="font-weight:400;font-size:11px;color:#aaa;margin-left:6px">' + escHtml(vc.description) + '</span>' : ''}
       <div class="actions">
         <button onclick="_catEditNode={level:'vc',v:${v}};renderCatalogEditor()" title="Edit">&#9998;</button>
@@ -4236,21 +4236,21 @@ function renderCatalogEditor() {
     if (vcEditing) {
       html += `<div class="cat-ed-form">
         <input class="short" id="cat-ed-vc-code" value="${escHtml(vc.code || '')}" placeholder="Code" maxlength="10" style="text-transform:uppercase" title="Short uppercase code (max 10 chars). Used as composite code prefix, e.g. PRJ.">
-        <input class="med" id="cat-ed-vc-name" value="${escHtml(vc.name || '')}" placeholder="Name" title="Display name for this value chain, e.g. Projecten.">
-        <input class="med" id="cat-ed-vc-desc" value="${escHtml(vc.description || '')}" placeholder="Description (optional)" title="Optional description of this value chain.">
+        <input class="med" id="cat-ed-vc-name" value="${escHtml(vc.name || '')}" placeholder="Type name" title="Display name for this type, e.g. Projecten.">
+        <input class="med" id="cat-ed-vc-desc" value="${escHtml(vc.description || '')}" placeholder="Description (optional)" title="Optional description of this type.">
         <div class="form-btns"><button class="btn-primary" onclick="catSaveVc(${v})">Done</button></div>
       </div>`;
     }
 
     html += `<div class="cat-ed-vc-body">`;
 
-    for (let t = 0; t < (vc.types || []).length; t++) {
-      const type = vc.types[t];
+    for (let t = 0; t < (vc.value_chains || []).length; t++) {
+      const type = vc.value_chains[t];
       const typeEditing = _catEditNode && _catEditNode.level === 'type' && _catEditNode.v === v && _catEditNode.t === t;
 
       html += `<div class="cat-ed-type-block">`;
       html += `<div class="cat-ed-type-header">
-        <code>${escHtml(vc.code)}-${escHtml(type.code || '?')}</code> ${escHtml(type.name || '(unnamed)')}
+        <code>${escHtml(vc.code)}-${escHtml(type.code || '?')}</code> Value chain: ${escHtml(type.name || '(unnamed)')}
         ${type.description ? '<span style="font-weight:400;font-size:11px;color:var(--text-muted);margin-left:6px">' + escHtml(type.description) + '</span>' : ''}
         <div class="actions">
           <button onclick="_catEditNode={level:'type',v:${v},t:${t}};renderCatalogEditor()" title="Edit">&#9998;</button>
@@ -4261,8 +4261,8 @@ function renderCatalogEditor() {
       if (typeEditing) {
         html += `<div class="cat-ed-form">
           <input class="short" id="cat-ed-type-code" value="${escHtml(type.code || '')}" placeholder="Code" maxlength="10" style="text-transform:uppercase" title="Short uppercase code (max 10 chars). Combined with parent, e.g. PRJ-TM.">
-          <input class="med" id="cat-ed-type-name" value="${escHtml(type.name || '')}" placeholder="Name" title="Display name for this type, e.g. Termijnmotivering or Regie.">
-          <input class="med" id="cat-ed-type-desc" value="${escHtml(type.description || '')}" placeholder="Description (optional)" title="Optional description of this project type.">
+          <input class="med" id="cat-ed-type-name" value="${escHtml(type.name || '')}" placeholder="Value chain name" title="Display name for this value chain, e.g. Termijnmotivering or Regie.">
+          <input class="med" id="cat-ed-type-desc" value="${escHtml(type.description || '')}" placeholder="Description (optional)" title="Optional description of this value chain.">
           <div class="form-btns"><button class="btn-primary" onclick="catSaveType(${v},${t})">Done</button></div>
         </div>`;
       }
@@ -4270,7 +4270,7 @@ function renderCatalogEditor() {
       for (let p = 0; p < (type.process_flows || []).length; p++) {
         const pf = type.process_flows[p];
         const pfEditing = _catEditNode && _catEditNode.level === 'pf' && _catEditNode.v === v && _catEditNode.t === t && _catEditNode.p === p;
-        const isActive = cur.value_chain === vc.code && cur.type === type.code && cur.process_flow === pf.code;
+        const isActive = cur.type === vc.code && cur.value_chain === type.code && cur.process_flow === pf.code;
         const activeBadge = isActive
           ? '<span style="display:inline-block;padding:0 5px;border-radius:3px;background:var(--primary-light);color:var(--primary);font-size:10px;font-weight:600;margin-left:4px">CURRENT</span>'
           : '';
@@ -4315,12 +4315,12 @@ function renderCatalogEditor() {
       html += `</div>`; // type-block
     }
 
-    html += `<div class="cat-ed-add" onclick="catAddType(${v})">+ Type</div>`;
+    html += `<div class="cat-ed-add" onclick="catAddType(${v})">+ Value Chain</div>`;
     html += `</div>`; // vc-body
     html += `</div>`; // section
   }
 
-  html += `<div class="cat-ed-add" style="padding:8px 0;font-size:13px;font-weight:600" onclick="catAddVc()">+ Value Chain</div>`;
+  html += `<div class="cat-ed-add" style="padding:8px 0;font-size:13px;font-weight:600" onclick="catAddVc()">+ Type</div>`;
 
   body.innerHTML = html;
 }
@@ -4336,15 +4336,15 @@ function _catSyncMeta() {
 
 function catAddVc() {
   _catSyncMeta();
-  state.catalog.value_chains.push({ code: '', name: '', description: '', types: [] });
-  const idx = state.catalog.value_chains.length - 1;
+  state.catalog.types.push({ code: '', name: '', description: '', value_chains: [] });
+  const idx = state.catalog.types.length - 1;
   _catEditNode = { level: 'vc', v: idx };
   renderCatalogEditor();
 }
 
 function catSaveVc(v) {
   _catSyncMeta();
-  const vc = state.catalog.value_chains[v];
+  const vc = state.catalog.types[v];
   vc.code = (document.getElementById('cat-ed-vc-code').value || '').toUpperCase().trim();
   vc.name = document.getElementById('cat-ed-vc-name').value.trim();
   vc.description = document.getElementById('cat-ed-vc-desc').value.trim();
@@ -4354,26 +4354,26 @@ function catSaveVc(v) {
 }
 
 function catRemoveVc(v) {
-  const vc = state.catalog.value_chains[v];
-  if (!confirm(`Remove value chain "${vc.code || '(unnamed)'}" and all its types/process flows?`)) return;
+  const vc = state.catalog.types[v];
+  if (!confirm(`Remove type "${vc.code || '(unnamed)'}" and all its value chains/process flows?`)) return;
   _catSyncMeta();
-  state.catalog.value_chains.splice(v, 1);
+  state.catalog.types.splice(v, 1);
   _catEditNode = null;
   renderCatalogEditor();
 }
 
 function catAddType(v) {
   _catSyncMeta();
-  if (!state.catalog.value_chains[v].types) state.catalog.value_chains[v].types = [];
-  state.catalog.value_chains[v].types.push({ code: '', name: '', description: '', process_flows: [] });
-  const idx = state.catalog.value_chains[v].types.length - 1;
+  if (!state.catalog.types[v].value_chains) state.catalog.types[v].value_chains = [];
+  state.catalog.types[v].value_chains.push({ code: '', name: '', description: '', process_flows: [] });
+  const idx = state.catalog.types[v].value_chains.length - 1;
   _catEditNode = { level: 'type', v, t: idx };
   renderCatalogEditor();
 }
 
 function catSaveType(v, t) {
   _catSyncMeta();
-  const type = state.catalog.value_chains[v].types[t];
+  const type = state.catalog.types[v].value_chains[t];
   type.code = (document.getElementById('cat-ed-type-code').value || '').toUpperCase().trim();
   type.name = document.getElementById('cat-ed-type-name').value.trim();
   type.description = document.getElementById('cat-ed-type-desc').value.trim();
@@ -4383,26 +4383,26 @@ function catSaveType(v, t) {
 }
 
 function catRemoveType(v, t) {
-  const type = state.catalog.value_chains[v].types[t];
-  if (!confirm(`Remove type "${type.code || '(unnamed)'}" and all its process flows?`)) return;
+  const type = state.catalog.types[v].value_chains[t];
+  if (!confirm(`Remove value chain "${type.code || '(unnamed)'}" and all its process flows?`)) return;
   _catSyncMeta();
-  state.catalog.value_chains[v].types.splice(t, 1);
+  state.catalog.types[v].value_chains.splice(t, 1);
   _catEditNode = null;
   renderCatalogEditor();
 }
 
 function catAddPf(v, t) {
   _catSyncMeta();
-  if (!state.catalog.value_chains[v].types[t].process_flows) state.catalog.value_chains[v].types[t].process_flows = [];
-  state.catalog.value_chains[v].types[t].process_flows.push({ code: '', name: '', description: '', workflow_path: '' });
-  const idx = state.catalog.value_chains[v].types[t].process_flows.length - 1;
+  if (!state.catalog.types[v].value_chains[t].process_flows) state.catalog.types[v].value_chains[t].process_flows = [];
+  state.catalog.types[v].value_chains[t].process_flows.push({ code: '', name: '', description: '', workflow_path: '' });
+  const idx = state.catalog.types[v].value_chains[t].process_flows.length - 1;
   _catEditNode = { level: 'pf', v, t, p: idx };
   renderCatalogEditor();
 }
 
 function catSavePf(v, t, p) {
   _catSyncMeta();
-  const pf = state.catalog.value_chains[v].types[t].process_flows[p];
+  const pf = state.catalog.types[v].value_chains[t].process_flows[p];
   pf.code = (document.getElementById('cat-ed-pf-code').value || '').toUpperCase().trim();
   pf.name = document.getElementById('cat-ed-pf-name').value.trim();
   pf.description = document.getElementById('cat-ed-pf-desc').value.trim();
@@ -4413,10 +4413,10 @@ function catSavePf(v, t, p) {
 }
 
 function catRemovePf(v, t, p) {
-  const pf = state.catalog.value_chains[v].types[t].process_flows[p];
+  const pf = state.catalog.types[v].value_chains[t].process_flows[p];
   if (!confirm(`Remove process flow "${pf.code || '(unnamed)'}"?`)) return;
   _catSyncMeta();
-  state.catalog.value_chains[v].types[t].process_flows.splice(p, 1);
+  state.catalog.types[v].value_chains[t].process_flows.splice(p, 1);
   _catEditNode = null;
   renderCatalogEditor();
 }
@@ -4435,9 +4435,9 @@ async function catAddExistingPf(v, t) {
 
   // Collect already-cataloged paths
   const catalogedPaths = new Set();
-  if (state.catalog && state.catalog.value_chains) {
-    for (const vc of state.catalog.value_chains) {
-      for (const tp of (vc.types || [])) {
+  if (state.catalog && state.catalog.types) {
+    for (const vc of state.catalog.types) {
+      for (const tp of (vc.value_chains || [])) {
         for (const pf of (tp.process_flows || [])) {
           if (pf.workflow_path) catalogedPaths.add(pf.workflow_path.replace(/^\.\//, ''));
         }
@@ -4493,17 +4493,17 @@ async function catApplyExistingPf(v, t, projectName) {
     .slice(0, 10);
 
   // Add the process flow entry
-  if (!state.catalog.value_chains[v].types[t].process_flows) {
-    state.catalog.value_chains[v].types[t].process_flows = [];
+  if (!state.catalog.types[v].value_chains[t].process_flows) {
+    state.catalog.types[v].value_chains[t].process_flows = [];
   }
-  state.catalog.value_chains[v].types[t].process_flows.push({
+  state.catalog.types[v].value_chains[t].process_flows.push({
     code: autoCode,
     name: wfName,
     description: wfDesc,
     workflow_path: `./${projectName}`
   });
 
-  const idx = state.catalog.value_chains[v].types[t].process_flows.length - 1;
+  const idx = state.catalog.types[v].value_chains[t].process_flows.length - 1;
   _catEditNode = { level: 'pf', v, t, p: idx };
   renderCatalogEditor();
   toast(`Linked "${projectName}" — review the code and name, then click Done`, 'success');
@@ -4543,10 +4543,10 @@ function exportCatalog() {
 }
 
 function createNewCatalog() {
-  if (state.catalog && state.catalog.value_chains && state.catalog.value_chains.length) {
+  if (state.catalog && state.catalog.types && state.catalog.types.length) {
     if (!confirm('This will replace the current catalog. Continue?')) return;
   }
-  state.catalog = { name: '', description: '', value_chains: [] };
+  state.catalog = { name: '', description: '', types: [] };
   _catEditNode = null;
   renderCatalogEditor();
   renderCatalogSidebar();
@@ -4563,7 +4563,7 @@ function importCatalogFile() {
     try {
       const text = await file.text();
       const data = JSON.parse(text);
-      if (!data.value_chains) { toast('Invalid catalog — missing value_chains', 'error'); return; }
+      if (!data.types) { toast('Invalid catalog — missing types', 'error'); return; }
       state.catalog = data;
       _catEditNode = null;
       renderCatalogEditor();
@@ -4584,7 +4584,7 @@ function importCatalogFile() {
       <svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="var(--primary)" stroke-width="1.5"><path d="M2 3h4l1 2h7v8H2V3z"/></svg>
       <span>Catalog Editor</span>
       <span style="flex:1"></span>
-      <span style="font-size:12px;color:var(--text-muted)">Waardeketen &gt; Type &gt; Procesflow</span>
+      <span style="font-size:12px;color:var(--text-muted)">Type &gt; Value Chain &gt; Process Flow</span>
     </div>
     <div class="modal-body" id="catalog-editor-body" style="overflow-y:auto;flex:1;padding:16px">
       <!-- populated by renderCatalogEditor() -->

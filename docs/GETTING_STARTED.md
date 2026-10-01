@@ -78,7 +78,7 @@ cd ..\bc-replay
 - **`page-scripting/`** - Script generation and variant automation
   - PowerShell generators and project folders
   - Workflow projects with multi-user step definitions
-  - `catalog.json` — 3-level test hierarchy (Waardeketen > Type > Procesflow)
+  - `catalog.json` — 3-level test hierarchy (Type > Value Chain > Process Flow)
 
 - **`bc-replay/`** - Test execution
   - `Run-BCWorkflow.ps1` — multi-user workflow orchestrator
@@ -95,7 +95,7 @@ cd ..\bc-replay
 
 Workflows are organised into a 3-level hierarchy for traceability:
 
-**Waardeketen** (value chain) > **Type** > **Procesflow**
+**Type** > **Value Chain** > **Process Flow**
 
 Each level has a user-defined code and name. Composite codes (e.g. `PRJ-VG-TRAJECT`) are used in reports and filtering.
 

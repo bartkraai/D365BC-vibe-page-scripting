@@ -24,7 +24,7 @@ Automate Business Central page testing using YAML-based scripts executed via Pla
 - PowerShell generators for creating test variants
 - Project folders with BASE recordings and data files
 - **Workflow projects** with multi-user step definitions
-- **`catalog.json`** — 3-level test hierarchy (Waardeketen > Type > Procesflow)
+- **`catalog.json`** — 3-level test hierarchy (Type > Value Chain > Process Flow)
 - [PAGE-SCRIPTING-QUICK-START.md](docs/PAGE-SCRIPTING-QUICK-START.md) - Recording guide
 
 **`bc-replay/`** - Test execution including multi-user workflows
@@ -63,9 +63,9 @@ Organise workflows into a traceable hierarchy with user-defined codes and names:
 
 | Level | Name | Example Code | Example Name |
 |-------|------|-------------|-------------|
-| 1 | Waardeketen | `PRJ` | Projecten |
-| 2 | Type | `VG` | Vastgoed |
-| 3 | Procesflow | `TRAJECT` | Van traject naar project |
+| 1 | Type | `PRJ` | Projecten |
+| 2 | Value Chain | `VG` | Vastgoed |
+| 3 | Process Flow | `TRAJECT` | Van traject naar project |
 
 **Composite code:** `PRJ-VG-TRAJECT` — used in reports and filtering.
 

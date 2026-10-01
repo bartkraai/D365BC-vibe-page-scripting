@@ -22,7 +22,7 @@
       </li>      <li class="nav-item" data-tab="catalog">
         <span class="nav-icon">&#x1F4C2;</span><span class="nav-label">Test Catalog</span>
       </li>      <li class="nav-item" data-tab="workflow">
-        <span class="nav-icon">⬡</span><span class="nav-label">Workflow Designer</span>
+        <span class="nav-icon">⬡</span><span class="nav-label">4PS Test Flow Builder</span>
       </li>
       <li class="nav-item" data-tab="variants">
         <span class="nav-icon">⊞</span><span class="nav-label">Variant Generator</span>
@@ -140,7 +140,7 @@
 
           <div id="env-companies-container">
             <h3>Companies <small>(available for workflow steps)</small></h3>
-            <p style="font-size:12px;color:var(--text-muted);margin:0 0 8px">Add the BC company names that are available in this environment. Steps in the Workflow Builder can then target a specific company.</p>
+            <p style="font-size:12px;color:var(--text-muted);margin:0 0 8px">Add the BC company names that are available in this environment. Steps in the Test Flow Builder can then target a specific company.</p>
             <div id="env-companies-list"></div>
             <div style="display:flex;gap:6px;margin-top:8px">
               <input id="env-company-input" type="text" class="input" placeholder="e.g. CRONUS International Ltd." style="flex:1" />
@@ -262,18 +262,18 @@
         </div>
       </div>
       <div id="cat-tree-container" class="mt-md">
-        <!-- value chain cards rendered here by JS -->
+        <!-- type cards rendered here by JS -->
       </div>
       <div class="mt-md" style="text-align:center">
-        <button class="btn btn-secondary" id="btn-cat-add-vc">+ Add Value Chain</button>
+        <button class="btn btn-secondary" id="btn-cat-add-vc">+ Add Type</button>
       </div>
     </section>
 
-    <!-- ── WORKFLOW DESIGNER ── -->
+    <!-- ── TEST FLOW BUILDER ── -->
     <section id="tab-workflow" class="tab">
-      <!-- The workflow builder iframe keeps it fully isolated -->
+      <!-- The test flow builder iframe keeps it fully isolated -->
       <div class="iframe-wrapper" style="height:100%">
-        <iframe id="wf-iframe" src="/tools/workflow-builder/index.html" title="Workflow Designer"></iframe>
+        <iframe id="wf-iframe" src="/tools/workflow-builder/index.html" title="4PS Test Flow Builder"></iframe>
       </div>
     </section>
 

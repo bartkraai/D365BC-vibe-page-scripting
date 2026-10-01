@@ -4,7 +4,7 @@
     workflow folders exist and contain a valid workflow.json.
 
 .DESCRIPTION
-    Pre-flight validation for the 3-level test catalog (Waardeketen > Type > Procesflow).
+    Pre-flight validation for the 3-level test catalog (Type > Value Chain > Process Flow).
     Checks:
     - All workflow_path references resolve to existing folders with workflow.json
     - No duplicate codes within the same level
@@ -66,45 +66,45 @@ $warnings = @()
 $info     = @()
 
 $allWorkflowPaths = @()
-$vcCodes = @()
+$typeCodes = @()
 
-foreach ($vc in $catalog.value_chains) {
-    $vcLabel = "$($vc.code) ($($vc.name))"
+foreach ($typ in $catalog.types) {
+    $typLabel = "$($typ.code) ($($typ.name))"
 
-    # Check duplicate value chain codes
-    if ($vc.code -in $vcCodes) {
-        $errors += "Duplicate value chain code: '$($vc.code)'"
+    # Check duplicate Type codes
+    if ($typ.code -in $typeCodes) {
+        $errors += "Duplicate Type code: '$($typ.code)'"
     }
-    $vcCodes += $vc.code
+    $typeCodes += $typ.code
 
-    if (-not $vc.types -or $vc.types.Count -eq 0) {
-        $errors += "Value chain '$vcLabel' has no types defined."
+    if (-not $typ.value_chains -or $typ.value_chains.Count -eq 0) {
+        $errors += "Type '$typLabel' has no Value Chains defined."
         continue
     }
 
-    $typeCodes = @()
-    foreach ($type in $vc.types) {
-        $typeLabel = "$($vc.code)-$($type.code) ($($type.name))"
+    $vcCodes = @()
+    foreach ($vc in $typ.value_chains) {
+        $vcLabel = "$($typ.code)-$($vc.code) ($($vc.name))"
 
-        # Check duplicate type codes within this value chain
-        if ($type.code -in $typeCodes) {
-            $errors += "Duplicate type code '$($type.code)' in value chain '$vcLabel'"
+        # Check duplicate Value Chain codes within this Type
+        if ($vc.code -in $vcCodes) {
+            $errors += "Duplicate Value Chain code '$($vc.code)' in Type '$typLabel'"
         }
-        $typeCodes += $type.code
+        $vcCodes += $vc.code
 
-        if (-not $type.process_flows -or $type.process_flows.Count -eq 0) {
-            $errors += "Type '$typeLabel' has no process flows defined."
+        if (-not $vc.process_flows -or $vc.process_flows.Count -eq 0) {
+            $errors += "Value Chain '$vcLabel' has no process flows defined."
             continue
         }
 
         $pfCodes = @()
-        foreach ($pf in $type.process_flows) {
-            $compositeCode = "$($vc.code)-$($type.code)-$($pf.code)"
+        foreach ($pf in $vc.process_flows) {
+            $compositeCode = "$($typ.code)-$($vc.code)-$($pf.code)"
             $pfLabel = "$compositeCode ($($pf.name))"
 
-            # Check duplicate process flow codes within this type
+            # Check duplicate process flow codes within this Value Chain
             if ($pf.code -in $pfCodes) {
-                $errors += "Duplicate process flow code '$($pf.code)' in type '$typeLabel'"
+                $errors += "Duplicate process flow code '$($pf.code)' in Value Chain '$vcLabel'"
             }
             $pfCodes += $pf.code
 
@@ -162,12 +162,12 @@ foreach ($line in $info) {
 }
 Write-Host ""
 
-$totalPF = ($catalog.value_chains | ForEach-Object { $_.types | ForEach-Object { $_.process_flows.Count } } | Measure-Object -Sum).Sum
-$totalTypes = ($catalog.value_chains | ForEach-Object { $_.types.Count } | Measure-Object -Sum).Sum
+$totalPF = ($catalog.types | ForEach-Object { $_.value_chains | ForEach-Object { $_.process_flows.Count } } | Measure-Object -Sum).Sum
+$totalValueChains = ($catalog.types | ForEach-Object { $_.value_chains.Count } | Measure-Object -Sum).Sum
 
 Write-Host "  Summary:" -ForegroundColor White
-Write-Host "    Value chains  : $($catalog.value_chains.Count)" -ForegroundColor White
-Write-Host "    Types         : $totalTypes" -ForegroundColor White
+Write-Host "    Types         : $($catalog.types.Count)" -ForegroundColor White
+Write-Host "    Value chains  : $totalValueChains" -ForegroundColor White
 Write-Host "    Process flows : $totalPF" -ForegroundColor White
 Write-Host ""
 

@@ -7,9 +7,9 @@
     and executes each matching workflow via Run-BCWorkflow.ps1.
     After all workflows complete, generates an aggregate catalog report.
 
-    Composite codes follow the pattern: VALUE_CHAIN-TYPE-PROCESS_FLOW
+    Composite codes follow the pattern: TYPE-VALUE_CHAIN-PROCESS_FLOW
     Examples:
-      -Filter "PRJ"        → all process flows under value chain Projecten
+      -Filter "PRJ"        → all process flows under Type Projecten
       -Filter "PRJ-VG"     → all Vastgoed process flows
       -Filter "INK-PO-APPR"→ one specific process flow
 
@@ -87,11 +87,11 @@ $catalog = Get-Content $CatalogPath -Raw | ConvertFrom-Json
 # ── Resolve matching process flows ──────────────────────────────────────────
 $matchingFlows = @()
 
-foreach ($vc in $catalog.value_chains) {
-    foreach ($type in $vc.types) {
-        foreach ($pf in $type.process_flows) {
-            $compositeCode = "$($vc.code)-$($type.code)-$($pf.code)"
-            $breadcrumb    = "$($vc.name) > $($type.name) > $($pf.name)"
+foreach ($typ in $catalog.types) {
+    foreach ($vc in $typ.value_chains) {
+        foreach ($pf in $vc.process_flows) {
+            $compositeCode = "$($typ.code)-$($vc.code)-$($pf.code)"
+            $breadcrumb    = "$($typ.name) > $($vc.name) > $($pf.name)"
 
             if ($Filter -and -not $compositeCode.StartsWith($Filter, [System.StringComparison]::OrdinalIgnoreCase)) {
                 continue
@@ -102,10 +102,10 @@ foreach ($vc in $catalog.value_chains) {
                 CompositeCode  = $compositeCode
                 Breadcrumb     = $breadcrumb
                 WorkflowPath   = $workflowFolder
+                Type           = $typ.name
+                TypeCode       = $typ.code
                 ValueChain     = $vc.name
                 ValueChainCode = $vc.code
-                Type           = $type.name
-                TypeCode       = $type.code
                 ProcessFlow    = $pf.name
                 ProcessFlowCode = $pf.code
             }

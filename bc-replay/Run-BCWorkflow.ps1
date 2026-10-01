@@ -1081,22 +1081,22 @@ if ($workflow.catalog) {
     if (Test-Path $catalogJsonPath) {
         try {
             $catalogData = Get-Content $catalogJsonPath -Raw | ConvertFrom-Json
-            $vcNode = $catalogData.value_chains | Where-Object { $_.code -eq $cat.value_chain } | Select-Object -First 1
-            $typeNode = if ($vcNode) { $vcNode.types | Where-Object { $_.code -eq $cat.type } | Select-Object -First 1 } else { $null }
-            $pfNode = if ($typeNode) { $typeNode.process_flows | Where-Object { $_.code -eq $cat.process_flow } | Select-Object -First 1 } else { $null }
+            $typeNode = $catalogData.types | Where-Object { $_.code -eq $cat.type } | Select-Object -First 1
+            $vcNode = if ($typeNode) { $typeNode.value_chains | Where-Object { $_.code -eq $cat.value_chain } | Select-Object -First 1 } else { $null }
+            $pfNode = if ($vcNode) { $vcNode.process_flows | Where-Object { $_.code -eq $cat.process_flow } | Select-Object -First 1 } else { $null }
+            $typeName = if ($typeNode) { $typeNode.name } else { $cat.type }
             $vcName   = if ($vcNode)   { $vcNode.name }   else { $cat.value_chain }
-            $typeName = if ($typeNode) { $typeNode.name }  else { $cat.type }
             $pfName   = if ($pfNode)   { $pfNode.name }   else { $cat.process_flow }
-            $catalogBreadcrumb = "$vcName > $typeName > $pfName"
-            $compositeCode = "$($cat.value_chain)-$($cat.type)-$($cat.process_flow)"
+            $catalogBreadcrumb = "$typeName > $vcName > $pfName"
+            $compositeCode = "$($cat.type)-$($cat.value_chain)-$($cat.process_flow)"
         } catch {
             # Fall back to codes only
-            $catalogBreadcrumb = "$($cat.value_chain) > $($cat.type) > $($cat.process_flow)"
-            $compositeCode = "$($cat.value_chain)-$($cat.type)-$($cat.process_flow)"
+            $catalogBreadcrumb = "$($cat.type) > $($cat.value_chain) > $($cat.process_flow)"
+            $compositeCode = "$($cat.type)-$($cat.value_chain)-$($cat.process_flow)"
         }
     } else {
-        $catalogBreadcrumb = "$($cat.value_chain) > $($cat.type) > $($cat.process_flow)"
-        $compositeCode = "$($cat.value_chain)-$($cat.type)-$($cat.process_flow)"
+        $catalogBreadcrumb = "$($cat.type) > $($cat.value_chain) > $($cat.process_flow)"
+        $compositeCode = "$($cat.type)-$($cat.value_chain)-$($cat.process_flow)"
     }
 }
 
