@@ -1107,7 +1107,7 @@ function renderStepDetail(detailRow, data) {
 
   for (const s of data.steps) {
     const durText = s.duration_ms != null ? `${s.duration_ms}ms` : '';
-    const typeClass = s.type === 'input' ? 'type-input' : s.type === 'invoke' ? 'type-invoke' : s.type === 'navigate' ? 'type-navigate' : '';
+    const typeClass = s.type === 'input' ? 'type-input' : s.type === 'validate' ? 'type-validate' : s.type === 'navigate' ? 'type-navigate' : '';
     const status = s.status || 'not-recorded';
     const statusLabel = status === 'not-recorded' ? 'Not recorded' : status;
     const failureDetail = s.error_message

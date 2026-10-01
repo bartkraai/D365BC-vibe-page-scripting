@@ -818,8 +818,8 @@ label small { font-weight: 400; color: var(--text-muted); }
   font-size: 10px; font-weight: 600; font-family: monospace;
   background: #e9e9e9; color: #555;
 }
-.action-type.type-input    { background: #dff5e3; color: #1a7a3f; }
-.action-type.type-invoke   { background: #ffecd2; color: #b35a00; }
+.action-type.type-input    { background: #d6eaff; color: #1a5bb5; }
+.action-type.type-validate { background: #dff5e3; color: #1a7a3f; }
 .action-type.type-navigate { background: #d6eaff; color: #1a5bb5; }
 
 /* ── Screenshots ─────────────────────────────────────────────────────────── */
