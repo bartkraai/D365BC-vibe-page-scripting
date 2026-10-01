@@ -1389,6 +1389,7 @@ function renderCatalog() {
           <div class="cat-actions">
             ${pf.name ? `<button class="btn btn-primary btn-sm" onclick="catOpenPfWorkflow(${v},${t},${p})">Open</button>` : ''}
             <button class="btn btn-secondary btn-sm" onclick="catEditPf(${v},${t},${p})">Edit</button>
+            <button class="btn btn-secondary btn-sm" onclick="catDuplicatePf(${v},${t},${p})">Duplicate</button>
             <button class="btn btn-secondary btn-sm" onclick="catRemovePf(${v},${t},${p})" style="color:var(--error)">Remove</button>
           </div>
         </div>`;
@@ -1458,6 +1459,18 @@ function catBeginEdit(node) {
   renderCatalog();
 }
 
+function catCopyCode(items, sourceCode, fallbackCode) {
+  const usedCodes = new Set(items.map(item => item.code));
+  const suffix = '-COPY';
+  const baseCode = sourceCode || fallbackCode;
+  let code = `${baseCode.slice(0, 10 - suffix.length)}${suffix}`;
+  for (let index = 2; usedCodes.has(code); index++) {
+    const numberedSuffix = `-COPY${index}`;
+    code = `${baseCode.slice(0, 10 - numberedSuffix.length)}${numberedSuffix}`;
+  }
+  return code;
+}
+
 function catEditVc(v) { catBeginEdit({ level: 'vc', v }); }
 function catSaveVc(v) {
   syncCatalogMeta();
@@ -1489,15 +1502,7 @@ function catDuplicateType(v, t) {
   const valueChains = catalog.types[v].value_chains;
   const source = valueChains[t];
   const copy = JSON.parse(JSON.stringify(source));
-  const usedCodes = new Set(valueChains.map(valueChain => valueChain.code));
-  const suffix = '-COPY';
-  const baseCode = (source.code || 'VC').slice(0, 10 - suffix.length);
-  let code = `${baseCode}${suffix}`;
-  for (let index = 2; usedCodes.has(code); index++) {
-    const numberedSuffix = `-COPY${index}`;
-    code = `${(source.code || 'VC').slice(0, 10 - numberedSuffix.length)}${numberedSuffix}`;
-  }
-  copy.code = code;
+  copy.code = catCopyCode(valueChains, source.code, 'VC');
   copy.name = `${source.name || 'Value Chain'} (Copy)`;
   valueChains.splice(t + 1, 0, copy);
   catEditNode = { level: 'type', v, t: t + 1 };
@@ -1520,6 +1525,18 @@ function catSavePf(v, t, p) {
   syncCatalogMeta();
   if (!catCommitActiveEdit()) return;
   catEditNode = null; renderCatalog();
+}
+function catDuplicatePf(v, t, p) {
+  syncCatalogMeta();
+  if (!catCommitActiveEdit()) return;
+  const processFlows = catalog.types[v].value_chains[t].process_flows;
+  const source = processFlows[p];
+  const copy = JSON.parse(JSON.stringify(source));
+  copy.code = catCopyCode(processFlows, source.code, 'PF');
+  copy.name = `${source.name || 'Process Flow'} (Copy)`;
+  processFlows.splice(p + 1, 0, copy);
+  catEditNode = { level: 'pf', v, t, p: p + 1 };
+  renderCatalog();
 }
 async function catSavePfAndOpen(v, t, p) {
   syncCatalogMeta();
