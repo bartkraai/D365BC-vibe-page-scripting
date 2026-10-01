@@ -1,5 +1,6 @@
 {
-  "name": "Binnenland",
+  "$schema": "./workflow.schema.json",
+  "name": "Buitenlandse opdrachtgever",
   "description": "",
   "steps": [
     {
