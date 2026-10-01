@@ -4462,17 +4462,45 @@ function catSavePf(v, t, p) {
   renderCatalogEditor();
 }
 
-function catDuplicatePf(v, t, p) {
+async function catDuplicatePf(v, t, p) {
   _catSyncMeta();
   if (!catCommitActiveEdit()) return;
   const processFlows = state.catalog.types[v].value_chains[t].process_flows;
   const source = processFlows[p];
+  const sourceProject = (source.workflow_path || '').replace(/^\.\//, '').trim();
+  if (!sourceProject) {
+    toast('This process flow has no workflow folder to duplicate', 'error');
+    return;
+  }
   const copy = JSON.parse(JSON.stringify(source));
   copy.code = catCopyCode(processFlows, source.code, 'PF');
   copy.name = `${source.name || 'Process Flow'} (Copy)`;
+  let duplicatedProject;
+  try {
+    const res = await fetch(`/api/projects/${encodeURIComponent(sourceProject)}/duplicate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        workflowName: copy.name,
+        catalog: {
+          type: state.catalog.types[v].code,
+          value_chain: state.catalog.types[v].value_chains[t].code,
+          process_flow: copy.code,
+        },
+      }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+    duplicatedProject = data;
+  } catch (e) {
+    toast(`Could not duplicate the workflow folder: ${e.message}`, 'error');
+    return;
+  }
+  copy.workflow_path = `./${duplicatedProject.projectName}`;
   processFlows.splice(p + 1, 0, copy);
   _catEditNode = { level: 'pf', v, t, p: p + 1 };
   renderCatalogEditor();
+  toast(`Copied workflow folder to "${duplicatedProject.projectName}"`, 'success');
 }
 
 function catRemovePf(v, t, p) {

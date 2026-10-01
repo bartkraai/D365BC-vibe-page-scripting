@@ -1526,14 +1526,34 @@ function catSavePf(v, t, p) {
   if (!catCommitActiveEdit()) return;
   catEditNode = null; renderCatalog();
 }
-function catDuplicatePf(v, t, p) {
+async function catDuplicatePf(v, t, p) {
   syncCatalogMeta();
   if (!catCommitActiveEdit()) return;
   const processFlows = catalog.types[v].value_chains[t].process_flows;
   const source = processFlows[p];
+  const sourceProject = (source.workflow_path || '').replace(/^\.\//, '').trim();
+  if (!sourceProject) {
+    alert('This process flow has no workflow folder to duplicate.');
+    return;
+  }
   const copy = JSON.parse(JSON.stringify(source));
   copy.code = catCopyCode(processFlows, source.code, 'PF');
   copy.name = `${source.name || 'Process Flow'} (Copy)`;
+  let duplicatedProject;
+  try {
+    duplicatedProject = await POST(`/projects/${encodeURIComponent(sourceProject)}/duplicate`, {
+      workflowName: copy.name,
+      catalog: {
+        type: catalog.types[v].code,
+        value_chain: catalog.types[v].value_chains[t].code,
+        process_flow: copy.code,
+      },
+    });
+  } catch (e) {
+    alert('Could not duplicate the workflow folder: ' + e.message);
+    return;
+  }
+  copy.workflow_path = `./${duplicatedProject.projectName}`;
   processFlows.splice(p + 1, 0, copy);
   catEditNode = { level: 'pf', v, t, p: p + 1 };
   renderCatalog();

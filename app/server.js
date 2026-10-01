@@ -11,6 +11,7 @@ const PDFDocument = require('pdfkit');
 const { syncOptionalCredential } = require('./credential-updates');
 const { readActionOutcomes } = require('./action-outcomes');
 const { findReplayVideo, isWithinDirectory } = require('./result-artifacts');
+const { duplicateProjectFolder } = require('./project-folders');
 
 // ── Keytar (Windows Credential Manager — graceful fallback) ──────────────────
 let keytar = null;
@@ -513,6 +514,27 @@ app.post('/api/projects/:name/workflow', (req, res) => {
   const wfPath = path.join(projDir, 'workflow.json');
   fs.writeFileSync(wfPath, JSON.stringify(req.body, null, 2));
   res.json({ ok: true, path: path.relative(ROOT, wfPath).replace(/\\/g, '/') });
+});
+
+app.post('/api/projects/:name/duplicate', (req, res) => {
+  try {
+    const result = duplicateProjectFolder(
+      path.join(ROOT, 'page-scripting'),
+      req.params.name,
+      {
+        name: req.body?.workflowName,
+        catalog: req.body?.catalog,
+      },
+    );
+    res.json({
+      ok: true,
+      projectName: result.targetName,
+      projectPath: path.relative(ROOT, result.targetDir).replace(/\\/g, '/'),
+    });
+  } catch (e) {
+    const status = /was not found/.test(e.message) ? 404 : /Invalid project name/.test(e.message) ? 400 : 500;
+    res.status(status).json({ error: e.message });
+  }
 });
 
 app.delete('/api/projects/:name', (req, res) => {
