@@ -12,6 +12,10 @@ const { syncOptionalCredential } = require('./credential-updates');
 const { readActionOutcomes } = require('./action-outcomes');
 const { findReplayVideo, isWithinDirectory } = require('./result-artifacts');
 const { duplicateProjectFolder } = require('./project-folders');
+const paths = require('./paths');
+const { readJson, writeJsonAtomic } = require('./json-store');
+const { ScriptLibrary } = require('./script-library');
+const { WorkflowStore, validateCatalog, validateWorkflow } = require('./workflow-store');
 
 // ── Keytar (Windows Credential Manager — graceful fallback) ──────────────────
 let keytar = null;
@@ -24,9 +28,13 @@ const CREDS_DIR = path.join(DATA_DIR, 'credentials');
 const ENVS_FILE = path.join(DATA_DIR, 'environments.json');
 const SERVICE   = 'bc-page-scripting';
 const PS_EXE    = 'pwsh'; // PowerShell 7
+const library = new ScriptLibrary(paths.LIBRARY, paths.WORKFLOWS);
+const workflowStore = new WorkflowStore(paths.WORKFLOWS, paths.CATALOG);
+const activeRuns = new Map();
 
 fs.mkdirSync(DATA_DIR,  { recursive: true });
 fs.mkdirSync(CREDS_DIR, { recursive: true });
+fs.mkdirSync(paths.WORKFLOWS, { recursive: true });
 
 // ── PowerShell helpers ────────────────────────────────────────────────────────
 function runPs(cmd) {
@@ -86,7 +94,7 @@ app.use(express.json({ limit: '5mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/tools', express.static(path.join(ROOT, 'tools')));
 // Serve page-scripting tree so Playwright reports and screenshots are reachable
-app.use('/result-files', express.static(path.join(ROOT, 'page-scripting'), { dotfiles: 'ignore' }));
+app.use('/result-files', express.static(paths.WORKFLOWS, { dotfiles: 'ignore' }));
 app.use('/result-files-bc', express.static(path.join(ROOT, 'bc-replay', 'test-results'), { dotfiles: 'ignore' }));
 app.use('/docs', express.static(path.join(ROOT, 'docs')));
 
@@ -94,14 +102,17 @@ function broadcast(msg) {
   const data = JSON.stringify(msg);
   wss.clients.forEach(c => { if (c.readyState === OPEN) c.send(data); });
 }
+function isRunActive(name) { return (activeRuns.get(name) || 0) > 0; }
+function beginRun(name) { activeRuns.set(name, (activeRuns.get(name) || 0) + 1); }
+function endRun(name) { const count = activeRuns.get(name) || 0; if (count <= 1) activeRuns.delete(name); else activeRuns.set(name, count - 1); }
 
 // ── File watcher — pushes file-change events to all browser clients ───────────
 const watchTargets = [
-  path.join(ROOT, 'page-scripting'),
+  paths.PAGE_SCRIPTING,
   path.join(ROOT, 'bc-replay', 'test-results'),
 ].filter(p => fs.existsSync(p));
 
-if (watchTargets.length) {
+if (watchTargets.length && !process.env.DISABLE_FILE_WATCHER) {
   chokidar.watch(watchTargets, {
     // Generated recordings can remain locked by Playwright or a media player.
     // They do not affect the UI file-change notifications.
@@ -215,7 +226,7 @@ app.get('/api/environments/:name', async (req, res) => {
       },
     });
   } catch (e) {
-    res.status(500).json({ error: e.message });
+    res.status(e.status || 500).json({ error: e.message });
   }
 });
 
@@ -291,7 +302,7 @@ app.post('/api/environments', async (req, res) => {
     }
     res.json({ ok: true });
   } catch (e) {
-    res.status(500).json({ error: e.message });
+    res.status(e.status || 500).json({ error: e.message });
   }
 });
 
@@ -305,7 +316,7 @@ app.patch('/api/environments/:name/default', (req, res) => {
     writeEnvs(envs);
     res.json({ ok: true });
   } catch (e) {
-    res.status(500).json({ error: e.message });
+    res.status(e.status || 500).json({ error: e.message });
   }
 });
 
@@ -319,7 +330,7 @@ app.post('/api/environments/:name/export', async (req, res) => {
     const env = readEnvs().find(e => e.name === name);
     if (!env) return res.status(404).json({ error: 'Environment not found' });
 
-    const projectDir = path.join(ROOT, 'page-scripting', project);
+    const projectDir = paths.resolveWorkflowDir(project);
     if (!fs.existsSync(projectDir)) return res.status(404).json({ error: 'Project folder not found' });
 
     // Read workflow.json for bc_url (optional — include if present)
@@ -327,7 +338,7 @@ app.post('/api/environments/:name/export', async (req, res) => {
     const wfPath = path.join(projectDir, 'workflow.json');
     if (fs.existsSync(wfPath)) {
       try {
-        const wf = JSON.parse(fs.readFileSync(wfPath, 'utf8'));
+        const wf = readJson(wfPath);
         if (wf.bc_url) bcUrl = wf.bc_url;
       } catch { /* use env url */ }
     }
@@ -349,7 +360,7 @@ app.post('/api/environments/:name/export', async (req, res) => {
 
     res.json({ ok: true, path: path.relative(ROOT, usersPath).replace(/\\/g, '/'), roles: Object.keys(users) });
   } catch (e) {
-    res.status(500).json({ error: e.message });
+    res.status(e.status || 500).json({ error: e.message });
   }
 });
 
@@ -373,7 +384,7 @@ app.delete('/api/environments/:name', async (req, res) => {
     writeEnvs(readEnvs().filter(e => e.name !== name));
     res.json({ ok: true });
   } catch (e) {
-    res.status(500).json({ error: e.message });
+    res.status(e.status || 500).json({ error: e.message });
   }
 });
 
@@ -426,7 +437,7 @@ app.post('/api/bc/companies', async (req, res) => {
     }));
     res.json({ companies, environmentName: envName });
   } catch (e) {
-    res.status(500).json({ error: e.message });
+    res.status(e.status || 500).json({ error: e.message });
   }
 });
 
@@ -434,41 +445,46 @@ app.post('/api/bc/companies', async (req, res) => {
 // ROUTES — Projects & Scripts
 // ══════════════════════════════════════════════════════════════════════════════
 
-app.get('/api/projects', (_req, res) => {
-  const psDir = path.join(ROOT, 'page-scripting');
-  try {
-    const entries = fs.readdirSync(psDir, { withFileTypes: true })
-      .filter(e => e.isDirectory() && !e.name.startsWith('.'))
-      .map(e => ({
-        name: e.name,
-        hasWorkflow: fs.existsSync(path.join(psDir, e.name, 'workflow.json')),
-      }));
-    res.json(entries);
-  } catch { res.json([]); }
-});
+app.get('/api/projects', (_req, res) => res.json(workflowStore.list()));
 
 app.get('/api/catalog', (_req, res) => {
-  const catalogPath = path.join(ROOT, 'page-scripting', 'catalog.json');
+  const catalogPath = paths.CATALOG;
   if (!fs.existsSync(catalogPath)) return res.status(404).json({ error: 'catalog.json not found' });
   try {
-    res.json(JSON.parse(fs.readFileSync(catalogPath, 'utf8')));
+    res.json(readJson(catalogPath));
   } catch (e) {
-    res.status(500).json({ error: `Invalid catalog.json: ${e.message}` });
+    res.status(e.status || 500).json({ error: `Invalid catalog.json: ${e.message}` });
   }
 });
 
 app.post('/api/catalog', (req, res) => {
-  const catalogPath = path.join(ROOT, 'page-scripting', 'catalog.json');
+  const catalogPath = paths.CATALOG;
   try {
-    fs.writeFileSync(catalogPath, JSON.stringify(req.body, null, 2), 'utf8');
+    validateCatalog(req.body, paths.WORKFLOWS);
+    writeJsonAtomic(catalogPath, req.body);
     res.json({ ok: true, path: catalogPath });
   } catch (e) {
-    res.status(500).json({ error: `Failed to save catalog.json: ${e.message}` });
+    res.status(e.status || 500).json({ error: `Failed to save catalog.json: ${e.message}` });
   }
 });
 
+app.get('/api/library', (_req, res) => res.json(library.list()));
+app.post('/api/library/folders', (req, res) => res.status(201).json(library.createFolder(req.body || {})));
+app.patch('/api/library/folders/:id', (req, res) => res.json(library.updateFolder(req.params.id, req.body || {})));
+app.delete('/api/library/folders/:id', (req, res) => { library.deleteFolder(req.params.id); res.status(204).end(); });
+app.post('/api/library/scripts', (req, res) => res.status(201).json(library.createScript(req.body || {})));
+app.get('/api/library/scripts/:id', (req, res) => res.json(library.details(req.params.id)));
+app.patch('/api/library/scripts/:id', (req, res) => res.json(library.updateScript(req.params.id, req.body || {})));
+app.post('/api/library/scripts/:id/versions', (req, res) => res.status(201).json(library.addVersion(req.params.id, req.body || {})));
+app.get('/api/library/scripts/:id/versions/:version/content', (req, res) => {
+  const result = library.content(req.params.id, req.params.version);
+  res.type('text/yaml').send(result.content);
+});
+app.get('/api/library/scripts/:id/usage', (req, res) => res.json(library.usage(req.params.id)));
+app.delete('/api/library/scripts/:id', (req, res) => { library.deleteScript(req.params.id); res.status(204).end(); });
+
 app.get('/api/projects/:name/scripts', (req, res) => {
-  const projectDir = path.join(ROOT, 'page-scripting', req.params.name);
+  const projectDir = paths.resolveWorkflowDir(req.params.name);
   const collect = (dir) => {
     if (!fs.existsSync(dir)) return [];
     return fs.readdirSync(dir)
@@ -482,26 +498,32 @@ app.get('/api/projects/:name/scripts', (req, res) => {
         };
       });
   };
+  const workflow = workflowStore.read(req.params.name);
+  const libraryScripts = [...new Set((workflow.steps || []).flatMap(step => step.scriptIds || []))].map(id => {
+    const result = library.content(id);
+    return { id, name: result.script.name, latestVersion: result.version.version, content: result.content };
+  });
   res.json([
+    ...libraryScripts,
     ...collect(path.join(projectDir, 'scripts')),
     ...collect(projectDir),
   ]);
 });
 
 app.get('/api/projects/:name/workflow', (req, res) => {
-  const wfPath = path.join(ROOT, 'page-scripting', req.params.name, 'workflow.json');
+  const wfPath = path.join(paths.resolveWorkflowDir(req.params.name), 'workflow.json');
   if (!fs.existsSync(wfPath)) return res.status(404).json({ error: 'workflow.json not found' });
-  res.json(JSON.parse(fs.readFileSync(wfPath, 'utf8')));
+  res.json(readJson(wfPath));
 });
 
 app.get('/api/projects/:name/users', (req, res) => {
-  const projDir = path.join(ROOT, 'page-scripting', req.params.name);
+  const projDir = paths.resolveWorkflowDir(req.params.name);
   // Prefer the real users.json over the sample
   const candidates = ['users.json', 'users.sample.json'];
   for (const fname of candidates) {
     const p = path.join(projDir, fname);
     if (fs.existsSync(p)) {
-      try { return res.json(JSON.parse(fs.readFileSync(p, 'utf8'))); }
+      try { return res.json(readJson(p)); }
       catch { break; }
     }
   }
@@ -509,17 +531,17 @@ app.get('/api/projects/:name/users', (req, res) => {
 });
 
 app.post('/api/projects/:name/workflow', (req, res) => {
-  const projDir = path.join(ROOT, 'page-scripting', req.params.name);
+  const projDir = paths.resolveWorkflowDir(req.params.name);
   fs.mkdirSync(projDir, { recursive: true });
+  workflowStore.write(req.params.name, req.body, library);
   const wfPath = path.join(projDir, 'workflow.json');
-  fs.writeFileSync(wfPath, JSON.stringify(req.body, null, 2));
   res.json({ ok: true, path: path.relative(ROOT, wfPath).replace(/\\/g, '/') });
 });
 
 app.post('/api/projects/:name/duplicate', (req, res) => {
   try {
     const result = duplicateProjectFolder(
-      path.join(ROOT, 'page-scripting'),
+      paths.WORKFLOWS,
       req.params.name,
       {
         name: req.body?.workflowName,
@@ -538,18 +560,23 @@ app.post('/api/projects/:name/duplicate', (req, res) => {
 });
 
 app.delete('/api/projects/:name', (req, res) => {
-  const safeName = path.basename(req.params.name);
-  if (!safeName) return res.status(400).json({ error: 'Invalid project name' });
-
-  const projDir = path.join(ROOT, 'page-scripting', safeName);
+  const safeName = req.params.name;
+  if (isRunActive(safeName)) return res.status(409).json({ error: 'Workflow has an active run' });
+  const projDir = paths.resolveWorkflowDir(safeName);
   if (!fs.existsSync(projDir)) return res.status(404).json({ error: 'Project not found' });
 
   try {
     fs.rmSync(projDir, { recursive: true, force: true });
     res.json({ ok: true, deleted: safeName });
   } catch (e) {
-    res.status(500).json({ error: e.message });
+    res.status(e.status || 500).json({ error: e.message });
   }
+});
+
+app.patch('/api/projects/:name', (req, res) => {
+  if (isRunActive(req.params.name)) return res.status(409).json({ error: 'Workflow has an active run' });
+  const result = workflowStore.renameWorkflow(req.params.name, req.body?.newName);
+  res.json(result);
 });
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -560,8 +587,8 @@ app.post('/api/variants/generate', (req, res) => {
   const { project, baseScript, items, locations } = req.body;
   if (!project || !baseScript) return res.status(400).json({ error: 'project and baseScript are required' });
 
-  const projectDir  = path.join(ROOT, 'page-scripting', project);
-  const baseScriptPath = path.join(projectDir, baseScript);
+  const projectDir  = paths.resolveWorkflowDir(project);
+  const baseScriptPath = paths.resolveInside(projectDir, baseScript);
   const outputFolder   = path.join(projectDir, 'Variants');
   const tempDir        = path.join(DATA_DIR, `temp-${Date.now()}`);
 
@@ -570,12 +597,12 @@ app.post('/api/variants/generate', (req, res) => {
     if (items)     fs.writeFileSync(path.join(tempDir, 'Items'),     items.split('\n').filter(Boolean).join('\r\n'));
     if (locations) fs.writeFileSync(path.join(tempDir, 'Locations'), locations.split('\n').filter(Boolean).join('\r\n'));
   } catch (e) {
-    return res.status(500).json({ error: `Could not write temp data files: ${e.message}` });
+    return res.status(e.status || 500).json({ error: `Could not write temp data files: ${e.message}` });
   }
 
   res.json({ ok: true });
 
-  const psScript = path.join(ROOT, 'page-scripting', 'Generate-BC-Script-Variants.ps1');
+  const psScript = path.join(paths.PAGE_SCRIPTING, 'Generate-BC-Script-Variants.ps1');
   const proc = spawnPsFile(psScript, [
     '-BaseScriptPath', baseScriptPath,
     '-ProjectFolder',  tempDir,
@@ -621,7 +648,7 @@ app.post('/api/run', async (req, res) => {
     tempUsersPath = path.join(DATA_DIR, `users-${Date.now()}.json`);
     fs.writeFileSync(tempUsersPath, JSON.stringify(users, null, 2));
   } catch (e) {
-    return res.status(500).json({ error: `Could not resolve credentials: ${e.message}` });
+    return res.status(e.status || 500).json({ error: `Could not resolve credentials: ${e.message}` });
   }
 
   res.json({ ok: true });
@@ -652,12 +679,15 @@ app.post('/api/run', async (req, res) => {
     const projName = projectsToRun[idx];
     idx++;
     broadcast({ type: 'run-output', data: `\n=== [${idx}/${projectsToRun.length}] ${projName} ===\n` });
-    const projectPath = path.join(ROOT, 'page-scripting', projName);
-    const extraArgs = ['-WorkflowPath', projectPath, '-UsersPath', tempUsersPath, ...extraCommon];
+    let projectPath;
+    try { projectPath = paths.resolveWorkflowDir(projName); } catch (error) { broadcast({ type: 'run-output', data: `\n--- ${projName} error: ${error.message} ---\n` }); return runNext(); }
+    beginRun(projName);
+    const extraArgs = ['-WorkflowPath', projectPath, '-UsersPath', tempUsersPath, '-LibraryPath', paths.LIBRARY, ...extraCommon];
     const proc = spawnPsFile(psScript, extraArgs, { cwd: path.join(ROOT, 'bc-replay') });
     proc.stdout.on('data', d => broadcast({ type: 'run-output', data: d.toString() }));
     proc.stderr.on('data', d => broadcast({ type: 'run-output', data: d.toString() }));
     proc.on('close', code => {
+      endRun(projName);
       if (code !== 0 && stopOnFailure !== false) {
         broadcast({ type: 'run-output', data: `\n--- ${projName} failed (exit ${code}) — stopping. ---\n` });
         broadcast({ type: 'run-done', code });
@@ -667,6 +697,7 @@ app.post('/api/run', async (req, res) => {
       runNext();
     });
     proc.on('error', e => {
+      endRun(projName);
       broadcast({ type: 'run-output', data: `\n--- ${projName} error: ${e.message} ---\n` });
       broadcast({ type: 'run-done', code: 1, error: e.message });
       try { if (tempUsersPath) fs.unlinkSync(tempUsersPath); } catch {}
@@ -681,7 +712,7 @@ app.post('/api/run', async (req, res) => {
 
 // Returns info about what would be seeded — lets the UI show a preview
 app.get('/api/projects/:name/seed-info', (req, res) => {
-  const projectDir = path.join(ROOT, 'page-scripting', req.params.name);
+  const projectDir = paths.resolveWorkflowDir(req.params.name);
   const wfPath     = path.join(projectDir, 'workflow.json');
   const usersPath  = path.join(projectDir, 'users.json');
 
@@ -699,13 +730,13 @@ app.get('/api/projects/:name/seed-info', (req, res) => {
     }));
     res.json({ envName: req.params.name, bc_url: wf.bc_url || '', roles });
   } catch (e) {
-    res.status(500).json({ error: e.message });
+    res.status(e.status || 500).json({ error: e.message });
   }
 });
 
 // Actually seeds the environment — reads credentials from users.json and saves to Credential Manager
 app.post('/api/projects/:name/seed', async (req, res) => {
-  const projectDir = path.join(ROOT, 'page-scripting', req.params.name);
+  const projectDir = paths.resolveWorkflowDir(req.params.name);
   const wfPath     = path.join(projectDir, 'workflow.json');
   const usersPath  = path.join(projectDir, 'users.json');
 
@@ -745,7 +776,7 @@ app.post('/api/projects/:name/seed', async (req, res) => {
 
     res.json({ ok: true, envName, url, rolesSeeded: roles.length });
   } catch (e) {
-    res.status(500).json({ error: e.message });
+    res.status(e.status || 500).json({ error: e.message });
   }
 });
 
@@ -758,32 +789,21 @@ app.post('/api/projects/scaffold', (req, res) => {
   if (!projectName) return res.status(400).json({ error: 'projectName is required' });
   if (!workflow)    return res.status(400).json({ error: 'workflow is required' });
 
-  // ── Server-side validation (safety net for incomplete workflows) ──
-  const vErrors = [];
-  if (!workflow.steps || !workflow.steps.length) vErrors.push('At least one step is required.');
-  if (workflow.steps) {
-    for (const s of workflow.steps) {
-      const label = s.name || s.id || 'unknown';
-      if (!s.user) vErrors.push(`Step "${label}": user role is required.`);
-      if (s.type !== 'bc-api') {
-        if (!s.script && !(s.scripts && s.scripts.length)) vErrors.push(`Step "${label}": no script assigned.`);
-      }
-    }
-  }
-  if (vErrors.length) return res.status(400).json({ error: 'Workflow validation failed:\n' + vErrors.join('\n') });
+  if (!Array.isArray(workflow.steps) || !workflow.steps.length) return res.status(400).json({ error: 'Workflow validation failed:\nAt least one step is required.' });
+  try { validateWorkflow(workflow, library); }
+  catch (e) { return res.status(e.status || 400).json({ error: `Workflow validation failed:\n${e.message}` }); }
 
   // Prevent path traversal — keep only the final path segment and strip illegal chars
   const safeName = path.basename(projectName).replace(/[<>:"/\\|?*\x00-\x1f]/g, '-').replace(/[\s.]+$/, '').trim();
   if (!safeName) return res.status(400).json({ error: 'Invalid project name (after removing trailing dots/spaces and illegal characters, nothing remains)' });
 
-  const projDir    = path.join(ROOT, 'page-scripting', safeName);
-  const scriptsDir = path.join(projDir, 'scripts');
+  const projDir    = paths.resolveWorkflowDir(safeName);
 
   try {
-    fs.mkdirSync(scriptsDir, { recursive: true });
+    fs.mkdirSync(projDir, { recursive: true });
 
     // workflow.json
-    fs.writeFileSync(path.join(projDir, 'workflow.json'), JSON.stringify(workflow, null, 2));
+    workflowStore.write(safeName, workflow, library);
 
     // users.sample.json
     if (users) {
@@ -795,23 +815,14 @@ app.post('/api/projects/scaffold', (req, res) => {
       fs.writeFileSync(path.join(projDir, 'app-registrations.sample.json'), JSON.stringify(appRegistrations, null, 2));
     }
 
-    // .yml script files → scripts/
-    const savedScripts = [];
-    for (const { name, content } of scripts) {
-      if (!name || !content) continue;
-      const safeFName = path.basename(name);
-      fs.writeFileSync(path.join(scriptsDir, safeFName), content);
-      savedScripts.push(safeFName);
-    }
-
     res.json({
       ok: true,
       projectName: safeName,
       projectPath: path.relative(ROOT, projDir).replace(/\\/g, '/'),
-      savedScripts,
+      savedScripts: [],
     });
   } catch (e) {
-    res.status(500).json({ error: e.message });
+    res.status(e.status || 500).json({ error: e.message });
   }
 });
 
@@ -823,7 +834,7 @@ app.post('/api/evaluate', (req, res) => {
   const { project } = req.body;
   if (!project) return res.status(400).json({ error: 'project is required' });
 
-  const projectPath = path.join(ROOT, 'page-scripting', project);
+  const projectPath = paths.resolveWorkflowDir(project);
   const wfPath = path.join(projectPath, 'workflow.json');
   if (!fs.existsSync(wfPath)) return res.status(404).json({ error: 'workflow.json not found in project' });
 
@@ -890,7 +901,7 @@ function findSummaries(dir, base, results = []) {
 
 // Delete all result directories (reset)
 app.delete('/api/results', (_req, res) => {
-  const psBase = path.join(ROOT, 'page-scripting');
+  const psBase = paths.WORKFLOWS;
   let deleted = 0;
   try {
     const entries = fs.readdirSync(psBase, { withFileTypes: true });
@@ -904,13 +915,13 @@ app.delete('/api/results', (_req, res) => {
     }
     res.json({ ok: true, deleted });
   } catch (e) {
-    res.status(500).json({ error: e.message });
+    res.status(e.status || 500).json({ error: e.message });
   }
 });
 
 // List all available run summaries
 app.get('/api/results', (_req, res) => {
-  const psBase    = path.join(ROOT, 'page-scripting');
+  const psBase    = paths.WORKFLOWS;
   const summaries = findSummaries(psBase, psBase);
   summaries.sort((a, b) => new Date(b.start_time || 0) - new Date(a.start_time || 0));
   res.json(summaries);
@@ -920,7 +931,7 @@ app.get('/api/results', (_req, res) => {
 app.get('/api/results/detail', (req, res) => {
   const relDir = req.query.id;
   if (!relDir) return res.status(400).json({ error: 'id query param required' });
-  const summaryPath = path.join(ROOT, 'page-scripting', relDir, 'workflow-summary.json');
+  const summaryPath = paths.resolveInside(paths.WORKFLOWS, path.join(relDir, 'workflow-summary.json'));
   if (!fs.existsSync(summaryPath)) return res.status(404).json({ error: 'Not found' });
   try {
     const data = JSON.parse(fs.readFileSync(summaryPath, 'utf8'));
@@ -933,7 +944,7 @@ app.get('/api/results/detail', (req, res) => {
         let reportUrl = null;
         if (reportIndexAbs && fs.existsSync(reportIndexAbs)) {
           // Convert absolute path to a /result-files/ URL
-          const rel = path.relative(path.join(ROOT, 'page-scripting'), reportIndexAbs).replace(/\\/g, '/');
+          const rel = path.relative(paths.WORKFLOWS, reportIndexAbs).replace(/\\/g, '/');
           reportUrl = '/result-files/' + rel;
         }
         // Screenshots: look for attachments folder next to playwright-report
@@ -943,11 +954,11 @@ app.get('/api/results/detail', (req, res) => {
           fs.readdirSync(attachDir)
             .filter(f => /\.(png|jpg|jpeg|webp)$/i.test(f))
             .forEach(f => {
-              const rel = path.relative(path.join(ROOT, 'page-scripting'), path.join(attachDir, f)).replace(/\\/g, '/');
+              const rel = path.relative(paths.WORKFLOWS, path.join(attachDir, f)).replace(/\\/g, '/');
               screenshots.push('/result-files/' + rel);
             });
         }
-        const resultsRoot = path.join(ROOT, 'page-scripting');
+        const resultsRoot = paths.WORKFLOWS;
         const videoAbs = isWithinDirectory(resultsRoot, step.report_dir)
           ? findReplayVideo(step.report_dir)
           : null;
@@ -962,7 +973,7 @@ app.get('/api/results/detail', (req, res) => {
     }
     res.json(data);
   } catch (e) {
-    res.status(500).json({ error: e.message });
+    res.status(e.status || 500).json({ error: e.message });
   }
 });
 
@@ -975,11 +986,12 @@ app.get('/api/results/step-data', (req, res) => {
   if (!reportDir) return res.status(400).json({ error: 'dir query param required' });
 
   try {
-    const outcomes = readActionOutcomes(reportDir);
+    const relativeDir = path.relative(paths.WORKFLOWS, reportDir);
+    const outcomes = readActionOutcomes(paths.resolveInside(paths.WORKFLOWS, relativeDir));
     if (!outcomes) return res.status(404).json({ error: 'No playwright-report/data found' });
     res.json(outcomes);
   } catch (e) {
-    res.status(500).json({ error: e.message });
+    res.status(e.status || 500).json({ error: e.message });
   }
 });
 
@@ -990,7 +1002,7 @@ app.get('/api/results/step-data', (req, res) => {
 app.get('/api/results/pdf', (req, res) => {
   const relDir = req.query.id;
   if (!relDir) return res.status(400).json({ error: 'id query param required' });
-  const summaryPath = path.join(ROOT, 'page-scripting', relDir, 'workflow-summary.json');
+  const summaryPath = paths.resolveInside(paths.WORKFLOWS, path.join(relDir, 'workflow-summary.json'));
   if (!fs.existsSync(summaryPath)) return res.status(404).json({ error: 'Not found' });
 
   try {
@@ -998,7 +1010,7 @@ app.get('/api/results/pdf', (req, res) => {
 
     // Load captured values from workflow-state.json if present
     let capturedState = {};
-    const statePath = path.join(ROOT, 'page-scripting', relDir, 'workflow-state.json');
+    const statePath = paths.resolveInside(paths.WORKFLOWS, path.join(relDir, 'workflow-state.json'));
     if (fs.existsSync(statePath)) {
       try { capturedState = JSON.parse(fs.readFileSync(statePath, 'utf8')); } catch {}
     }
@@ -1240,6 +1252,7 @@ app.get('/api/results/pdf', (req, res) => {
         // Metadata (2-col)
         const mdPairs = [
           ['ID',        step.id || '-',         'User',       step.user || '-'],
+          ['Script',    step.scriptName ? `${step.scriptName} v${step.scriptVersion}` : '-', 'Version date', step.scriptVersionDate || '-'],
           ['Start',     step.start_time  ? new Date(step.start_time).toLocaleString('en-GB')  : '-',
            'End',       step.end_time    ? new Date(step.end_time).toLocaleString('en-GB')    : '-'],
           ['Duration',  step.duration_s != null ? step.duration_s + ' s' : '-',
@@ -1339,7 +1352,7 @@ app.get('/api/results/pdf', (req, res) => {
 
     doc.end();
   } catch (e) {
-    res.status(500).json({ error: e.message });
+    res.status(e.status || 500).json({ error: e.message });
   }
 });
 
@@ -1376,9 +1389,17 @@ app.get('/api/health/deps', (_req, res) => {
   res.json(checkDeps());
 });
 
+app.use('/api', (_req, res) => res.status(404).json({ error: 'API route not found' }));
+app.use((error, _req, res, _next) => {
+  const status = error.status || (error.code === 'ENOENT' ? 404 : 500);
+  const body = { error: error.message || 'Internal server error' };
+  if (error.usage) body.usage = error.usage;
+  res.status(status).json(body);
+});
+
 // ── Start server ──────────────────────────────────────────────────────────────
-const PORT = process.env.PORT || 3333;
-server.listen(PORT, '127.0.0.1', () => {
+function startServer(port = process.env.PORT || 3333) {
+  return server.listen(port, '127.0.0.1', () => {
   // Warn about missing deps at startup
   const deps = checkDeps();
   if (!deps.allOk) {
@@ -1388,13 +1409,16 @@ server.listen(PORT, '127.0.0.1', () => {
     if (!deps.chromiumInstalled)
       console.warn('  [WARN] Playwright Chromium not found. Run: cd bc-replay && npx playwright install chromium');
   }
-  const url = `http://localhost:${PORT}`;
+  const url = `http://localhost:${port}`;
   console.log('');
   console.log('  4PS Test Automation');
   console.log(`  Running at: ${url}`);
   console.log('');
   // Open in default browser (Windows)
   exec(`start ${url}`, { shell: true });
-});
+  });
+}
 
 process.on('SIGINT', () => { wss.close(); server.close(); process.exit(0); });
+if (require.main === module) startServer();
+module.exports = { app, server, startServer };

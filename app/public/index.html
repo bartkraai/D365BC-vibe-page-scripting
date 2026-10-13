@@ -21,6 +21,8 @@
         <span class="nav-icon">🔑</span><span class="nav-label">Environments</span>
       </li>      <li class="nav-item" data-tab="catalog">
         <span class="nav-icon">&#x1F4C2;</span><span class="nav-label">Test Catalog</span>
+      </li>      <li class="nav-item" data-tab="library">
+        <span class="nav-icon">&#128218;</span><span class="nav-label">Script Library</span>
       </li>      <li class="nav-item" data-tab="workflow">
         <span class="nav-icon">⬡</span><span class="nav-label">4PS Test Flow Builder</span>
       </li>
@@ -267,6 +269,13 @@
       <div class="mt-md" style="text-align:center">
         <button class="btn btn-secondary" id="btn-cat-add-vc">+ Add Type</button>
       </div>
+    </section>
+
+    <!-- ── SCRIPT LIBRARY ── -->
+    <section id="tab-library" class="tab">
+      <div class="page-header"><h1>Script Library</h1><div class="header-actions"><button class="btn btn-secondary" id="btn-library-folder">+ New folder</button><button class="btn btn-primary" id="btn-library-upload">Upload script</button><input id="library-upload-input" type="file" accept=".yml,.yaml" hidden></div></div>
+      <div class="library-layout"><aside class="card library-folders"><label for="library-search">Search scripts</label><input id="library-search" class="input" type="search" placeholder="Name or description"><div id="library-folder-tree" class="library-tree" aria-label="Library folders"></div></aside><section class="card library-content"><div id="library-list"></div><div id="library-detail" class="library-detail" aria-live="polite"></div></section></div>
+      <div id="modal-library" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modal-library-title"><div class="modal-backdrop"></div><div class="modal-box"><h2 id="modal-library-title">Script Library</h2><div id="modal-library-body"></div><div class="modal-actions"><button class="btn btn-secondary" id="btn-library-cancel">Cancel</button><button class="btn btn-primary" id="btn-library-confirm">Save</button></div></div></div>
     </section>
 
     <!-- ── TEST FLOW BUILDER ── -->

@@ -81,6 +81,10 @@ function New-WorkflowReport {
             end_time   = $r.end_time.ToString("o")
             duration_s = $r.duration_s
             report_dir = if ($r.report_dir) { (Resolve-Path $r.report_dir -ErrorAction SilentlyContinue)?.Path ?? $r.report_dir } else { $null }
+            scriptId = $r.scriptId
+            scriptName = $r.scriptName
+            scriptVersion = $r.scriptVersion
+            scriptVersionDate = $r.scriptVersionDate
         }
         if ($r.sub_results) {
             $stepData.sub_results = @()
@@ -94,6 +98,10 @@ function New-WorkflowReport {
                     end_time   = $sub.end_time.ToString("o")
                     duration_s = $sub.duration_s
                     report_dir = if ($sub.report_dir) { (Resolve-Path $sub.report_dir -ErrorAction SilentlyContinue)?.Path ?? $sub.report_dir } else { $null }
+                    scriptId = $sub.scriptId
+                    scriptName = $sub.scriptName
+                    scriptVersion = $sub.scriptVersion
+                    scriptVersionDate = $sub.scriptVersionDate
                 }
             }
         }
@@ -135,7 +143,7 @@ function New-WorkflowReport {
         $stepsHtml += @"
         <tr>
             <td>$($r.id)</td>
-            <td><strong>$($r.name)</strong></td>
+            <td><strong>$($r.name)</strong>$(if ($r.scriptName) { " <span style=`"color:#666;font-size:.85em`">$($r.scriptName) v$($r.scriptVersion)</span>" })</td>
             <td>$($r.user)</td>
             <td>
                 <span class="badge" style="background:$badgeColor">$($r.status.ToUpper())</span>
@@ -169,7 +177,7 @@ function New-WorkflowReport {
                 $stepsHtml += @"
         <tr style="background:#fafafa">
             <td></td>
-            <td style="padding-left:28px;font-size:0.88em;color:#666">$($sub.label)</td>
+            <td style="padding-left:28px;font-size:0.88em;color:#666">$(if ($sub.scriptName) { "$($sub.scriptName) v$($sub.scriptVersion)" } else { $sub.label })</td>
             <td></td>
             <td>
                 <span class="badge" style="background:$subBadgeColor;font-size:0.75em;padding:2px 7px">$($sub.status.ToUpper())</span>
