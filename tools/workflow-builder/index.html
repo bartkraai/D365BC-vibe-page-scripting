@@ -173,6 +173,12 @@ main { flex: 1; display: flex; overflow: hidden; }
 
 /* ── Form Fields ───────────────────────────────────────────────────── */
 label { display: flex; align-items: center; font-size: 12px; font-weight: 500; margin-bottom: 4px; color: var(--text-muted); gap: 0; }
+.library-picker-row { display: flex; align-items: flex-start; justify-content: flex-start; gap: 10px; margin: 0; padding: 10px 8px; border-bottom: 1px solid var(--border); color: var(--text); cursor: pointer; text-align: left; }
+.library-picker-row:hover { background: var(--bg); }
+.library-picker-row input[type="checkbox"] { flex: 0 0 auto; width: 16px; height: 16px; margin: 2px 0 0; padding: 0; }
+.library-picker-text { flex: 1; min-width: 0; }
+.library-picker-text strong { display: block; font-size: 13px; overflow-wrap: anywhere; }
+.library-picker-text small { display: block; margin-top: 2px; color: var(--text-muted); font-weight: 400; }
 input, select, textarea {
   width: 100%; padding: 7px 10px; border: 1px solid var(--border);
   border-radius: var(--radius); font-size: 13px; color: var(--text);
@@ -1849,9 +1855,10 @@ function moveStep(stepId, direction) {
 
 function selectStep(stepId) {
   state.selectedStepId = stepId;
+  document.getElementById('properties-panel').classList.remove('hidden');
   renderCanvas();
   renderProperties();
-  document.getElementById('properties-panel').classList.remove('hidden');
+  if (!state.library) loadLibrary().then(() => { if (state.selectedStepId === stepId) renderProperties(); });
 }
 
 function closeProperties() {
@@ -1866,19 +1873,19 @@ function closeProperties() {
 
 // Phase 3: get parameters from assigned scripts that have no inject mapping (or empty mapping)
 function getUnresolvedParams(step) {
-  const scripts = step.scripts && step.scripts.length ? step.scripts : (step.script ? [step.script] : []);
-  const allParams = [];
-  for (const sp of scripts) {
-    const fn = sp?.replace('./scripts/', '');
-    const meta = state.scripts[fn];
-    if (meta) allParams.push(...meta.parameters);
+  const allParams = (step.scriptIds || []).flatMap(id => step.libraryMeta?.[id]?.parameters || []);
+  const legacyScripts = step.scripts && step.scripts.length ? step.scripts : (step.script ? [step.script] : []);
+  for (const script of legacyScripts) {
+    const fileName = script?.replace('./scripts/', '');
+    const meta = state.scripts[fileName];
+    if (meta) allParams.push(...(meta.parameters || []));
   }
   const uniqueParams = [...new Set(allParams)];
   if (!uniqueParams.length) return [];
   const mappedParams = Object.entries(step.inject || {})
-    .filter(([, val]) => val && val.trim() !== '')
+    .filter(([, value]) => typeof value === 'string' && value.trim() !== '')
     .map(([key]) => key);
-  return uniqueParams.filter(p => !mappedParams.includes(p));
+  return uniqueParams.filter(parameter => !mappedParams.includes(parameter));
 }
 
 function renderCanvas() {
@@ -2387,7 +2394,7 @@ function renderPropertiesReplay(step) {
   const stepScriptIds = step.scriptIds || [];
   const stepScripts = step.legacyScripts || [];
   const scriptsListHtml = stepScriptIds.map((id, i) => {
-    const item = state.library.scripts.find(x => x.id === id) || { name: id };
+    const item = (state.library?.scripts || []).find(x => x.id === id) || { name: id };
     return `<div style="display:flex;align-items:center;gap:4px;padding:4px 0;border-bottom:1px solid var(--border)"><span style="font-size:12px;flex:1">${escHtml(item.name)} · v${item.latestVersion || '—'}${item.latestVersionDate ? ' · ' + new Date(item.latestVersionDate).toLocaleDateString() : ''}</span>${i > 0 ? `<button class="btn-sm btn-icon" aria-label="Move script up" onclick="moveLibraryScriptInStep('${escAttr(step.id)}',${i},-1)">&uarr;</button>` : ''}${i < stepScriptIds.length - 1 ? `<button class="btn-sm btn-icon" aria-label="Move script down" onclick="moveLibraryScriptInStep('${escAttr(step.id)}',${i},1)">&darr;</button>` : ''}<button class="btn-sm btn-icon" aria-label="Remove script" style="color:var(--danger)" onclick="removeLibraryScriptFromStep('${escAttr(step.id)}',${i})">&times;</button></div>`;
   }).join('') + (stepScripts.length ? `<div class="validation-msg warning">Legacy – migrate: ${stepScripts.map(escHtml).join(', ')}. Select library scripts before saving.</div>` : '');
 
@@ -2408,7 +2415,7 @@ function renderPropertiesReplay(step) {
   // Detect suggested captures/injects from assigned scripts
   const stepScriptsForMeta = step.scripts && step.scripts.length ? step.scripts : (step.script ? [step.script] : []);
   const scriptFile = stepScriptsForMeta[0]?.replace('./scripts/', '');
-  const scriptMeta = step.libraryMeta?.[step.scriptIds?.[0]] || state.scripts[scriptFile];
+  const scriptMeta = step.scriptIds?.map(id => step.libraryMeta?.[id]).find(Boolean) || state.scripts[scriptFile];
   let suggestions = '';
 
   if (scriptMeta) {
@@ -2573,18 +2580,10 @@ function renderPropertiesReplay(step) {
       ${!state.companies.length ? '<span class="text-sm text-muted">No companies configured. Add them in the Environment settings.</span>' : ''}
     </div>
     <div class="field-group">
-      <label class="flex justify-between items-center">
-        Scripts (.yml) ${fieldTip('Assign one or more .yml page scripts to this step. Scripts run in order. Upload scripts in the sidebar Script Library first.')}
-        ${addableScriptOptions ? `<span class="add-row-btn" onclick="toggleAddScriptSelect('${escAttr(step.id)}')">+ Add</span>` : ''}
-      </label>
+      <label>Scripts ${fieldTip('Select reusable page scripts from the central library. Workflows use the latest version automatically.')}</label>
       ${scriptsListHtml || '<div class="text-sm text-muted">No scripts assigned.</div>'}
-      <div id="add-script-sel-${escAttr(step.id)}" class="hidden mt-2">
-        <select onchange="addScriptToStep('${escAttr(step.id)}', this.value); this.value=''">
-          <option value="">-- select script --</option>
-          ${addableScriptOptions}
-        </select>
-      </div>
-      <span class="text-sm text-muted" style="margin-top:4px">Scripts run in order. Or drag from the library onto the step card.</span>
+      <button type="button" class="btn-sm mt-2" onclick="openLibraryPicker('${escAttr(step.id)}')">Choose from Script Library</button>
+      <span class="text-sm text-muted" style="margin-top:4px">Scripts run in order. The latest version is used for each run.</span>
     </div>
     <div class="field-group">
       <label>Depends On ${fieldTip('Which step must complete before this one starts. Controls execution order. Leave empty for the first step in the workflow.')}</label>
@@ -2803,7 +2802,7 @@ async function openLibraryPicker(stepId) {
   overlay.style.cssText='position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center';
   overlay.innerHTML='<div style="width:min(680px,94vw);max-height:85vh;overflow:auto;background:#fff;border-radius:8px;padding:20px"><div style="display:flex;justify-content:space-between;gap:12px;align-items:center"><h2 style="font-size:17px">Choose library scripts</h2><button type="button" aria-label="Close picker">×</button></div><label style="display:block;margin:12px 0 6px">Search<input class="library-picker-search" style="width:100%;padding:7px" autofocus placeholder="Search scripts"></label><div class="library-picker-list" style="max-height:45vh;overflow:auto"></div><div style="display:flex;gap:8px;justify-content:space-between;margin-top:14px"><button type="button" class="library-upload-shortcut">Upload to library</button><span><button type="button" class="library-cancel">Cancel</button> <button type="button" class="btn-primary library-add">Add selected</button></span></div></div>';
   document.body.append(overlay); const close=()=>{overlay.remove();trigger?.focus();}; const search=overlay.querySelector('.library-picker-search'), list=overlay.querySelector('.library-picker-list');
-  const render=()=>{const q=search.value.toLowerCase();const folderName=id=>state.library.folders.find(f=>f.id===id)?.name||'Root';const rows=state.library.scripts.filter(x=>`${x.name} ${x.description||''}`.toLowerCase().includes(q)).map(x=>`<label style="display:flex;gap:8px;padding:8px;border-bottom:1px solid #e0e0e0"><input type="checkbox" value="${escAttr(x.id)}" ${step.scriptIds?.includes(x.id)?'checked':''}><span style="flex:1"><strong>${escHtml(x.name)}</strong><small style="display:block;color:#777">${escHtml(folderName(x.folderId))} · v${x.latestVersion||'—'}${x.latestVersionDate?' · '+new Date(x.latestVersionDate).toLocaleDateString():''}</small></span></label>`).join('');list.innerHTML=rows||'<p style="padding:12px;color:#777">No scripts found.</p>';}; render(); search.oninput=render;
+  const render=()=>{const q=search.value.toLowerCase();const folderName=id=>state.library.folders.find(f=>f.id===id)?.name||'Root';const rows=state.library.scripts.filter(x=>`${x.name} ${x.description||''}`.toLowerCase().includes(q)).map(x=>`<label class="library-picker-row"><input type="checkbox" value="${escAttr(x.id)}" ${step.scriptIds?.includes(x.id)?'checked':''}><span class="library-picker-text"><strong>${escHtml(x.name)}</strong><small>${escHtml(folderName(x.folderId))} · v${x.latestVersion||'—'}${x.latestVersionDate?' · '+new Date(x.latestVersionDate).toLocaleDateString():''}</small></span></label>`).join('');list.innerHTML=rows||'<p style="padding:12px;color:#777">No scripts found.</p>';}; render(); search.oninput=render;
   overlay.querySelector('.library-add').onclick=()=>{step.scriptIds=[...list.querySelectorAll('input:checked')].map(x=>x.value);step.scriptIds.forEach(id=>fetchLibraryScriptMeta(step.id,id));close();renderCanvas();renderProperties();}; overlay.querySelector('.library-cancel').onclick=close;overlay.querySelector('[aria-label="Close picker"]').onclick=close;
   overlay.querySelector('.library-upload-shortcut').onclick=()=>{const input=document.createElement('input');input.type='file';input.accept='.yml,.yaml';input.onchange=async()=>{const file=input.files[0];if(!file)return;try{const response=await fetch('/api/library/scripts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:file.name.replace(/\.ya?ml$/i,''),folderId:null,fileName:file.name,content:await file.text()})});const created=await response.json().catch(()=>({}));if(!response.ok)throw new Error(created.error||`HTTP ${response.status}`);await loadLibrary();step.scriptIds ||= [];if(created.id&&!step.scriptIds.includes(created.id))step.scriptIds.push(created.id);render();toast('Uploaded to library','success');}catch(e){toast(`Upload failed: ${e.message}`,'error');}};input.click();};
   overlay.addEventListener('keydown',e=>{if(e.key==='Escape'){close();return;}if(e.key==='Tab'){const f=[...overlay.querySelectorAll('button,input')].filter(x=>!x.disabled),first=f[0],last=f.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}}}); search.focus();
