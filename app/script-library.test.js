@@ -19,6 +19,10 @@ test('script library enforces names, cycles, versions, usage and latest content'
     assert.equal(library.addVersion(script.id, { fileName: 'copy.yml', content: 'name: test' }).unchanged, true);
     assert.equal(library.addVersion(script.id, { fileName: 'next.yml', content: 'name: next' }).version, 2);
     assert.equal(library.content(script.id, 'latest').content, 'name: next');
+    assert.throws(() => library.createScript({ name: 'test', folderId: folder.id, fileName: 'dup.yml', content: 'name: dup' }), error => error.status === 409);
+    const other = library.createScript({ name: 'Test', folderId: child.id, fileName: 'other.yml', content: 'name: other' });
+    assert.throws(() => library.updateScript(other.id, { folderId: folder.id }), error => error.status === 409);
+    assert.equal(library.updateScript(other.id, { name: 'Child' }).name, 'Child');
     fs.mkdirSync(path.join(workflows, 'one'));
     fs.writeFileSync(path.join(workflows, 'one', 'workflow.json'), JSON.stringify({ steps: [{ id: 'a', scriptIds: [script.id] }] }));
     assert.throws(() => library.deleteScript(script.id), error => error.status === 409 && error.usage.length === 1);

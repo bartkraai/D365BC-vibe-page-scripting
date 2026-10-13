@@ -2,42 +2,52 @@
   "schemaVersion": 1,
   "folders": [
     {
-      "id": "f-afc667ab-2f41-4478-a7ec-8b80f94c3d00",
-      "name": "Imported - Binnenlandse opdrachtgever",
+      "id": "f-1d7df240-40f5-4678-bfb2-614c1057d61b",
+      "name": "Aanmaken inkooporder",
       "parentId": null
     },
     {
-      "id": "f-63b42fe9-8a3c-4bd5-9e82-5f104efe6ccf",
-      "name": "Imported - Demo UAV vaste termijnen (light versie)",
+      "id": "f-d443648a-34a3-4f60-b22d-7a559bdbccfd",
+      "name": "Goedkeuring inkooporder",
       "parentId": null
     },
     {
-      "id": "f-fc412f16-5bfd-41fd-81cc-a0bef806929b",
-      "name": "Imported - Switch Role and Permissions",
+      "id": "f-94d0ae6a-3d2f-4ec7-9076-33e7a779b2c4",
+      "name": "Inkooporder ontvangst",
       "parentId": null
     },
     {
-      "id": "f-c966fb6e-bacb-4a79-8430-21b45e589cc1",
-      "name": "Imported - Termijnschema",
+      "id": "f-385823a0-b7be-4be6-b267-0449d1a793ca",
+      "name": "Periodieke administratie",
       "parentId": null
     },
     {
-      "id": "f-882305bc-0a02-44aa-8290-3a63d171b450",
-      "name": "Imported - UAV Project",
+      "id": "f-8f97ef7c-70d2-4016-b37e-ccc9ce59840d",
+      "name": "Project inrichten",
       "parentId": null
     },
     {
-      "id": "f-2594cad3-8cb9-41ea-83cc-0bf5a5eb25db",
-      "name": "Imported - UAV Project (3)",
+      "id": "f-4ef85e4d-3a40-4d53-8c4a-2cfa26b07586",
+      "name": "Projectregistratie",
+      "parentId": null
+    },
+    {
+      "id": "f-09dc4ba5-1a8d-42f8-a3e8-2480b0c933cd",
+      "name": "Van traject registratie tm vervolgtraject",
+      "parentId": null
+    },
+    {
+      "id": "f-6c29e75b-0d5c-45fe-8c55-f92365ffdd0f",
+      "name": "Rollen en rechten",
       "parentId": null
     }
   ],
   "scripts": [
     {
       "id": "s-23ca3770-c8df-4b9f-b6e0-b3d6b84a1036",
-      "name": "Aanmaken inkooporder 3",
+      "name": "Aanmaken inkooporder - Standaard",
       "description": "",
-      "folderId": "f-afc667ab-2f41-4478-a7ec-8b80f94c3d00",
+      "folderId": "f-1d7df240-40f5-4678-bfb2-614c1057d61b",
       "versions": [
         {
           "version": 1,
@@ -49,9 +59,9 @@
     },
     {
       "id": "s-47c0995e-7e10-46d7-aab9-ded6ccea005c",
-      "name": "Goedkeuring inkooporder 3",
+      "name": "Goedkeuring inkooporder - Standaard",
       "description": "",
-      "folderId": "f-afc667ab-2f41-4478-a7ec-8b80f94c3d00",
+      "folderId": "f-d443648a-34a3-4f60-b22d-7a559bdbccfd",
       "versions": [
         {
           "version": 1,
@@ -63,9 +73,9 @@
     },
     {
       "id": "s-a19ec0a0-2a49-4bb6-b856-5f1936140610",
-      "name": "Inkooporder ontvangstregistratie 3",
+      "name": "Inkooporder ontvangstregistratie - Standaard",
       "description": "",
-      "folderId": "f-afc667ab-2f41-4478-a7ec-8b80f94c3d00",
+      "folderId": "f-94d0ae6a-3d2f-4ec7-9076-33e7a779b2c4",
       "versions": [
         {
           "version": 1,
@@ -77,9 +87,9 @@
     },
     {
       "id": "s-367d050b-a20d-4c47-a03d-6ffd29a8fc21",
-      "name": "Periodieke administratie 3",
+      "name": "Periodieke administratie - Standaard",
       "description": "",
-      "folderId": "f-afc667ab-2f41-4478-a7ec-8b80f94c3d00",
+      "folderId": "f-385823a0-b7be-4be6-b267-0449d1a793ca",
       "versions": [
         {
           "version": 1,
@@ -91,9 +101,9 @@
     },
     {
       "id": "s-f7dc6867-79dc-456b-9fcb-8414111fedab",
-      "name": "Project inrichten en 1e prognose 3",
+      "name": "Project inrichten en 1e prognose - Standaard",
       "description": "",
-      "folderId": "f-afc667ab-2f41-4478-a7ec-8b80f94c3d00",
+      "folderId": "f-8f97ef7c-70d2-4016-b37e-ccc9ce59840d",
       "versions": [
         {
           "version": 1,
@@ -105,9 +115,9 @@
     },
     {
       "id": "s-5d141cbc-8c04-48d7-af9b-755e8158551e",
-      "name": "Projectregistratie 3",
+      "name": "Projectregistratie - Standaard",
       "description": "",
-      "folderId": "f-afc667ab-2f41-4478-a7ec-8b80f94c3d00",
+      "folderId": "f-4ef85e4d-3a40-4d53-8c4a-2cfa26b07586",
       "versions": [
         {
           "version": 1,
@@ -119,9 +129,9 @@
     },
     {
       "id": "s-10dcbd0a-75d7-4c23-97ce-ddfa933507ea",
-      "name": "Van traject registratie tm vervolgtraject 3",
+      "name": "Van traject registratie tm vervolgtraject - Standaard",
       "description": "",
-      "folderId": "f-afc667ab-2f41-4478-a7ec-8b80f94c3d00",
+      "folderId": "f-09dc4ba5-1a8d-42f8-a3e8-2480b0c933cd",
       "versions": [
         {
           "version": 1,
@@ -133,9 +143,9 @@
     },
     {
       "id": "s-86f3d529-f285-4277-bdeb-1d41a613a1d8",
-      "name": "Aanmaken inkooporder ter goedkeuring 1",
+      "name": "Aanmaken inkooporder ter goedkeuring - Demo UAV light",
       "description": "",
-      "folderId": "f-63b42fe9-8a3c-4bd5-9e82-5f104efe6ccf",
+      "folderId": "f-1d7df240-40f5-4678-bfb2-614c1057d61b",
       "versions": [
         {
           "version": 1,
@@ -147,9 +157,9 @@
     },
     {
       "id": "s-5cb1598b-1ca9-4350-972a-6dd7001f3990",
-      "name": "Eerste periodieke administratie 1",
+      "name": "Eerste periodieke administratie - Demo UAV light",
       "description": "",
-      "folderId": "f-63b42fe9-8a3c-4bd5-9e82-5f104efe6ccf",
+      "folderId": "f-385823a0-b7be-4be6-b267-0449d1a793ca",
       "versions": [
         {
           "version": 1,
@@ -161,9 +171,9 @@
     },
     {
       "id": "s-911b6f2a-4073-461b-8bf4-6134939991df",
-      "name": "Goedkeuren inkooporder 1",
+      "name": "Goedkeuring inkooporder - Demo UAV light",
       "description": "",
-      "folderId": "f-63b42fe9-8a3c-4bd5-9e82-5f104efe6ccf",
+      "folderId": "f-d443648a-34a3-4f60-b22d-7a559bdbccfd",
       "versions": [
         {
           "version": 1,
@@ -175,9 +185,9 @@
     },
     {
       "id": "s-ae7fccba-1e12-4e21-ad30-32eb35beb6ee",
-      "name": "ontvangst boeken inkooporder 1",
+      "name": "Ontvangst boeken inkooporder - Demo UAV light",
       "description": "",
-      "folderId": "f-63b42fe9-8a3c-4bd5-9e82-5f104efe6ccf",
+      "folderId": "f-94d0ae6a-3d2f-4ec7-9076-33e7a779b2c4",
       "versions": [
         {
           "version": 1,
@@ -189,9 +199,9 @@
     },
     {
       "id": "s-522f8bf5-2438-4b23-81b6-2d4c4ede3c48",
-      "name": "Project aanmaken en financieel inrichten 1",
+      "name": "Project aanmaken en financieel inrichten - Demo UAV light",
       "description": "",
-      "folderId": "f-63b42fe9-8a3c-4bd5-9e82-5f104efe6ccf",
+      "folderId": "f-8f97ef7c-70d2-4016-b37e-ccc9ce59840d",
       "versions": [
         {
           "version": 1,
@@ -203,9 +213,9 @@
     },
     {
       "id": "s-5161f358-58c9-4e62-8f82-9f5999004251",
-      "name": "Project inrichten en 1e prognose 3",
+      "name": "Project inrichten en 1e prognose - Demo UAV light",
       "description": "",
-      "folderId": "f-63b42fe9-8a3c-4bd5-9e82-5f104efe6ccf",
+      "folderId": "f-8f97ef7c-70d2-4016-b37e-ccc9ce59840d",
       "versions": [
         {
           "version": 1,
@@ -219,7 +229,7 @@
       "id": "s-c0f34fe0-cf42-4d5c-a6cc-94a6f20ea4fa",
       "name": "Transfer to Rol ACQ en Perms. ACQ",
       "description": "",
-      "folderId": "f-fc412f16-5bfd-41fd-81cc-a0bef806929b",
+      "folderId": "f-6c29e75b-0d5c-45fe-8c55-f92365ffdd0f",
       "versions": [
         {
           "version": 1,
@@ -231,9 +241,9 @@
     },
     {
       "id": "s-734428c4-03f3-4470-af30-5f90fbe725e5",
-      "name": "Aanmaken inkooporder 3",
+      "name": "Aanmaken inkooporder - Termijnschema",
       "description": "",
-      "folderId": "f-c966fb6e-bacb-4a79-8430-21b45e589cc1",
+      "folderId": "f-1d7df240-40f5-4678-bfb2-614c1057d61b",
       "versions": [
         {
           "version": 1,
@@ -245,9 +255,9 @@
     },
     {
       "id": "s-b96cb21f-7370-4992-949a-5d78417e4448",
-      "name": "Inkooporder ontvangstregistratie 3",
+      "name": "Inkooporder ontvangstregistratie - Termijnschema",
       "description": "",
-      "folderId": "f-c966fb6e-bacb-4a79-8430-21b45e589cc1",
+      "folderId": "f-94d0ae6a-3d2f-4ec7-9076-33e7a779b2c4",
       "versions": [
         {
           "version": 1,
@@ -259,9 +269,9 @@
     },
     {
       "id": "s-68e0c48f-aef7-4232-a26f-9b404b1ad2dc",
-      "name": "Project aanmaken en financieel inrichten 1 CB",
+      "name": "Project aanmaken en financieel inrichten CB - Termijnschema",
       "description": "",
-      "folderId": "f-c966fb6e-bacb-4a79-8430-21b45e589cc1",
+      "folderId": "f-8f97ef7c-70d2-4016-b37e-ccc9ce59840d",
       "versions": [
         {
           "version": 1,
@@ -273,9 +283,9 @@
     },
     {
       "id": "s-e583e5c2-bfa5-4b7d-a120-eb7c66f5b921",
-      "name": "Aanmaken inkooporder 2",
+      "name": "Aanmaken inkooporder - UAV Project",
       "description": "",
-      "folderId": "f-882305bc-0a02-44aa-8290-3a63d171b450",
+      "folderId": "f-1d7df240-40f5-4678-bfb2-614c1057d61b",
       "versions": [
         {
           "version": 1,
@@ -286,24 +296,10 @@
       ]
     },
     {
-      "id": "s-67e66ec7-f60a-484d-a162-ff6e3de3ec5b",
-      "name": "Aanmaken inkooporder",
-      "description": "",
-      "folderId": "f-882305bc-0a02-44aa-8290-3a63d171b450",
-      "versions": [
-        {
-          "version": 1,
-          "createdAt": "2026-10-13T11:14:44.802Z",
-          "sha256": "17a7bda9405d42c33eac337bec935b773e0041b7142b4d3a690e0461a51f45da",
-          "fileName": "Aanmaken inkooporder.yml"
-        }
-      ]
-    },
-    {
       "id": "s-43deda09-c9da-4a96-868b-2f9a7d270b12",
-      "name": "Goedkeuring inkooporder 2",
+      "name": "Goedkeuring inkooporder - UAV Project",
       "description": "",
-      "folderId": "f-882305bc-0a02-44aa-8290-3a63d171b450",
+      "folderId": "f-d443648a-34a3-4f60-b22d-7a559bdbccfd",
       "versions": [
         {
           "version": 1,
@@ -314,24 +310,10 @@
       ]
     },
     {
-      "id": "s-19a13bf2-9078-4e11-adfa-001b92f02c98",
-      "name": "Goedkeuring inkooporder",
-      "description": "",
-      "folderId": "f-882305bc-0a02-44aa-8290-3a63d171b450",
-      "versions": [
-        {
-          "version": 1,
-          "createdAt": "2026-10-13T11:14:44.813Z",
-          "sha256": "167c8836a1f2ee459d221078751569b1572cd9be7faca8ca93510c651e95cf5d",
-          "fileName": "Goedkeuring inkooporder.yml"
-        }
-      ]
-    },
-    {
       "id": "s-223272f1-fa45-4f39-b876-d6b9a885aa5a",
-      "name": "Inkooporder ontvangst 2",
+      "name": "Inkooporder ontvangst - UAV Project",
       "description": "",
-      "folderId": "f-882305bc-0a02-44aa-8290-3a63d171b450",
+      "folderId": "f-94d0ae6a-3d2f-4ec7-9076-33e7a779b2c4",
       "versions": [
         {
           "version": 1,
@@ -342,24 +324,10 @@
       ]
     },
     {
-      "id": "s-64382637-458b-4b71-8470-b26e050bdfc3",
-      "name": "Inkooporder ontvangst",
-      "description": "",
-      "folderId": "f-882305bc-0a02-44aa-8290-3a63d171b450",
-      "versions": [
-        {
-          "version": 1,
-          "createdAt": "2026-10-13T11:14:44.825Z",
-          "sha256": "6ee1dfba876a069f7da16eb055d64a7d88e1c49f5e1a5e227c5e07e530737190",
-          "fileName": "Inkooporder ontvangst.yml"
-        }
-      ]
-    },
-    {
       "id": "s-b31b7934-af41-4c25-aef8-59f277e361f4",
-      "name": "Periodieke administratie 2",
+      "name": "Periodieke administratie - UAV Project",
       "description": "",
-      "folderId": "f-882305bc-0a02-44aa-8290-3a63d171b450",
+      "folderId": "f-385823a0-b7be-4be6-b267-0449d1a793ca",
       "versions": [
         {
           "version": 1,
@@ -370,24 +338,10 @@
       ]
     },
     {
-      "id": "s-59c23806-db5f-4099-b045-7067da69bbce",
-      "name": "Periodieke administratie",
-      "description": "",
-      "folderId": "f-882305bc-0a02-44aa-8290-3a63d171b450",
-      "versions": [
-        {
-          "version": 1,
-          "createdAt": "2026-10-13T11:14:44.835Z",
-          "sha256": "c566f824d9fed845c7155fcd56f48bd399654c3307acc547f7a47b97d3ef319c",
-          "fileName": "Periodieke administratie.yml"
-        }
-      ]
-    },
-    {
       "id": "s-9048c1b8-2e2b-4ec2-aaa4-df56c3493c12",
-      "name": "Project inrichten en 1e prognose 2",
+      "name": "Project inrichten en 1e prognose - UAV Project",
       "description": "",
-      "folderId": "f-882305bc-0a02-44aa-8290-3a63d171b450",
+      "folderId": "f-8f97ef7c-70d2-4016-b37e-ccc9ce59840d",
       "versions": [
         {
           "version": 1,
@@ -398,24 +352,10 @@
       ]
     },
     {
-      "id": "s-807e8d80-3e16-4698-80a3-a87d55a21d53",
-      "name": "Project inrichten en 1e prognose",
-      "description": "",
-      "folderId": "f-882305bc-0a02-44aa-8290-3a63d171b450",
-      "versions": [
-        {
-          "version": 1,
-          "createdAt": "2026-10-13T11:14:44.856Z",
-          "sha256": "a55eda58a063dcf84483c95f463eb19446dad5c19ce812e3f2a856ad48c45829",
-          "fileName": "Project inrichten en 1e prognose.yml"
-        }
-      ]
-    },
-    {
       "id": "s-d6f2242e-ca85-420d-bb02-e74073cb9f0e",
-      "name": "Projectregistratie 2",
+      "name": "Projectregistratie - UAV Project",
       "description": "",
-      "folderId": "f-882305bc-0a02-44aa-8290-3a63d171b450",
+      "folderId": "f-4ef85e4d-3a40-4d53-8c4a-2cfa26b07586",
       "versions": [
         {
           "version": 1,
@@ -426,52 +366,10 @@
       ]
     },
     {
-      "id": "s-85517485-cbbf-41ab-abdd-b848a600d271",
-      "name": "Projectregistratie",
-      "description": "",
-      "folderId": "f-882305bc-0a02-44aa-8290-3a63d171b450",
-      "versions": [
-        {
-          "version": 1,
-          "createdAt": "2026-10-13T11:14:44.902Z",
-          "sha256": "44cbc5c2d16cab4b4b311533024f2cf4cf1d92737076fd0e86173a8869e9c36a",
-          "fileName": "Projectregistratie.yml"
-        }
-      ]
-    },
-    {
-      "id": "s-8dc3fb7f-77c5-4b94-aea0-8dec8b11b161",
-      "name": "Van trajectregistratie tm vervolgtraject (zonder kenmerken)",
-      "description": "",
-      "folderId": "f-882305bc-0a02-44aa-8290-3a63d171b450",
-      "versions": [
-        {
-          "version": 1,
-          "createdAt": "2026-10-13T11:14:44.914Z",
-          "sha256": "da8e864d71bbadc2a74b07abbeea586775f9d7c148cda67711b39d54e0d70069",
-          "fileName": "Van trajectregistratie tm vervolgtraject (zonder kenmerken).yml"
-        }
-      ]
-    },
-    {
-      "id": "s-8dc4e333-346e-498b-81ae-612884b9f1e6",
-      "name": "Van trajectregistratie tm vervolgtraject 1",
-      "description": "",
-      "folderId": "f-882305bc-0a02-44aa-8290-3a63d171b450",
-      "versions": [
-        {
-          "version": 1,
-          "createdAt": "2026-10-13T11:14:44.924Z",
-          "sha256": "8fd47059754abbb26062d3dac74b969ca9c00f594a03934447ed82a9dedc7dbb",
-          "fileName": "Van trajectregistratie tm vervolgtraject 1.yml"
-        }
-      ]
-    },
-    {
       "id": "s-d454a584-fd42-4ba7-9fb7-c0be6bdefe95",
-      "name": "Van trajectregistratie tm vervolgtraject 2",
+      "name": "Van traject registratie tm vervolgtraject - UAV Project",
       "description": "",
-      "folderId": "f-882305bc-0a02-44aa-8290-3a63d171b450",
+      "folderId": "f-09dc4ba5-1a8d-42f8-a3e8-2480b0c933cd",
       "versions": [
         {
           "version": 1,
@@ -482,24 +380,10 @@
       ]
     },
     {
-      "id": "s-59edb255-26ab-4a70-9fdf-39fe29ea1057",
-      "name": "Van trajectregistratie tm vervolgtraject",
-      "description": "",
-      "folderId": "f-882305bc-0a02-44aa-8290-3a63d171b450",
-      "versions": [
-        {
-          "version": 1,
-          "createdAt": "2026-10-13T11:14:44.938Z",
-          "sha256": "59b553cf37e5af35ad03739f72d2d75fbc1d67b49e4c085800cc05ae8877024f",
-          "fileName": "Van trajectregistratie tm vervolgtraject.yml"
-        }
-      ]
-    },
-    {
       "id": "s-e3900d9b-9d03-45f2-9553-37bcf95a91a0",
-      "name": "Periodieke administratie 3",
+      "name": "Periodieke administratie - UAV Project (3)",
       "description": "",
-      "folderId": "f-2594cad3-8cb9-41ea-83cc-0bf5a5eb25db",
+      "folderId": "f-385823a0-b7be-4be6-b267-0449d1a793ca",
       "versions": [
         {
           "version": 1,
@@ -511,9 +395,9 @@
     },
     {
       "id": "s-1955b20c-1a9b-44be-84e2-3fc10feb8979",
-      "name": "Projectregistratie 3",
+      "name": "Projectregistratie - UAV Project (3)",
       "description": "",
-      "folderId": "f-2594cad3-8cb9-41ea-83cc-0bf5a5eb25db",
+      "folderId": "f-4ef85e4d-3a40-4d53-8c4a-2cfa26b07586",
       "versions": [
         {
           "version": 1,
@@ -525,9 +409,9 @@
     },
     {
       "id": "s-eaeb95f2-a5a9-4a04-8667-30c6f4122237",
-      "name": "Van traject registratie tm vervolgtraject 3",
+      "name": "Van traject registratie tm vervolgtraject - UAV Project (3)",
       "description": "",
-      "folderId": "f-2594cad3-8cb9-41ea-83cc-0bf5a5eb25db",
+      "folderId": "f-09dc4ba5-1a8d-42f8-a3e8-2480b0c933cd",
       "versions": [
         {
           "version": 1,

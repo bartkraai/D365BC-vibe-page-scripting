@@ -23,7 +23,7 @@ class ScriptLibrary {
   script(id) { const item = this.load().scripts.find(x => x.id === id); if (!item) throw new LibraryError('Script not found', 404); return item; }
   assertName(index, name, parentId, exceptId) {
     if (typeof name !== 'string' || !name.trim()) throw new LibraryError('name is required');
-    const same = [...index.folders, ...index.scripts].some(item => item.id !== exceptId && item.parentId === parentId && item.name.toLocaleLowerCase() === name.trim().toLocaleLowerCase());
+    const same = [...index.folders, ...index.scripts].some(item => item.id !== exceptId && ((Object.hasOwn(item, 'folderId') ? item.folderId : item.parentId) ?? null) === (parentId ?? null) && item.name.toLocaleLowerCase() === name.trim().toLocaleLowerCase());
     if (same) throw new LibraryError('Name already exists in this folder', 409);
   }
   assertFolder(index, id) { if (id !== null && !index.folders.some(x => x.id === id)) throw new LibraryError('Parent folder not found', 404); }

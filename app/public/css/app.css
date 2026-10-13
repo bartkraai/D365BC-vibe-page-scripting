@@ -1215,8 +1215,8 @@ label small { font-weight: 400; color: var(--text-muted); }
 .library-list-main { flex:1; min-width:0; }
 .library-script-name { font-weight:600; }
 .library-meta { color:var(--text-muted); font-size:12px; margin-top:3px; }
-.library-detail { margin-top:20px; border-top:1px solid var(--border); padding-top:16px; }
-.library-detail:empty { display:none; }
+.library-detail-box { max-width:860px; max-height:88vh; overflow:auto; }
+.library-detail-head { display:flex; justify-content:space-between; align-items:center; gap:12px; }
 .library-usage { margin:8px 0 0 18px; }
 .library-versions { width:100%; border-collapse:collapse; margin-top:10px; }
 .library-versions th, .library-versions td { text-align:left; padding:8px; border-bottom:1px solid var(--border); font-size:12px; }

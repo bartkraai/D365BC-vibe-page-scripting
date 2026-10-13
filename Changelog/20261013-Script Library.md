@@ -36,3 +36,12 @@ Complete. See the [archived plan](../.archive/20261013-Script%20Library.md).
 ## Migration note
 
 When missing local script references had multiple candidates, matching copies were selected from the complete corresponding workflow version. Review those workflows if the source files had different business intent.
+
+## Library cleanup
+
+- Removed 9 scripts that no workflow used (36 → 27). Their content remains available in git history.
+- Compared the remaining scripts after normalizing line endings and trailing whitespace. No identical scripts were found, so none were merged.
+- Replaced the `Imported - …` folders with one folder per process. Removed version-like suffixes from script names and added the variant name, for example `Aanmaken inkooporder - Standaard` or `- UAV Project`.
+- Workflows reference scripts by ID, so no workflow changed; all 81 references still resolve.
+- Fixed duplicate script-name detection within one folder.
+- Improved script picker, folder tree, and script details popup layouts.
