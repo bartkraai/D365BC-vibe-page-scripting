@@ -1,0 +1,32 @@
+{
+  "Acquisiteur 4PS": {
+    "username": "pagescripter@fpstest018.onmicrosoft.com",
+    "password": "your-password-here",
+    "description": "",
+    "mfa_seed": "your-totp-seed-here"
+  },
+  "Project Controller": {
+    "username": "pagescripter@fpstest018.onmicrosoft.com",
+    "password": "your-password-here",
+    "description": "",
+    "mfa_seed": "your-totp-seed-here"
+  },
+  "Projectleider": {
+    "username": "cbos@fpstest018.onmicrosoft.com",
+    "password": "your-password-here",
+    "description": "",
+    "mfa_seed": "your-totp-seed-here"
+  },
+  "Werkvoorbereider": {
+    "username": "pagescripter@fpstest018.onmicrosoft.com",
+    "password": "your-password-here",
+    "description": "",
+    "mfa_seed": "your-totp-seed-here"
+  },
+  "Uitvoerder GWW 4PS": {
+    "username": "pagescripter@fpstest018.onmicrosoft.com",
+    "password": "your-password-here",
+    "description": "",
+    "mfa_seed": "your-totp-seed-here"
+  }
+}

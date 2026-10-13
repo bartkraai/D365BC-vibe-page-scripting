@@ -7,66 +7,59 @@
       "description": "",
       "value_chains": [
         {
-          "code": "UAV-T",
-          "name": "UAV",
-          "description": "UAV",
+          "code": "TP",
+          "name": "Tender Projecten",
+          "description": "",
           "process_flows": [
             {
-              "code": "UAV-PROJEC",
-              "name": "UAV Project (3)",
+              "code": "TENDER",
+              "name": "Tenderproject",
               "description": "",
-              "workflow_path": "./UAV Project (3)"
+              "workflow_path": "./Tenderproject"
             }
           ]
         },
         {
-          "code": "PRJ-VT",
-          "name": "Vaste termijnen",
+          "code": "UITV",
+          "name": "Uitvoeringsprojecten",
           "description": "",
           "process_flows": [
             {
-              "code": "BINNENLAND",
-              "name": "Binnenlandse opdrachtgever",
+              "code": "TERMIJNEN",
+              "name": "Termijnschema",
               "description": "",
-              "workflow_path": "./Binnenlandse opdrachtgever"
+              "workflow_path": "./Termijnschema"
             },
             {
-              "code": "BUITENLAND",
-              "name": "Buitenlandse opdrachtgever",
+              "code": "RAW",
+              "name": "RAW methodiek",
               "description": "",
-              "workflow_path": "./Buitenlandse opdrachtgever"
+              "workflow_path": "./RAW methodiek"
             },
             {
-              "code": "DEMO-UAV-V",
-              "name": "Demo UAV vaste termijnen (light versie)",
+              "code": "BESTEK",
+              "name": "Besteksposten",
               "description": "",
-              "workflow_path": "./Demo UAV vaste termijnen (light versie)"
+              "workflow_path": "./Besteksposten"
             }
           ]
-        }
-      ]
-    },
-    {
-      "code": "SYSTEEMBHR",
-      "name": "Systeembeheer",
-      "description": "",
-      "value_chains": [
+        },
         {
-          "code": "R&P",
-          "name": "Switch Roles and Permissions",
+          "code": "OHP",
+          "name": "Onderhoudsprojecten",
           "description": "",
           "process_flows": [
             {
-              "code": "SWITCH-ROL",
-              "name": "Switch Role and Permissions",
+              "code": "ONDERHOUD",
+              "name": "Onderhoudsproject",
               "description": "",
-              "workflow_path": "./Switch Role and Permissions"
+              "workflow_path": "./Onderhoudsproject"
             }
           ]
         }
       ]
     }
   ],
-  "name": "4PS test catalog",
+  "name": "4PS Test Catalog",
   "description": ""
 }

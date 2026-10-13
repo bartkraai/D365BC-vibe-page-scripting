@@ -1,6 +1,5 @@
 {
-  "$schema": "./workflow.schema.json",
-  "name": "Buitenlandse opdrachtgever",
+  "name": "RAW methodiek",
   "description": "",
   "steps": [
     {
