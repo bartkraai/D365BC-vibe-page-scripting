@@ -16,12 +16,13 @@ async function api(method, path, body) {
   }
   const res = await fetch('/api' + path, opts);
   const json = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(json.error || `HTTP ${res.status}`);
+  if (!res.ok) { const error = new Error(json.error || `HTTP ${res.status}`); Object.assign(error, json); throw error; }
   return json;
 }
 const GET    = (p)    => api('GET',    p);
 const POST   = (p, b) => api('POST',   p, b);
 const DEL    = (p)    => api('DELETE', p);
+const PATCH  = (p, b) => api('PATCH',  p, b);
 
 // ── Tab routing ───────────────────────────────────────────────────────────────
 document.querySelectorAll('.nav-item').forEach(item => {
@@ -44,6 +45,7 @@ function activateTab(tabId) {
   if (tabId === 'setup')        loadSetup();
   if (tabId === 'environments') loadEnvironments();
   if (tabId === 'catalog')      loadCatalog();
+  if (tabId === 'library')      loadLibrary();
   if (tabId === 'variants')     loadVariantProjects();
   if (tabId === 'run')          loadRunPage();
   if (tabId === 'evaluate')     loadEvaluatePage();
@@ -99,6 +101,7 @@ function onFilesChanged(msg) {
   if (/\.(ya?ml)$/i.test(msg.path) || /workflow\.json$/i.test(msg.path)) {
     loadVariantProjects();
     loadRunPage();
+    if (activeTab === 'library') loadLibrary();
   }
 }
 
@@ -985,11 +988,12 @@ async function showRunDetail(runId, cardEl) {
       ? `<button class="btn btn-secondary btn-sm step-expand-btn" data-step-idx="${stepIdx}" data-report-dir="${esc(step.report_dir)}">&#9660; Details</button>`
       : '';
 
+    const scriptLabel = formatResultScript(step);
     const hasSubResults = step.sub_results?.length > 0;
     stepsRows += `
       <tr class="step-main-row" data-step-idx="${stepIdx}">
         <td style="white-space:nowrap;font-family:monospace;font-size:12px">${esc(step.id)}</td>
-        <td><strong>${esc(step.name)}</strong></td>
+        <td><strong>${esc(step.name)}</strong>${scriptLabel ? `<div class="library-meta">${esc(scriptLabel)}</div>` : ''}</td>
         <td style="font-size:12px">${esc(step.user || '')}</td>
         <td><span class="step-badge ${esc(status)}">${esc(status)}</span></td>
         <td style="white-space:nowrap;font-size:12px">${step.duration_s != null ? step.duration_s + 's' : '—'}</td>
@@ -1007,7 +1011,7 @@ async function showRunDetail(runId, cardEl) {
         stepsRows += `
           <tr class="sub-row">
             <td></td>
-            <td>${esc(sub.label || sub.script || '')}</td>
+            <td>${esc(formatResultScript(sub) || sub.label || sub.script || '')}</td>
             <td></td>
             <td><span class="step-badge ${esc(subStatus)}" style="font-size:10px">${esc(subStatus)}</span></td>
             <td style="font-size:12px">${sub.duration_s != null ? sub.duration_s + 's' : '—'}</td>
@@ -1364,7 +1368,7 @@ function renderCatalog() {
           ${type.description ? '<span class="text-muted" style="font-size:12px;margin-left:6px">' + esc(type.description) + '</span>' : ''}
           <div class="cat-actions">
             <button class="btn btn-secondary btn-sm" onclick="catEditType(${v},${t})">Edit</button>
-            <button class="btn btn-secondary btn-sm" onclick="catDuplicateType(${v},${t})">Duplicate</button>
+            <button class="btn btn-secondary btn-sm" onclick="catMoveType(${v},${t})">Move to…</button><button class="btn btn-secondary btn-sm" onclick="catDuplicateType(${v},${t})">Duplicate</button>
             <button class="btn btn-secondary btn-sm" onclick="catRemoveType(${v},${t})" style="color:var(--error)">Remove</button>
           </div>
         </div>`;
@@ -1389,7 +1393,7 @@ function renderCatalog() {
           <div class="cat-actions">
             ${pf.name ? `<button class="btn btn-primary btn-sm" onclick="catOpenPfWorkflow(${v},${t},${p})">Open</button>` : ''}
             <button class="btn btn-secondary btn-sm" onclick="catEditPf(${v},${t},${p})">Edit</button>
-            <button class="btn btn-secondary btn-sm" onclick="catDuplicatePf(${v},${t},${p})">Duplicate</button>
+            <button class="btn btn-secondary btn-sm" onclick="catMovePf(${v},${t},${p})">Move to…</button><button class="btn btn-secondary btn-sm" onclick="catRenameWorkflowFolder(${v},${t},${p})">Rename folder</button><button class="btn btn-secondary btn-sm" onclick="catDuplicatePf(${v},${t},${p})">Duplicate</button>
             <button class="btn btn-secondary btn-sm" onclick="catRemovePf(${v},${t},${p})" style="color:var(--error)">Remove</button>
           </div>
         </div>`;
@@ -1709,6 +1713,77 @@ document.getElementById('btn-cat-import').addEventListener('click', () => {
 });
 
 document.getElementById('btn-cat-add-vc').addEventListener('click', catAddVc);
+
+
+function formatResultScript(item) {
+  if (!item || !item.scriptName) return item?.script || '';
+  const version = item.scriptVersion != null ? ` v${item.scriptVersion}` : '';
+  const date = item.scriptVersionDate ? ` · ${new Date(item.scriptVersionDate).toLocaleDateString()}` : '';
+  return `${item.scriptName}${version}${date}`;
+}
+
+async function catMoveType(v, t) {
+  const source = catalog.types[v].value_chains[t];
+  const targets = catalog.types.filter((_, i) => i !== v);
+  if (!targets.length) { alert('Create another Type first.'); return; }
+  const targetCode = prompt(`Move Value Chain to Type (${targets.map(x => x.code).join(', ')}):`, targets[0].code);
+  const target = targets.find(x => x.code === targetCode);
+  if (!target) return;
+  catalog.types[v].value_chains.splice(t, 1);
+  (target.value_chains ||= []).push(source);
+  renderCatalog();
+}
+async function catMovePf(v, t, p) {
+  const source = catalog.types[v].value_chains[t].process_flows[p];
+  const targets = catalog.types.flatMap((x, vi) => (x.value_chains || []).map((y, ti) => ({ x, y, vi, ti }))).filter(x => x.vi !== v || x.ti !== t);
+  if (!targets.length) { alert('Create another Value Chain first.'); return; }
+  const targetCode = prompt(`Move Process Flow to Value Chain (${targets.map(x => `${x.x.code} › ${x.y.code}`).join(', ')}):`, `${targets[0].x.code} › ${targets[0].y.code}`);
+  const target = targets.find(x => `${x.x.code} › ${x.y.code}` === targetCode);
+  if (!target) return;
+  catalog.types[v].value_chains[t].process_flows.splice(p, 1);
+  (target.y.process_flows ||= []).push(source);
+  renderCatalog();
+}
+async function catRenameWorkflowFolder(v, t, p) {
+  const pf = catalog.types[v].value_chains[t].process_flows[p];
+  const oldName = (pf.workflow_path || '').replace(/^\.\//, '');
+  if (!oldName) { alert('This process flow has no workflow folder.'); return; }
+  const newName = prompt('New workflow folder name:', oldName);
+  if (!newName || newName === oldName) return;
+  try { await PATCH(`/projects/${encodeURIComponent(oldName)}`, { newName }); pf.workflow_path = `./${newName}`; catalog = await GET('/catalog'); renderCatalog(); }
+  catch (e) { alert(`Rename failed: ${e.message}`); }
+}
+
+// ── Script Library ───────────────────────────────────────────────────────────
+const libraryState = { data: null, folderId: null, scriptId: null, dialogTrigger: null };
+async function loadLibrary() { try { libraryState.data = await GET('/library'); renderLibrary(); } catch (e) { document.getElementById('library-list').textContent = `Could not load library: ${e.message}`; } }
+function libraryFolders(parentId = null) { return (libraryState.data?.folders || []).filter(f => (f.parentId || null) === parentId); }
+function renderLibrary() {
+  const tree = document.getElementById('library-folder-tree'); const list = document.getElementById('library-list'); if (!tree || !list) return;
+  tree.innerHTML = ''; const addFolder = (folder, depth) => { const row = document.createElement('div'); row.className = 'library-folder' + (libraryState.folderId === folder.id ? ' selected' : ''); row.style.paddingLeft = `${8 + depth * 16}px`; row.draggable = true; row.tabIndex = 0; row.innerHTML = `<span>▸ ${esc(folder.name)}</span><span class="library-folder-actions"><button class="btn btn-secondary btn-sm" aria-label="Rename folder">Rename</button><button class="btn btn-secondary btn-sm" aria-label="Move folder">Move</button><button class="btn btn-danger btn-sm" aria-label="Delete folder">Delete</button></span>`; row.onclick = event => { if (event.target.closest('button')) return; libraryState.folderId = folder.id; libraryState.scriptId = null; renderLibrary(); }; const buttons = row.querySelectorAll('button'); buttons[0].onclick=()=>libraryRenameFolder(folder); buttons[1].onclick=()=>libraryMoveFolder(folder); buttons[2].onclick=()=>libraryDeleteFolder(folder); row.ondragover = e => e.preventDefault(); row.ondrop = e => { e.preventDefault(); const scriptId = e.dataTransfer.getData('text/script-id'); const folderId = e.dataTransfer.getData('text/folder-id'); if (scriptId) moveLibraryScript(scriptId, folder.id); else if (folderId && folderId !== folder.id) moveLibraryFolder(folderId, folder.id); }; row.ondragstart = e => e.dataTransfer.setData('text/folder-id', folder.id); tree.append(row); libraryFolders(folder.id).forEach(x => addFolder(x, depth + 1)); };
+  const root = document.createElement('button'); root.className = 'library-folder' + (!libraryState.folderId ? ' selected' : ''); root.type = 'button'; root.textContent = 'All scripts'; root.onclick = () => { libraryState.folderId = null; libraryState.scriptId = null; renderLibrary(); }; root.ondragover = e => e.preventDefault(); root.ondrop = e => { e.preventDefault(); const scriptId = e.dataTransfer.getData('text/script-id'); const folderId = e.dataTransfer.getData('text/folder-id'); if (scriptId) moveLibraryScript(scriptId, null); else if (folderId) moveLibraryFolder(folderId, null); }; tree.append(root); libraryFolders().forEach(x => addFolder(x, 0));
+  const q = document.getElementById('library-search').value.toLowerCase(); const scripts = (libraryState.data?.scripts || []).filter(x => (!libraryState.folderId || x.folderId === libraryState.folderId) && `${x.name} ${x.description || ''}`.toLowerCase().includes(q));
+  list.innerHTML = scripts.length ? '' : '<p class="text-muted">No scripts in this folder.</p>'; scripts.forEach(x => { const row = document.createElement('div'); row.className = 'library-list-item'; row.draggable = true; row.ondragstart = e => e.dataTransfer.setData('text/script-id', x.id); row.innerHTML = `<div class="library-list-main"><div class="library-script-name">${esc(x.name)}</div><div class="library-meta">v${x.latestVersion || '—'}${x.latestVersionDate ? ' · ' + new Date(x.latestVersionDate).toLocaleDateString() : ''}${x.description ? ' · ' + esc(x.description) : ''}</div></div><button class="btn btn-secondary btn-sm">Details</button>`; row.querySelector('button').onclick = () => showLibraryScript(x.id); list.append(row); });
+  renderLibraryDetail();
+}
+async function showLibraryScript(id) { libraryState.scriptId = id; const detail = document.getElementById('library-detail'); detail.textContent = 'Loading…'; try { libraryState.detail = await GET(`/library/scripts/${encodeURIComponent(id)}`); renderLibraryDetail(); } catch(e) { detail.textContent = e.message; } }
+function renderLibraryDetail() { const el = document.getElementById('library-detail'); const script = libraryState.detail; if (!libraryState.scriptId || !script || script.id !== libraryState.scriptId) { el.innerHTML = ''; return; } const versions = (script.versions || []).sort((a,b) => b.version-a.version); const usage = script.usage || []; el.innerHTML = `<h2>${esc(script.name)}</h2><p class="library-meta">${esc(script.description || 'No description')}</p><div class="actions mt-sm"><button class="btn btn-secondary btn-sm" onclick="libraryEditScript('${script.id}')">Rename / description</button><button class="btn btn-secondary btn-sm" onclick="libraryMoveScript('${script.id}')">Move to…</button><button class="btn btn-secondary btn-sm" onclick="libraryUploadVersion('${script.id}')">Upload new version</button><button class="btn btn-danger btn-sm" onclick="libraryDeleteScript('${script.id}')">Delete</button></div><h3 class="mt-md">Version history</h3><table class="library-versions"><thead><tr><th>Version</th><th>Date</th><th>Original filename</th><th></th></tr></thead><tbody>${versions.map(v => `<tr><td>v${v.version}</td><td>${v.createdAt ? new Date(v.createdAt).toLocaleString() : '—'}</td><td>${esc(v.fileName || '')}</td><td><button class="btn btn-secondary btn-sm" onclick="libraryViewVersion('${script.id}',${v.version})">View</button> <a class="btn btn-secondary btn-sm" href="/api/library/scripts/${encodeURIComponent(script.id)}/versions/${v.version}/content" download="${esc(v.fileName || script.name + '.yml')}">Download</a></td></tr>`).join('')}</tbody></table><h3 class="mt-md">Used by</h3>${usage.length ? `<ul class="library-usage">${usage.map(u => `<li>${esc(u.workflow)} — ${esc((u.steps || []).map(s => s.name).join(', '))}</li>`).join('')}</ul>` : '<p class="text-muted">Not used by a workflow.</p>'}`; }
+function openLibraryDialog(title, body, confirm) { const modal=document.getElementById('modal-library'); libraryState.dialogTrigger=document.activeElement; document.getElementById('modal-library-title').textContent=title; document.getElementById('modal-library-body').innerHTML=body; const close=()=>{modal.classList.add('hidden'); libraryState.dialogTrigger?.focus();}; document.getElementById('btn-library-cancel').onclick=close; document.querySelector('#modal-library .modal-backdrop').onclick=close; document.getElementById('btn-library-confirm').onclick=async()=>{try { await confirm(); close(); await loadLibrary(); } catch(e) { alert(e.message); }}; modal.classList.remove('hidden'); modal.querySelector('input,select,textarea,button')?.focus(); }
+document.addEventListener('keydown', e => { const modal=document.getElementById('modal-library'); if (!modal || modal.classList.contains('hidden')) return; if(e.key==='Escape') document.getElementById('btn-library-cancel').click(); if(e.key==='Tab') { const items=[...modal.querySelectorAll('button,input,select,textarea,a[href]')].filter(x=>!x.disabled); const first=items[0], last=items.at(-1); if(e.shiftKey && document.activeElement===first){e.preventDefault();last.focus();} else if(!e.shiftKey && document.activeElement===last){e.preventDefault();first.focus();} } });
+function folderOptions(selected) { return `<option value="">Root</option>${(libraryState.data?.folders || []).map(f=>`<option value="${f.id}" ${f.id===selected?'selected':''}>${esc(f.name)}</option>`).join('')}`; }
+function libraryRenameFolder(folder) { openLibraryDialog('Rename folder', `<label>Name<input id="lib-name" class="input" value="${esc(folder.name)}"></label>`, () => PATCH(`/library/folders/${folder.id}`,{name:document.getElementById('lib-name').value.trim()})); }
+function libraryMoveFolder(folder) { openLibraryDialog('Move folder', `<label>Parent folder<select id="lib-folder" class="input">${folderOptions(folder.parentId)}</select></label>`, () => PATCH(`/library/folders/${folder.id}`,{parentId:document.getElementById('lib-folder').value||null})); }
+async function libraryDeleteFolder(folder) { if(!confirm(`Delete folder "${folder.name}"?`)) return; try { await DEL(`/library/folders/${folder.id}`); if(libraryState.folderId===folder.id) libraryState.folderId=null; await loadLibrary(); } catch(e) { alert(`Cannot delete folder: ${e.message}`); } }
+function libraryNewFolder() { openLibraryDialog('New folder', `<label>Name<input id="lib-name" class="input"></label><label>Parent folder<select id="lib-folder" class="input">${folderOptions(libraryState.folderId)}</select></label>`, () => POST('/library/folders',{name:document.getElementById('lib-name').value.trim(),parentId:document.getElementById('lib-folder').value||null})); }
+function libraryUploadScript() { const file=document.getElementById('library-upload-input').files[0]; if(!file)return; file.text().then(content=>openLibraryDialog('Upload script',`<label>Name<input id="lib-name" class="input" value="${esc(file.name.replace(/\.ya?ml$/i,''))}"></label><label>Folder<select id="lib-folder" class="input">${folderOptions(libraryState.folderId)}</select></label><label>Description<textarea id="lib-desc" class="input"></textarea></label>`,()=>POST('/library/scripts',{name:document.getElementById('lib-name').value.trim(),folderId:document.getElementById('lib-folder').value||null,description:document.getElementById('lib-desc').value.trim(),fileName:file.name,content}))); }
+function libraryEditScript(id) { const x=libraryState.detail; openLibraryDialog('Edit script',`<label>Name<input id="lib-name" class="input" value="${esc(x.name)}"></label><label>Description<textarea id="lib-desc" class="input">${esc(x.description||'')}</textarea></label>`,()=>PATCH(`/library/scripts/${id}`,{name:document.getElementById('lib-name').value.trim(),description:document.getElementById('lib-desc').value.trim()})); }
+function libraryMoveScript(id) { const script = (libraryState.data?.scripts || []).find(item => item.id === id) || libraryState.detail; const currentFolderId = script?.folderId || null; openLibraryDialog('Move script',`<label>Folder<select id="lib-folder" class="input">${folderOptions(currentFolderId)}</select></label>`,()=>{ const folderId = document.getElementById('lib-folder').value || null; return folderId === currentFolderId ? Promise.resolve() : moveLibraryScript(id,folderId); }); }
+async function moveLibraryScript(id, folderId) { const script = (libraryState.data?.scripts || []).find(item => item.id === id); if ((script?.folderId || null) === folderId) return; await PATCH(`/library/scripts/${id}`,{folderId}); await loadLibrary(); }
+async function moveLibraryFolder(id, parentId) { const folder = (libraryState.data?.folders || []).find(item => item.id === id); if (!folder || (folder.parentId || null) === parentId) return; try { await PATCH(`/library/folders/${id}`, { parentId }); await loadLibrary(); } catch (e) { alert(`Move folder failed: ${e.message}`); } }
+function libraryUploadVersion(id) { const input=document.createElement('input'); input.type='file'; input.accept='.yml,.yaml'; input.onchange=async()=>{const f=input.files[0];if(!f)return;try {const r=await POST(`/library/scripts/${id}/versions`,{fileName:f.name,content:await f.text()}); alert(r.unchanged?'File is identical to the latest version.':'New version uploaded.'); await showLibraryScript(id);}catch(e){alert(e.message);}}; input.click(); }
+async function libraryDeleteScript(id) { if(!confirm('Delete this script?'))return; try{await DEL(`/library/scripts/${id}`);libraryState.scriptId=null;libraryState.detail=null;await loadLibrary();}catch(e){alert(`${e.message}${e.usage ? '\nUsed by: '+e.usage.map(x=>x.workflow).join(', ') : ''}`);} }
+async function libraryViewVersion(id,v){ try { const response = await fetch(`/api/library/scripts/${encodeURIComponent(id)}/versions/${v}/content`); const text = await response.text(); if (!response.ok) throw new Error(text || `HTTP ${response.status}`); openLibraryDialog(`Version ${v}`,`<textarea class="input textarea" readonly rows="18">${esc(text)}</textarea>`,async()=>{}); } catch (e) { alert(`Could not load version: ${e.message}`); } }
+document.getElementById('btn-library-folder').addEventListener('click',libraryNewFolder); document.getElementById('btn-library-upload').addEventListener('click',()=>document.getElementById('library-upload-input').click()); document.getElementById('library-upload-input').addEventListener('change',libraryUploadScript); document.getElementById('library-search').addEventListener('input',renderLibrary);
 
 // ── Utils ─────────────────────────────────────────────────────────────────────
 function esc(s) {

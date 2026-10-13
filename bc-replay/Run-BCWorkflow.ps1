@@ -69,6 +69,9 @@ param(
     [string]$ResultDir,
 
     [Parameter(Mandatory = $false)]
+    [string]$LibraryPath = (Join-Path $PSScriptRoot "..\page-scripting\script-library"),
+
+    [Parameter(Mandatory = $false)]
     [switch]$Headed = $false,
 
     [Parameter(Mandatory = $false)]
@@ -173,6 +176,24 @@ if (-not $ResultDir) {
 
 # ── Load configuration ─────────────────────────────────────────────────────
 $workflow = Get-Content $WorkflowPath -Raw | ConvertFrom-Json
+$libraryIndexPath = Join-Path $LibraryPath "library.json"
+$libraryIndex = $null
+if (Test-Path $libraryIndexPath) {
+    try { $libraryIndex = Get-Content $libraryIndexPath -Raw | ConvertFrom-Json }
+    catch { Write-Error "Invalid script library index: $libraryIndexPath"; exit 1 }
+}
+
+function Resolve-LibraryScript {
+    param([string]$ScriptId)
+    if (-not $libraryIndex) { throw "Script library not found: $libraryIndexPath" }
+    $script = $libraryIndex.scripts | Where-Object { $_.id -eq $ScriptId } | Select-Object -First 1
+    if (-not $script) { throw "Library script not found: $ScriptId" }
+    $version = $script.versions | Sort-Object { [int]$_.version } -Descending | Select-Object -First 1
+    if (-not $version) { throw "Library script has no versions: $ScriptId" }
+    $scriptPath = Join-Path $LibraryPath "scripts\$ScriptId\v$($version.version).yml"
+    if (-not (Test-Path $scriptPath)) { throw "Library script file not found: $scriptPath" }
+    return [PSCustomObject]@{ Id = $ScriptId; Name = $script.name; Version = $version.version; VersionDate = $version.createdAt; Path = $scriptPath }
+}
 
 # ── Resolve user credentials (users.json or Windows Credential Vault) ──────
 $usersFromVault = $false
@@ -383,7 +404,11 @@ foreach ($step in $workflow.steps) {
     } else {
         # bc-replay step validation
         $scriptsToCheck = @()
-        if ($step.scripts -and $step.scripts.Count -gt 0) { $scriptsToCheck = @($step.scripts) }
+        if ($step.scriptIds -and $step.scriptIds.Count -gt 0) {
+            foreach ($scriptId in $step.scriptIds) {
+                try { [void](Resolve-LibraryScript $scriptId) } catch { $validationErrors += "Step '$($step.id)': $_" }
+            }
+        } elseif ($step.scripts -and $step.scripts.Count -gt 0) { $scriptsToCheck = @($step.scripts) }
         elseif ($step.script) { $scriptsToCheck = @($step.script) }
         else { $validationErrors += "Step '$($step.id)': no 'script' or 'scripts' defined." }
 
@@ -716,7 +741,14 @@ foreach ($step in $workflow.steps) {
     # Only applies to bc-replay steps; bc-api steps use a different execution path.
     $scriptsList = @()
     if ($step.type -ne 'bc-api') {
-        if ($step.scripts -and $step.scripts.Count -gt 0) {
+        $scriptMetadata = @{}
+        if ($step.scriptIds -and $step.scriptIds.Count -gt 0) {
+            foreach ($scriptId in $step.scriptIds) {
+                $resolved = Resolve-LibraryScript $scriptId
+                $scriptsList += $resolved.Path
+                $scriptMetadata[$resolved.Path] = $resolved
+            }
+        } elseif ($step.scripts -and $step.scripts.Count -gt 0) {
             $scriptsList = @($step.scripts)
         } elseif ($step.script) {
             $scriptsList = @($step.script)
@@ -833,6 +865,7 @@ foreach ($step in $workflow.steps) {
     foreach ($scriptRelPath in $scriptsList) {
         $scriptIndex++
         $scriptStart = Get-Date
+        $scriptDisplayPath = if ($scriptMetadata.ContainsKey($scriptRelPath)) { $scriptMetadata[$scriptRelPath].Name } else { $scriptRelPath }
 
         # Determine result dir: sub-folder per script if multi-script, else the step dir
         if ($isMultiScript) {
@@ -845,7 +878,7 @@ foreach ($step in $workflow.steps) {
         }
 
         # Resolve script path (normalize to remove .\  segments)
-        $scriptPath = [System.IO.Path]::GetFullPath((Join-Path $workflowFolder $scriptRelPath))
+        $scriptPath = if ($scriptMetadata.ContainsKey($scriptRelPath)) { $scriptRelPath } else { [System.IO.Path]::GetFullPath((Join-Path $workflowFolder $scriptRelPath)) }
         if (-not (Test-Path $scriptPath)) {
             Write-Error "Script not found: $scriptPath"
             exit 1
@@ -1000,8 +1033,12 @@ foreach ($step in $workflow.steps) {
         if ($isMultiScript) {
             $scriptStatus = if ($exitCode -eq 0) { "passed" } elseif ($DryRun) { "dry-run" } else { "failed" }
             $subResults += [PSCustomObject]@{
-                script     = $scriptRelPath
+                script     = $scriptDisplayPath
                 label      = Split-Path $scriptRelPath -Leaf
+                scriptId   = $scriptMetadata[$scriptRelPath].Id
+                scriptName = $scriptMetadata[$scriptRelPath].Name
+                scriptVersion = $scriptMetadata[$scriptRelPath].Version
+                scriptVersionDate = $scriptMetadata[$scriptRelPath].VersionDate
                 status     = $scriptStatus
                 exit_code  = $exitCode
                 start_time = $scriptStart
@@ -1046,6 +1083,11 @@ foreach ($step in $workflow.steps) {
         duration_s  = [math]::Round(($stepEnd - $stepStart).TotalSeconds, 1)
         report_dir  = $stepResultDir
         sub_results = if ($isMultiScript) { $subResults } else { $null }
+        script      = if ($scriptsList.Count -eq 1) { if ($scriptMetadata.ContainsKey($scriptsList[0])) { $scriptMetadata[$scriptsList[0]].Name } else { $scriptsList[0] } } else { $null }
+        scriptId    = if ($scriptsList.Count -eq 1) { $scriptMetadata[$scriptsList[0]].Id } else { $null }
+        scriptName  = if ($scriptsList.Count -eq 1) { $scriptMetadata[$scriptsList[0]].Name } else { $null }
+        scriptVersion = if ($scriptsList.Count -eq 1) { $scriptMetadata[$scriptsList[0]].Version } else { $null }
+        scriptVersionDate = if ($scriptsList.Count -eq 1) { $scriptMetadata[$scriptsList[0]].VersionDate } else { $null }
     }
     $stepResults += $stepResult
 

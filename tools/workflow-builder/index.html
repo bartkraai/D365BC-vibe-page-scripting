@@ -733,14 +733,7 @@ textarea { resize: vertical; min-height: 50px; }
     <!-- Script Library -->
     <div class="sidebar-section">
       <h3>Script Library <span class="field-tip" tabindex="0">?<span class="field-tip-text">Upload recorded .yml page scripts here. These scripts can then be assigned to workflow steps. The builder auto-detects parameters and captures from each script.</span></span></h3>
-      <div id="scripts-drop-zone" class="drop-zone"
-           ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)"
-           ondrop="handleScriptDrop(event)" onclick="openFileChooser()">
-        <svg width="24" height="24" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 10v3a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1v-3"/><path d="M5 5l3-3 3 3M8 2v9"/></svg>
-        <div>Drop <strong>.yml</strong> scripts here<br><span class="text-sm">or click to browse</span></div>
-      </div>
-      <input type="file" id="file-input" multiple accept=".yml,.yaml" style="display:none" onchange="handleFileInput(event)">
-      <div id="scripts-list" class="mt-2"></div>
+      <p class="text-sm text-muted">Choose versioned scripts per step from the central library. Legacy paths remain visible until migrated.</p>
     </div>
 
     <!-- API Components -->
@@ -1755,7 +1748,8 @@ function addStep(afterIndex) {
     description: '',
     user: Object.keys(state.users)[0] || '',
     company: null,
-    scripts: [],
+    scriptIds: [],
+    scripts: [], // legacy display only
     depends_on: null,
     capture: {},
     inject: {}
@@ -2390,20 +2384,12 @@ function renderPropertiesReplay(step) {
     `<option value="${escAttr(k)}" ${step.user === k ? 'selected' : ''}>${escHtml(k)}</option>`
   ).join('');
 
-  const stepScripts = step.scripts && step.scripts.length ? step.scripts : (step.script ? [step.script] : []);
-  const addableScriptOptions = Object.keys(state.scripts)
-    .filter(fn => !stepScripts.includes(`./scripts/${fn}`))
-    .map(fn => `<option value="${escAttr(fn)}">${escHtml(fn)}</option>`)
-    .join('');
-  const scriptsListHtml = stepScripts.map((s, i) => {
-    const fn = s.replace('./scripts/', '');
-    return `<div style="display:flex;align-items:center;gap:4px;padding:4px 0;border-bottom:1px solid var(--border)">
-      <span style="font-size:12px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${escAttr(fn)}">${escHtml(fn)}</span>
-      ${i > 0 ? `<button class="btn-sm btn-icon" onclick="moveScriptInStep('${escAttr(step.id)}', ${i}, -1)" title="Move up">&uarr;</button>` : '<div style="width:30px"></div>'}
-      ${i < stepScripts.length - 1 ? `<button class="btn-sm btn-icon" onclick="moveScriptInStep('${escAttr(step.id)}', ${i}, 1)" title="Move down">&darr;</button>` : '<div style="width:30px"></div>'}
-      <button class="btn-sm btn-icon" style="color:var(--danger)" onclick="removeScriptFromStep('${escAttr(step.id)}', ${i})" title="Remove">&times;</button>
-    </div>`;
-  }).join('');
+  const stepScriptIds = step.scriptIds || [];
+  const stepScripts = step.legacyScripts || [];
+  const scriptsListHtml = stepScriptIds.map((id, i) => {
+    const item = state.library.scripts.find(x => x.id === id) || { name: id };
+    return `<div style="display:flex;align-items:center;gap:4px;padding:4px 0;border-bottom:1px solid var(--border)"><span style="font-size:12px;flex:1">${escHtml(item.name)} · v${item.latestVersion || '—'}${item.latestVersionDate ? ' · ' + new Date(item.latestVersionDate).toLocaleDateString() : ''}</span>${i > 0 ? `<button class="btn-sm btn-icon" aria-label="Move script up" onclick="moveLibraryScriptInStep('${escAttr(step.id)}',${i},-1)">&uarr;</button>` : ''}${i < stepScriptIds.length - 1 ? `<button class="btn-sm btn-icon" aria-label="Move script down" onclick="moveLibraryScriptInStep('${escAttr(step.id)}',${i},1)">&darr;</button>` : ''}<button class="btn-sm btn-icon" aria-label="Remove script" style="color:var(--danger)" onclick="removeLibraryScriptFromStep('${escAttr(step.id)}',${i})">&times;</button></div>`;
+  }).join('') + (stepScripts.length ? `<div class="validation-msg warning">Legacy – migrate: ${stepScripts.map(escHtml).join(', ')}. Select library scripts before saving.</div>` : '');
 
   const depOptions = state.workflow.steps
     .filter(s => s.id !== step.id)
@@ -2422,7 +2408,7 @@ function renderPropertiesReplay(step) {
   // Detect suggested captures/injects from assigned scripts
   const stepScriptsForMeta = step.scripts && step.scripts.length ? step.scripts : (step.script ? [step.script] : []);
   const scriptFile = stepScriptsForMeta[0]?.replace('./scripts/', '');
-  const scriptMeta = state.scripts[scriptFile];
+  const scriptMeta = step.libraryMeta?.[step.scriptIds?.[0]] || state.scripts[scriptFile];
   let suggestions = '';
 
   if (scriptMeta) {
@@ -2458,7 +2444,7 @@ function renderPropertiesReplay(step) {
   ).join('');
 
   // Collect all script parameters from all assigned scripts
-  const allScriptParams = [];
+  const allScriptParams = Object.values(step.libraryMeta || {}).flatMap(meta => meta.parameters || []);
   for (const sp of stepScriptsForMeta) {
     const spFile = sp?.replace('./scripts/', '');
     const spMeta = state.scripts[spFile];
@@ -2809,6 +2795,23 @@ function _pfxFormatText(value, fmt) {
   return value;
 }
 
+/* ── Central Script Library picker ─────────────────────────────────── */
+async function loadLibrary() { try { const response = await fetch('/api/library'); const data = await response.json().catch(() => ({})); if (!response.ok) throw new Error(data.error || `HTTP ${response.status}`); state.library = data; } catch (e) { state.library = { folders: [], scripts: [] }; toast(`Could not load library: ${e.message}`, 'error'); } }
+async function openLibraryPicker(stepId) {
+  await loadLibrary(); const step=state.workflow.steps.find(s=>s.id===stepId); if(!step)return;
+  const trigger=document.activeElement, overlay=document.createElement('div'); overlay.setAttribute('role','dialog'); overlay.setAttribute('aria-modal','true'); overlay.setAttribute('aria-label','Choose library scripts');
+  overlay.style.cssText='position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center';
+  overlay.innerHTML='<div style="width:min(680px,94vw);max-height:85vh;overflow:auto;background:#fff;border-radius:8px;padding:20px"><div style="display:flex;justify-content:space-between;gap:12px;align-items:center"><h2 style="font-size:17px">Choose library scripts</h2><button type="button" aria-label="Close picker">×</button></div><label style="display:block;margin:12px 0 6px">Search<input class="library-picker-search" style="width:100%;padding:7px" autofocus placeholder="Search scripts"></label><div class="library-picker-list" style="max-height:45vh;overflow:auto"></div><div style="display:flex;gap:8px;justify-content:space-between;margin-top:14px"><button type="button" class="library-upload-shortcut">Upload to library</button><span><button type="button" class="library-cancel">Cancel</button> <button type="button" class="btn-primary library-add">Add selected</button></span></div></div>';
+  document.body.append(overlay); const close=()=>{overlay.remove();trigger?.focus();}; const search=overlay.querySelector('.library-picker-search'), list=overlay.querySelector('.library-picker-list');
+  const render=()=>{const q=search.value.toLowerCase();const folderName=id=>state.library.folders.find(f=>f.id===id)?.name||'Root';const rows=state.library.scripts.filter(x=>`${x.name} ${x.description||''}`.toLowerCase().includes(q)).map(x=>`<label style="display:flex;gap:8px;padding:8px;border-bottom:1px solid #e0e0e0"><input type="checkbox" value="${escAttr(x.id)}" ${step.scriptIds?.includes(x.id)?'checked':''}><span style="flex:1"><strong>${escHtml(x.name)}</strong><small style="display:block;color:#777">${escHtml(folderName(x.folderId))} · v${x.latestVersion||'—'}${x.latestVersionDate?' · '+new Date(x.latestVersionDate).toLocaleDateString():''}</small></span></label>`).join('');list.innerHTML=rows||'<p style="padding:12px;color:#777">No scripts found.</p>';}; render(); search.oninput=render;
+  overlay.querySelector('.library-add').onclick=()=>{step.scriptIds=[...list.querySelectorAll('input:checked')].map(x=>x.value);step.scriptIds.forEach(id=>fetchLibraryScriptMeta(step.id,id));close();renderCanvas();renderProperties();}; overlay.querySelector('.library-cancel').onclick=close;overlay.querySelector('[aria-label="Close picker"]').onclick=close;
+  overlay.querySelector('.library-upload-shortcut').onclick=()=>{const input=document.createElement('input');input.type='file';input.accept='.yml,.yaml';input.onchange=async()=>{const file=input.files[0];if(!file)return;try{const response=await fetch('/api/library/scripts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:file.name.replace(/\.ya?ml$/i,''),folderId:null,fileName:file.name,content:await file.text()})});const created=await response.json().catch(()=>({}));if(!response.ok)throw new Error(created.error||`HTTP ${response.status}`);await loadLibrary();step.scriptIds ||= [];if(created.id&&!step.scriptIds.includes(created.id))step.scriptIds.push(created.id);render();toast('Uploaded to library','success');}catch(e){toast(`Upload failed: ${e.message}`,'error');}};input.click();};
+  overlay.addEventListener('keydown',e=>{if(e.key==='Escape'){close();return;}if(e.key==='Tab'){const f=[...overlay.querySelectorAll('button,input')].filter(x=>!x.disabled),first=f[0],last=f.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}}}); search.focus();
+}
+async function fetchLibraryScriptMeta(stepId,id) { try { const r=await fetch(`/api/library/scripts/${encodeURIComponent(id)}/versions/latest/content`); const content=await r.text(); if(!r.ok) throw new Error(content || `HTTP ${r.status}`); const meta=parseYamlBasic(content); const step=state.workflow.steps.find(s=>s.id===stepId); if(step){ step.libraryMeta ||= {}; step.libraryMeta[id]=meta; autoPopulateFromMeta(step,meta); renderProperties(); } } catch {} }
+function removeLibraryScriptFromStep(stepId,index){const step=state.workflow.steps.find(s=>s.id===stepId);if(!step)return;step.scriptIds.splice(index,1);renderCanvas();renderProperties();}
+function moveLibraryScriptInStep(stepId,index,dir){const step=state.workflow.steps.find(s=>s.id===stepId);if(!step)return;const to=index+dir;if(to<0||to>=step.scriptIds.length)return;[step.scriptIds[index],step.scriptIds[to]]=[step.scriptIds[to],step.scriptIds[index]];renderCanvas();renderProperties();}
+
 /* ════════════════════════════════════════════════════════════════════
    STEP FIELD UPDATES
    ════════════════════════════════════════════════════════════════════ */
@@ -2903,7 +2906,7 @@ function autoPopulateFromMeta(step, meta) {
 
   // Phase 1 + 4: auto-populate injects from all script parameters
   const allScripts = step.scripts && step.scripts.length ? step.scripts : (step.script ? [step.script] : []);
-  const allParams = [];
+  const allParams = Object.values(step.libraryMeta || {}).flatMap(meta => meta.parameters || []);
   for (const sp of allScripts) {
     const fn = sp?.replace('./scripts/', '');
     const spMeta = state.scripts[fn];
@@ -3284,12 +3287,8 @@ function buildWorkflowJson() {
         if (s.body_template && Object.keys(s.body_template).length) step.body_template = s.body_template;
         if (s.capture_response && Object.keys(s.capture_response).length) step.capture_response = s.capture_response;
       } else {
-        const scripts = s.scripts && s.scripts.length ? s.scripts : (s.script ? [s.script] : []);
-        if (scripts.length > 1) {
-          step.scripts = scripts;
-        } else if (scripts.length === 1) {
-          step.script = scripts[0];
-        }
+        if (s.scriptIds?.length) step.scriptIds = [...s.scriptIds];
+        // Legacy paths load read-only; never write them again.
         const cleanCapture = Object.fromEntries(Object.entries(s.capture || {}).filter(([k]) => k.trim() !== ''));
         const cleanInject  = Object.fromEntries(Object.entries(s.inject  || {}).filter(([k]) => k.trim() !== ''));
         if (Object.keys(cleanCapture).length) step.capture = cleanCapture;
@@ -3414,9 +3413,7 @@ async function confirmSaveProject() {
     const users    = buildUsersJson();
     const hasApi   = state.workflow.steps.some(s => s.type === 'bc-api');
     const appRegs  = hasApi ? buildAppRegsJson() : null;
-    const scripts  = Object.entries(state.scripts)
-      .map(([filename, info]) => ({ name: filename, content: info.content || '' }))
-      .filter(s => s.content);
+    const scripts = []; // Workflows reference library scriptIds; no script contents are scaffolded.
 
     const res  = await fetch('/api/projects/scaffold', {
       method: 'POST',
@@ -3548,7 +3545,7 @@ function validate() {
         }
       }
     } else {
-      if (!step.script && !(step.scripts && step.scripts.length)) errors.push(`Step "${step.name}" has no script assigned. Drag a script onto the step or select one in step properties.`);
+      if (!(step.scriptIds && step.scriptIds.length) && !step.script && !(step.scripts && step.scripts.length)) errors.push(`Step "${step.name}" has no library script assigned. Choose one in step properties.`);
     }
 
     if (step.depends_on && !ids.has(step.depends_on) && !state.workflow.steps.find(s => s.id === step.depends_on)) {
@@ -3800,12 +3797,17 @@ function applyLoadedWorkflow(wf) {
       step.body_template = s.body_template || {};
       step.capture_response = s.capture_response || {};
     } else {
+      step.scriptIds = Array.isArray(s.scriptIds) ? [...s.scriptIds] : [];
       step.scripts = s.scripts && s.scripts.length ? s.scripts : (s.script ? [s.script] : []);
+      step.legacyScripts = step.scriptIds.length ? [] : step.scripts;
       step.capture = s.capture || {};
       step.inject = s.inject || {};
     }
     return step;
   });
+
+  // Load metadata from immutable latest library versions for parameter/capture detection.
+  state.workflow.steps.filter(step => step.scriptIds?.length).forEach(step => step.scriptIds.forEach(id => fetchLibraryScriptMeta(step.id, id)));
 
   // Auto-create user roles from steps
   for (const step of state.workflow.steps) {
@@ -4027,13 +4029,7 @@ window.addEventListener('message', function(evt) {
           if (s.body_template && Object.keys(s.body_template).length) step.body_template = s.body_template;
           if (s.capture_response && Object.keys(s.capture_response).length) step.capture_response = s.capture_response;
         } else {
-          if (s.scripts && s.scripts.length > 1) {
-            step.scripts = s.scripts;
-          } else if (s.scripts && s.scripts.length === 1) {
-            step.script = s.scripts[0];
-          } else {
-            step.script = s.script || '';
-          }
+          if (s.scriptIds?.length) step.scriptIds = [...s.scriptIds];
           if (Object.keys(s.capture || {}).length) step.capture = s.capture;
           if (Object.keys(s.inject || {}).length) step.inject = s.inject;
         }
@@ -4079,6 +4075,7 @@ window.addEventListener('message', function(evt) {
               };
             }
           }
+          loadLibrary().then(renderProperties);
           renderScripts();
           renderCanvas();
         }).catch(() => { /* scripts optional */ });
@@ -4254,7 +4251,7 @@ function renderCatalogEditor() {
         ${type.description ? '<span style="font-weight:400;font-size:11px;color:var(--text-muted);margin-left:6px">' + escHtml(type.description) + '</span>' : ''}
         <div class="actions">
           <button onclick="catBeginEdit({level:'type',v:${v},t:${t}})" title="Edit">&#9998;</button>
-          <button onclick="catDuplicateType(${v},${t})" title="Duplicate value chain">Copy</button>
+          <button onclick="catMoveType(${v},${t})" title="Move value chain">Move to…</button><button onclick="catDuplicateType(${v},${t})" title="Duplicate value chain">Copy</button>
           <button onclick="catRemoveType(${v},${t})" title="Remove">&times;</button>
         </div>
       </div>`;
@@ -4283,7 +4280,7 @@ function renderCatalogEditor() {
           <span class="pf-path">${escHtml(pf.workflow_path || '')}</span>
           <div class="actions">
             <button onclick="catBeginEdit({level:'pf',v:${v},t:${t},p:${p}})" title="Edit">&#9998;</button>
-            <button onclick="catDuplicatePf(${v},${t},${p})" title="Duplicate process flow">Copy</button>
+            <button onclick="catMovePf(${v},${t},${p})" title="Move process flow">Move to…</button><button onclick="catRenameWorkflowFolder(${v},${t},${p})" title="Rename workflow folder">Rename folder</button><button onclick="catDuplicatePf(${v},${t},${p})" title="Duplicate process flow">Copy</button>
             <button onclick="catRemovePf(${v},${t},${p})" title="Remove">&times;</button>
           </div>
         </div>`;
@@ -4422,6 +4419,10 @@ function catSaveType(v, t) {
   _catEditNode = null;
   renderCatalogEditor();
 }
+
+function catMoveType(v,t) { const source=state.catalog.types[v].value_chains[t], targets=state.catalog.types.filter((_,i)=>i!==v); if(!targets.length){toast('Create another Type first','error');return;} const code=prompt(`Move Value Chain to Type (${targets.map(x=>x.code).join(', ')}):`,targets[0].code); const target=targets.find(x=>x.code===code); if(!target)return; state.catalog.types[v].value_chains.splice(t,1); (target.value_chains ||= []).push(source); renderCatalogEditor(); }
+function catMovePf(v,t,p) { const source=state.catalog.types[v].value_chains[t].process_flows[p], targets=state.catalog.types.flatMap((x,vi)=>(x.value_chains||[]).map((y,ti)=>({x,y,vi,ti}))).filter(x=>x.vi!==v||x.ti!==t); if(!targets.length){toast('Create another Value Chain first','error');return;} const key=prompt(`Move Process Flow to (${targets.map(x=>x.x.code+' › '+x.y.code).join(', ')}):`,targets[0].x.code+' › '+targets[0].y.code); const target=targets.find(x=>x.x.code+' › '+x.y.code===key);if(!target)return;state.catalog.types[v].value_chains[t].process_flows.splice(p,1);(target.y.process_flows ||= []).push(source);renderCatalogEditor(); }
+async function catRenameWorkflowFolder(v,t,p) { const pf=state.catalog.types[v].value_chains[t].process_flows[p], oldName=(pf.workflow_path||'').replace(/^\.\//,'');if(!oldName){toast('No workflow folder is linked','error');return;}const newName=prompt('New workflow folder name:',oldName);if(!newName||newName===oldName)return;try{const r=await fetch(`/api/projects/${encodeURIComponent(oldName)}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({newName})});const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||r.statusText);pf.workflow_path=`./${newName}`;const c=await fetch('/api/catalog');if(c.ok)state.catalog=await c.json();renderCatalogEditor();toast('Workflow folder renamed','success');}catch(e){toast(`Rename failed: ${e.message}`,'error');} }
 
 function catDuplicateType(v, t) {
   _catSyncMeta();

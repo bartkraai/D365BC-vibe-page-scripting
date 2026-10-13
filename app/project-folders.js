@@ -11,7 +11,7 @@ function safeProjectName(name) {
     .trim();
 
   if (!safeName || safeName !== value) {
-    throw new Error('Invalid project name');
+    throw Object.assign(new Error('Invalid project name'), { status: 400 });
   }
   return safeName;
 }
@@ -30,7 +30,7 @@ function duplicateProjectFolder(projectsRoot, sourceName, workflowUpdates = {}) 
 
   const targetDir = path.join(projectsRoot, targetName);
   try {
-    fs.cpSync(sourceDir, targetDir, { recursive: true, errorOnExist: true });
+    fs.cpSync(sourceDir, targetDir, { recursive: true, errorOnExist: true, filter: source => path.basename(source).toLowerCase() !== 'results' });
     const workflowPath = path.join(targetDir, 'workflow.json');
     if (fs.existsSync(workflowPath)) {
       const workflow = JSON.parse(fs.readFileSync(workflowPath, 'utf8'));
