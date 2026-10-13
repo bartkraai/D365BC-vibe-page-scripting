@@ -1,0 +1,88 @@
+{
+  "$schema": "./workflow.schema.json",
+  "name": "Demo UAV vaste termijnen (light versie)",
+  "description": "",
+  "steps": [
+    {
+      "id": "step-1",
+      "name": "Project registratie",
+      "user": "Project Controller",
+      "capture": {
+        "job_card_no": "Job Card - No."
+      },
+      "company": "TestAT",
+      "scriptIds": [
+        "s-522f8bf5-2438-4b23-81b6-2d4c4ede3c48"
+      ]
+    },
+    {
+      "id": "step-2",
+      "name": "Project inrichting",
+      "user": "Projectleider",
+      "inject": {
+        "Job List.No.": "{capture.step-1.job_card_no}"
+      },
+      "depends_on": "step-1",
+      "company": "TestAT",
+      "scriptIds": [
+        "s-5161f358-58c9-4e62-8f82-9f5999004251"
+      ]
+    },
+    {
+      "id": "step-3",
+      "name": "Aanmaken inkooporder(s)",
+      "user": "Werkvoorbereider",
+      "capture": {
+        "purchase_order_list_no": "Purchase Order List - No."
+      },
+      "inject": {
+        "Job List.No.": "{capture.step-1.job_card_no}"
+      },
+      "depends_on": "step-2",
+      "company": "TestAT",
+      "scriptIds": [
+        "s-86f3d529-f285-4277-bdeb-1d41a613a1d8"
+      ]
+    },
+    {
+      "id": "step-4",
+      "name": "Inkooporder goedkeuren",
+      "user": "Projectleider",
+      "inject": {
+        "Approval (Compressed).Document No.": "{capture.step-3.purchase_order_list_no}"
+      },
+      "depends_on": "step-3",
+      "company": "TestAT",
+      "scriptIds": [
+        "s-911b6f2a-4073-461b-8bf4-6134939991df"
+      ]
+    },
+    {
+      "id": "step-5",
+      "name": "Ontvangst boeken",
+      "user": "Uitvoerder GWW 4PS",
+      "inject": {
+        "Job List.No.": "{capture.step-1.job_card_no}",
+        "Project Purchase Order List.No.": "{capture.step-3.purchase_order_list_no}"
+      },
+      "depends_on": "step-4",
+      "company": "TestAT",
+      "scriptIds": [
+        "s-ae7fccba-1e12-4e21-ad30-32eb35beb6ee"
+      ]
+    },
+    {
+      "id": "step-6",
+      "name": "Periodieke administratie",
+      "user": "Projectleider",
+      "inject": {
+        "Job List.No.": "{capture.step-1.job_card_no}"
+      },
+      "depends_on": "step-5",
+      "company": "TestAT",
+      "scriptIds": [
+        "s-5cb1598b-1ca9-4350-972a-6dd7001f3990"
+      ]
+    }
+  ]
+}

@@ -14,6 +14,7 @@ test('workflow validation and rename update catalog', () => {
   const library = { script: id => { if (id !== 's-a') throw new Error('missing'); } };
   try {
     assert.throws(() => validateWorkflow({ steps: [{ id: 'x', user: 'u', scriptIds: ['missing'] }] }, library), /unknown/);
+    assert.throws(() => validateWorkflow({ steps: [{ id: 'legacy', user: 'u', script: './scripts/old.yml' }] }, library), /requires scriptIds/);
     assert.throws(() => validateWorkflow({ steps: [{ id: 'x', user: 'u', scriptIds: ['s-a'], depends_on: 'none' }] }, library), /depends/);
     validateWorkflow({ steps: [{ id: 'x', user: 'u', scriptIds: ['s-a'] }] }, library);
     validateCatalog(JSON.parse(fs.readFileSync(catalog)), workflows);

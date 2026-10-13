@@ -28,4 +28,4 @@ The catalog, results URLs, and runner paths change once during migration. The va
 
 ## Citations
 
-1. [`/Plans/20261013-Script Library.md`](../Plans/20261013-Script%20Library.md) — full specification.
+1. [`/Plans/20261013-Script Library.md`](../.archive/20261013-Script%20Library.md) — full specification.

@@ -39,6 +39,7 @@ if (-not (Test-Path $CatalogPath)) {
 }
 $CatalogPath = Resolve-Path $CatalogPath
 $pageScriptingRoot = Split-Path $CatalogPath -Parent
+$workflowRoot = Join-Path $pageScriptingRoot "workflows"
 
 if (-not $OutputDir) {
     $OutputDir = $pageScriptingRoot
@@ -75,7 +76,7 @@ foreach ($typ in $catalog.types) {
 
         foreach ($pf in $vc.process_flows) {
             $compositeCode = "$($typ.code)-$($vc.code)-$($pf.code)"
-            $workflowFolder = Join-Path $pageScriptingRoot $pf.workflow_path
+            $workflowFolder = Join-Path $workflowRoot $pf.workflow_path
             $summaryPath = Join-Path $workflowFolder "results\workflow-summary.json"
 
             $pfData = @{
@@ -104,7 +105,7 @@ foreach ($typ in $catalog.types) {
                     $pfData.failed_steps = $summary.failed
                     $pfData.duration_s   = $summary.duration_s
                     $pfData.last_run     = $summary.start_time
-                    $pfData.report_path  = Join-Path $pf.workflow_path "results\workflow-summary.html"
+                    $pfData.report_path  = Join-Path (Join-Path "workflows" $pf.workflow_path) "results\workflow-summary.html"
                 } catch {
                     Write-Warning "  Could not read summary for $compositeCode : $_"
                 }

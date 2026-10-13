@@ -379,24 +379,20 @@ c:\bc-replay\
 
 ## Integration with This Repository
 
-This repository provides **script generation** in `page-scripting/` folder and **test execution** in `bc-replay/` folder:
+- Upload recordings in the app's **Script Library** tab. Uploading new content creates an immutable version.
+- Use **Test Flow Builder** to select library scripts by ID and assemble reusable workflows.
+- Use the app's **Variant Generator** to generate data variants from the latest library version.
+- Run saved workflows with `Run-BCWorkflow.ps1` or run generated variants with `npx-run.ps1`.
+- Review workflow summaries and Playwright reports after execution.
 
-1. **Generate variants:** Use PowerShell scripts in `page-scripting/` to create test combinations
-2. **Execute tests:** Use bc-replay in `bc-replay/` to run generated variants
-3. **Review results:** Analyze Playwright reports to validate business processes
-
-**Workflow:**
-```
-Record BASE script → Generate variants → Execute with bc-replay → Review reports
-```
-
+Workflow scripts run the latest library version automatically; results record the exact script version and date used.
 ## Multi-User Workflow Orchestration
 
 For business processes that span multiple users (e.g., create PO → approve PO → receive goods), use the workflow orchestrator instead of running individual scripts.
 
 ### How It Works
 
-1. Define a `workflow.json` with steps, user roles, scripts, and capture/inject rules
+1. Create a workflow in Test Flow Builder with steps that reference library script IDs, user roles, and capture/inject rules
 2. Define a `users.json` with credentials for each user role
 3. The orchestrator runs each step sequentially with the correct user's credentials
 4. Captured values (e.g., PO number) are injected into subsequent steps via BC's native `parameters:` section
@@ -406,7 +402,7 @@ For business processes that span multiple users (e.g., create PO → approve PO 
 ```powershell
 # Credentials are stored in users.json per role
 # Execute the workflow
-.\Run-BCWorkflow.ps1 -WorkflowPath "..\page-scripting\PO Approval Workflow"
+.\Run-BCWorkflow.ps1 -WorkflowPath "..\page-scripting\workflows\Tenderproject"
 
 # Options
 .\Run-BCWorkflow.ps1 -WorkflowPath "..." -Headed          # Watch execution
@@ -424,7 +420,7 @@ results/
   step-approve-po/         # Per-step Playwright report
 ```
 
-See [PO Approval Workflow](../page-scripting/PO%20Approval%20Workflow/) for a complete example and [MULTI-USER-WORKFLOW-PLAN.md](MULTI-USER-WORKFLOW-PLAN.md) for architecture details.
+See [Tenderproject workflow](../page-scripting/workflows/Tenderproject/) for a complete example and [MULTI-USER-WORKFLOW-PLAN.md](MULTI-USER-WORKFLOW-PLAN.md) for architecture details.
 
 ## Best Practices
 
@@ -447,7 +443,7 @@ See [PO Approval Workflow](../page-scripting/PO%20Approval%20Workflow/) for a co
 
 1. **Record your first script** - See [PAGE-SCRIPTING-QUICK-START.md](PAGE-SCRIPTING-QUICK-START.md)
 2. **Generate variants** - Use PowerShell scripts in `../page-scripting/`
-3. **Multi-user workflows** - See `Run-BCWorkflow.ps1` and the [PO Approval Workflow](../page-scripting/PO%20Approval%20Workflow/) example
+3. **Multi-user workflows** - See `Run-BCWorkflow.ps1` and the [Tenderproject workflow](../page-scripting/workflows/Tenderproject/) example
 4. **Set up CI/CD** - Integrate bc-replay into your build pipeline
 5. **Monitor results** - Review Playwright reports after each run
 
@@ -462,7 +458,8 @@ See [PO Approval Workflow](../page-scripting/PO%20Approval%20Workflow/) for a co
 - `../README.md` - Complete project documentation
 - `GETTING_STARTED.md` - Repository quick start
 - `PAGE-SCRIPTING-QUICK-START.md` - How to record BC scripts
-- `../page-scripting/` - Script generation and variant automation
+- `../page-scripting/script-library/` - Reusable scripts
+- `../page-scripting/workflows/` - Workflow definitions and run data
 - `../.github/copilot-instructions.md` - YAML patterns and project conventions
 
 ---

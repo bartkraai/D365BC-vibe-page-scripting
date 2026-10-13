@@ -484,30 +484,13 @@ app.get('/api/library/scripts/:id/usage', (req, res) => res.json(library.usage(r
 app.delete('/api/library/scripts/:id', (req, res) => { library.deleteScript(req.params.id); res.status(204).end(); });
 
 app.get('/api/projects/:name/scripts', (req, res) => {
-  const projectDir = paths.resolveWorkflowDir(req.params.name);
-  const collect = (dir) => {
-    if (!fs.existsSync(dir)) return [];
-    return fs.readdirSync(dir)
-      .filter(f => /\.ya?ml$/i.test(f))
-      .map(f => {
-        const fullPath = path.join(dir, f);
-        return {
-          name: f,
-          relativePath: path.relative(projectDir, fullPath).replace(/\\/g, '/'),
-          content: fs.readFileSync(fullPath, 'utf8')
-        };
-      });
-  };
+  paths.resolveWorkflowDir(req.params.name);
   const workflow = workflowStore.read(req.params.name);
-  const libraryScripts = [...new Set((workflow.steps || []).flatMap(step => step.scriptIds || []))].map(id => {
+  const scripts = [...new Set((workflow.steps || []).flatMap(step => step.scriptIds || []))].map(id => {
     const result = library.content(id);
     return { id, name: result.script.name, latestVersion: result.version.version, content: result.content };
   });
-  res.json([
-    ...libraryScripts,
-    ...collect(path.join(projectDir, 'scripts')),
-    ...collect(projectDir),
-  ]);
+  res.json(scripts);
 });
 
 app.get('/api/projects/:name/workflow', (req, res) => {
@@ -588,15 +571,19 @@ app.post('/api/variants/generate', (req, res) => {
   if (!project || !baseScript) return res.status(400).json({ error: 'project and baseScript are required' });
 
   const projectDir  = paths.resolveWorkflowDir(project);
-  const baseScriptPath = paths.resolveInside(projectDir, baseScript);
   const outputFolder   = path.join(projectDir, 'Variants');
   const tempDir        = path.join(DATA_DIR, `temp-${Date.now()}`);
+  const base = library.content(baseScript);
+  const safeBaseName = path.basename(base.script.name).replace(/[<>:"/\\|?*\x00-\x1f]/g, '-');
+  const baseScriptPath = path.join(tempDir, `${safeBaseName}.yml`);
 
   try {
     fs.mkdirSync(tempDir, { recursive: true });
+    fs.writeFileSync(baseScriptPath, base.content, 'utf8');
     if (items)     fs.writeFileSync(path.join(tempDir, 'Items'),     items.split('\n').filter(Boolean).join('\r\n'));
     if (locations) fs.writeFileSync(path.join(tempDir, 'Locations'), locations.split('\n').filter(Boolean).join('\r\n'));
   } catch (e) {
+    fs.rmSync(tempDir, { recursive: true, force: true });
     return res.status(e.status || 500).json({ error: `Could not write temp data files: ${e.message}` });
   }
 

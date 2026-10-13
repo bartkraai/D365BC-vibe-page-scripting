@@ -16,11 +16,20 @@ function validateWorkflow(workflow, library) {
       if (Object.hasOwn(step, 'scriptIds')) {
         if (!Array.isArray(step.scriptIds) || !step.scriptIds.length) throw new WorkflowError(`Step '${step.id}' requires scriptIds`);
         for (const id of step.scriptIds) { try { library.script(id); } catch { throw new WorkflowError(`Step '${step.id}' references unknown script '${id}'`); } }
-      } else if (!step.script && (!Array.isArray(step.scripts) || !step.scripts.length)) throw new WorkflowError(`Step '${step.id}' requires scriptIds or a legacy script`);
+      } else throw new WorkflowError(`Step '${step.id}' requires scriptIds`);
     }
   }
   for (const step of workflow.steps) if (step.depends_on && !ids.has(step.depends_on)) throw new WorkflowError(`Step '${step.id}' depends on an unknown step`);
   return workflow;
+}
+function renameWithRetry(source, target) {
+  for (let attempt = 0; ; attempt++) {
+    try { fs.renameSync(source, target); return; }
+    catch (error) {
+      if (!['EPERM', 'EACCES', 'EBUSY'].includes(error.code) || attempt >= 4) throw error;
+      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 20 * (attempt + 1));
+    }
+  }
 }
 class WorkflowStore {
   constructor(workflowsPath, catalogPath) { this.workflowsPath = workflowsPath; this.catalogPath = catalogPath; }
@@ -28,7 +37,22 @@ class WorkflowStore {
   list() { if (!fs.existsSync(this.workflowsPath)) return []; return fs.readdirSync(this.workflowsPath, { withFileTypes: true }).filter(x => x.isDirectory()).map(x => ({ name: x.name, hasWorkflow: fs.existsSync(path.join(this.workflowsPath, x.name, 'workflow.json')) })); }
   read(name) { return readJson(path.join(this.dir(name), 'workflow.json')); }
   write(name, workflow, library) { validateWorkflow(workflow, library); writeJsonAtomic(path.join(this.dir(name), 'workflow.json'), workflow); }
-  renameWorkflow(oldName, newName) { const source = this.dir(oldName), target = this.dir(newName); if (!fs.existsSync(source)) throw new WorkflowError('Workflow not found', 404); if (fs.existsSync(target)) throw new WorkflowError('Workflow already exists', 409); fs.renameSync(source, target); if (fs.existsSync(this.catalogPath)) { const catalog = readJson(this.catalogPath); const oldPath = `./${safeProjectName(oldName)}`; const newPath = `./${safeProjectName(newName)}`; for (const type of catalog.types || []) for (const chain of type.value_chains || []) for (const flow of chain.process_flows || []) if (flow.workflow_path === oldPath) flow.workflow_path = newPath; writeJsonAtomic(this.catalogPath, catalog); } return { oldName: safeProjectName(oldName), newName: safeProjectName(newName) }; }
+  renameWorkflow(oldName, newName) {
+    const safeOld = safeProjectName(oldName), safeNew = safeProjectName(newName);
+    const source = this.dir(safeOld), target = this.dir(safeNew);
+    if (!fs.existsSync(source)) throw new WorkflowError('Workflow not found', 404);
+    if (fs.existsSync(target)) throw new WorkflowError('Workflow already exists', 409);
+    let catalog;
+    if (fs.existsSync(this.catalogPath)) {
+      catalog = readJson(this.catalogPath);
+      const oldPath = `./${safeOld}`, newPath = `./${safeNew}`;
+      for (const type of catalog.types || []) for (const chain of type.value_chains || []) for (const flow of chain.process_flows || []) if (flow.workflow_path === oldPath) flow.workflow_path = newPath;
+    }
+    renameWithRetry(source, target);
+    try { if (catalog) writeJsonAtomic(this.catalogPath, catalog); }
+    catch (error) { renameWithRetry(target, source); throw error; }
+    return { oldName: safeOld, newName: safeNew };
+  }
 }
 function validateCatalog(catalog, workflowsPath) {
   if (!catalog || !Array.isArray(catalog.types)) throw new WorkflowError('catalog.types must be an array');

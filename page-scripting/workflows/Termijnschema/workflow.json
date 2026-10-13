@@ -1,0 +1,62 @@
+{
+  "$schema": "./workflow.schema.json",
+  "name": "Termijnschema",
+  "description": "",
+  "steps": [
+    {
+      "id": "step-1",
+      "name": "Projectregistratie",
+      "user": "Project Controller",
+      "capture": {
+        "job_card_no": "Job Card - No."
+      },
+      "company": "TestAT",
+      "scriptIds": [
+        "s-68e0c48f-aef7-4232-a26f-9b404b1ad2dc"
+      ]
+    },
+    {
+      "id": "step-2",
+      "name": "Aanmaken inkooporder",
+      "user": "Werkvoorbereider",
+      "capture": {
+        "purchase_order_list_no": "Purchase Order List - No."
+      },
+      "inject": {
+        "Job List.No.": "{capture.step-1.job_card_no}"
+      },
+      "depends_on": "step-1",
+      "company": "TestAT",
+      "scriptIds": [
+        "s-734428c4-03f3-4470-af30-5f90fbe725e5"
+      ]
+    },
+    {
+      "id": "step-3",
+      "name": "Goedkeuren inkooporder",
+      "user": "Projectleider",
+      "inject": {
+        "Approval (Compressed).Document No.": "{capture.step-2.purchase_order_list_no}"
+      },
+      "depends_on": "step-2",
+      "company": "TestAT",
+      "scriptIds": [
+        "s-47c0995e-7e10-46d7-aab9-ded6ccea005c"
+      ]
+    },
+    {
+      "id": "step-4",
+      "name": "Inkooporder ontvangstregistratie",
+      "user": "Uitvoerder GWW 4PS",
+      "inject": {
+        "Job List.No.": "{capture.step-1.job_card_no}",
+        "Project Purchase Order List.No.": "{capture.step-2.purchase_order_list_no}"
+      },
+      "depends_on": "step-3",
+      "company": "TestAT",
+      "scriptIds": [
+        "s-b96cb21f-7370-4992-949a-5d78417e4448"
+      ]
+    }
+  ]
+}

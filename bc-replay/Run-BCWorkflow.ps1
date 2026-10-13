@@ -403,20 +403,12 @@ foreach ($step in $workflow.steps) {
         }
     } else {
         # bc-replay step validation
-        $scriptsToCheck = @()
         if ($step.scriptIds -and $step.scriptIds.Count -gt 0) {
             foreach ($scriptId in $step.scriptIds) {
                 try { [void](Resolve-LibraryScript $scriptId) } catch { $validationErrors += "Step '$($step.id)': $_" }
             }
-        } elseif ($step.scripts -and $step.scripts.Count -gt 0) { $scriptsToCheck = @($step.scripts) }
-        elseif ($step.script) { $scriptsToCheck = @($step.script) }
-        else { $validationErrors += "Step '$($step.id)': no 'script' or 'scripts' defined." }
-
-        foreach ($rel in $scriptsToCheck) {
-            $abs = Join-Path $workflowFolder $rel
-            if (-not (Test-Path $abs)) {
-                $validationErrors += "Step '$($step.id)': script not found: $abs"
-            }
+        } else {
+            $validationErrors += "Step '$($step.id)': no 'scriptIds' defined."
         }
     }
 }
@@ -748,12 +740,8 @@ foreach ($step in $workflow.steps) {
                 $scriptsList += $resolved.Path
                 $scriptMetadata[$resolved.Path] = $resolved
             }
-        } elseif ($step.scripts -and $step.scripts.Count -gt 0) {
-            $scriptsList = @($step.scripts)
-        } elseif ($step.script) {
-            $scriptsList = @($step.script)
         } else {
-            Write-Error "Step '$($step.id)' has no 'script' or 'scripts' defined"
+            Write-Error "Step '$($step.id)' has no 'scriptIds' defined"
             exit 1
         }
     }

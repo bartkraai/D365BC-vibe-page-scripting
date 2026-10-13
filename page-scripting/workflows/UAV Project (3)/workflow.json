@@ -1,0 +1,95 @@
+{
+  "$schema": "./workflow.schema.json",
+  "name": "UAV Project (3)",
+  "description": "",
+  "steps": [
+    {
+      "id": "step-1",
+      "name": "Van traject tm vervolgtraject ",
+      "user": "Acquisiteur 4PS",
+      "capture": {
+        "try_out_successor_project_no": "Try-out Successor - Project No."
+      },
+      "scriptIds": [
+        "s-eaeb95f2-a5a9-4a04-8667-30c6f4122237"
+      ]
+    },
+    {
+      "id": "step-2",
+      "name": "Project Registratie",
+      "user": "Project Controller",
+      "inject": {
+        "Job List.No.": "{capture.step-1.try_out_successor_project_no}"
+      },
+      "depends_on": "step-1",
+      "scriptIds": [
+        "s-1955b20c-1a9b-44be-84e2-3fc10feb8979"
+      ]
+    },
+    {
+      "id": "step-3",
+      "name": "Project inrichten en eerste prognose",
+      "user": "Projectleider",
+      "inject": {
+        "Job List.No.": "{capture.step-1.try_out_successor_project_no}"
+      },
+      "depends_on": "step-2",
+      "scriptIds": [
+        "s-f7dc6867-79dc-456b-9fcb-8414111fedab"
+      ]
+    },
+    {
+      "id": "step-4",
+      "name": "Aanmaken inkooporder",
+      "user": "Werkvoorbereider",
+      "capture": {
+        "purchase_order_list_no": "Purchase Order List - No."
+      },
+      "inject": {
+        "Job List.No.": "{capture.step-1.try_out_successor_project_no}",
+        "Project Purchase Order List.No.": ""
+      },
+      "depends_on": "step-3",
+      "scriptIds": [
+        "s-23ca3770-c8df-4b9f-b6e0-b3d6b84a1036"
+      ]
+    },
+    {
+      "id": "step-5",
+      "name": "Goedkeuren inkooporder",
+      "user": "Projectleider",
+      "inject": {
+        "Approval (Compressed).Document No.": "{capture.step-1.try_out_successor_project_no}"
+      },
+      "depends_on": "step-4",
+      "scriptIds": [
+        "s-47c0995e-7e10-46d7-aab9-ded6ccea005c"
+      ]
+    },
+    {
+      "id": "step-6",
+      "name": "Inkooporder ontvangstregistratie ",
+      "user": "Uitvoerder GWW 4PS",
+      "inject": {
+        "Job List.No.": "{capture.step-1.try_out_successor_project_no}",
+        "Project Purchase Order List.No.": "{capture.step-4.purchase_order_list_no}"
+      },
+      "depends_on": "step-5",
+      "scriptIds": [
+        "s-a19ec0a0-2a49-4bb6-b856-5f1936140610"
+      ]
+    },
+    {
+      "id": "step-7",
+      "name": "Periodieke administratie",
+      "user": "Projectleider",
+      "inject": {
+        "Job List.No.": "{capture.step-1.try_out_successor_project_no}"
+      },
+      "depends_on": "step-6",
+      "scriptIds": [
+        "s-e3900d9b-9d03-45f2-9553-37bcf95a91a0"
+      ]
+    }
+  ]
+}

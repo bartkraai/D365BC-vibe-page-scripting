@@ -15,7 +15,7 @@
 
 .PARAMETER PageScriptingRoot
     Root folder that contains the workflow project folders.
-    Defaults to the parent folder of catalog.json.
+    Defaults to the workflows subfolder beside catalog.json.
 
 .EXAMPLE
     .\Test-Catalog.ps1
@@ -44,7 +44,7 @@ if (-not (Test-Path $CatalogPath)) {
 $CatalogPath = Resolve-Path $CatalogPath
 
 if (-not $PageScriptingRoot) {
-    $PageScriptingRoot = Split-Path $CatalogPath -Parent
+    $PageScriptingRoot = Join-Path (Split-Path $CatalogPath -Parent) "workflows"
 }
 $PageScriptingRoot = Resolve-Path $PageScriptingRoot
 

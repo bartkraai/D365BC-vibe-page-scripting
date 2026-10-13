@@ -244,19 +244,23 @@ The workflow orchestrator (`Run-BCWorkflow.ps1`) updates the `default:` value wi
 - Different users act on the same document in sequence
 - You want the same recording to work across different test runs
 
-### Workflow Project Structure
+### Script Library and Workflows
 
-```
-PO Approval Workflow/
-  workflow.json                  # Step definitions, capture/inject rules
-  users.json                     # User roles with credentials
-  scripts/
-    create-po.yml                # Step 1: Record in BC (captures PO number)
-    Check PO with approver.yml   # Step 2: Uses Parameters.'Purchase Order List.No.'
-  Process.md                     # Business process documentation
+Upload recorded YAML scripts in the app's **Script Library** tab. Workflows select scripts by stable ID and run the latest immutable version.
+
+```text
+page-scripting/
+  script-library/
+    library.json
+    scripts/<scriptId>/v<N>.yml
+  workflows/
+    <Workflow>/
+      workflow.json
+      users.sample.json
+      results/
 ```
 
-See [PO Approval Workflow](../page-scripting/PO%20Approval%20Workflow/) for a complete example and [MULTI-USER-WORKFLOW-PLAN.md](MULTI-USER-WORKFLOW-PLAN.md) for architecture details.
+See [the Workflow Builder guide](WORKFLOW-BUILDER.md) for the current workflow format and [Tenderproject](../page-scripting/workflows/Tenderproject/) for an example.
 
 ## Resources
 

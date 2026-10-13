@@ -611,7 +611,7 @@ window.addEventListener('message', async evt => {
 
 // ── Variant Generator ─────────────────────────────────────────────────────────
 async function loadVariantProjects() {
-  const data = await GET('/projects').catch(() => []);
+  const data = (await GET('/projects').catch(() => [])).filter(project => project.hasWorkflow);
   state.projects = data;
   const sel = document.getElementById('var-project');
   sel.innerHTML = '<option value="">— select project —</option>';
@@ -624,7 +624,7 @@ document.getElementById('var-project').addEventListener('change', async function
   scriptSel.innerHTML = '<option value="">— select base script —</option>';
   if (!name) return;
   const scripts = await GET(`/projects/${encodeURIComponent(name)}/scripts`).catch(() => []);
-  scripts.forEach(s => scriptSel.appendChild(new Option(s.name, s.relativePath || s.name)));
+  scripts.forEach(s => scriptSel.appendChild(new Option(s.name, s.id || s.relativePath || s.name)));
 });
 
 document.getElementById('btn-generate').addEventListener('click', async () => {

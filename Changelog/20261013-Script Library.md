@@ -1,36 +1,38 @@
 ---
 type: changelog
-title: Script Library
-description: Central versioned script library, rename/move everywhere, and hardening of existing functionality.
+title: Script Library and workflow migration
+description: Central reusable script library, numbered versions, workflow migration, and workflow-path hardening.
 tags:
   - script-library
-  - catalog
+  - migration
   - hardening
 date: 2026-10-13
 ---
 
-# Script Library
+# Script Library and workflow migration
 
 ## Status
 
-In progress. See [plan](../Plans/20261013-Script%20Library.md).
+Complete. See the [archived plan](../.archive/20261013-Script%20Library.md).
 
 ## Changed
 
-- Spec and decisions recorded.
-- Script Library backend: folders, scripts, immutable numbered versions (sha256 dedupe, YAML validation, atomic writes), usage lookup, delete blocked when referenced.
-- Workflow steps reference library scripts via `scriptIds`; runner always runs the latest version and records `scriptId`, `scriptName`, `scriptVersion`, `scriptVersionDate` in results (HTML, PDF, Results tab).
-- New **Script Library** tab: folder tree, upload, new version, rename, move (drag-and-drop + keyboard), delete, version history, view/download, "Used by".
-- Test Flow Builder: library script picker replaces per-workflow upload; duplicated flows reuse scripts.
-- Catalog: move Value Chains and Process Flows; rename workflow folders (catalog paths updated).
-- Hardening: single path resolver with traversal checks, typed HTTP errors (400/404/409), JSON 404 for unknown API routes, catalog and workflow validation on save, rename/delete blocked during active runs, atomic JSON writes.
+- Added a central Script Library with stable IDs, folders, immutable numbered YAML versions, hashes, usage lookup, and deletion protection for referenced scripts.
+- Added the **Script Library** tab for upload, new versions, version history, view/download, rename, move, usage, and folder management.
+- Updated workflows and the runner to use `scriptIds`, always execute the latest version, and record the exact script version and date in results.
+- Updated the workflow builder, variants UI, catalog workflow paths, result views, catalog PowerShell validation/runner/report tools, and documentation for the library/workflows split.
+- Migrated all 19 legacy project folders to `page-scripting/workflows/`; 13 contain workflows. Imported 36 unique scripts and deduplicated exact-content copies.
+- Preserved results and other project files. Created external backups before migration.
+- Added a dry-run-capable migration utility and tests, transient Windows atomic-write retry, and transactional workflow rename behavior.
+- Removed legacy path-based execution and workflow save validation. Updated catalog schema and module index.
 
 ## Validation
 
-- `cd app; npm test` — unit + HTTP integration tests.
-- PowerShell parser check on runner and report scripts.
+- Migration dry-run reports no remaining legacy folders after migration.
+- Workflow scan confirms all 81 steps use valid script IDs; no legacy `script`/`scripts` fields remain.
+- `cd app; npm test` — all tests pass.
+- Node syntax checks, PowerShell parser checks, catalog validation, app HTTP/API smoke checks, and `git diff --check` completed.
 
-## Pending
+## Migration note
 
-- Migration of existing workflows and scripts to `workflows/` + `script-library/` (until then the app lists no workflows).
-- Documentation updates.
+When missing local script references had multiple candidates, matching copies were selected from the complete corresponding workflow version. Review those workflows if the source files had different business intent.

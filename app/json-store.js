@@ -24,7 +24,13 @@ function writeJsonAtomic(filePath, value) {
   const temporary = path.join(directory, `.${path.basename(filePath)}.${crypto.randomUUID()}.tmp`);
   try {
     fs.writeFileSync(temporary, JSON.stringify(value, null, 2), 'utf8');
-    fs.renameSync(temporary, filePath);
+    for (let attempt = 0; ; attempt++) {
+      try { fs.renameSync(temporary, filePath); break; }
+      catch (error) {
+        if (!['EPERM', 'EACCES', 'EBUSY'].includes(error.code) || attempt >= 4) throw error;
+        Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 20 * (attempt + 1));
+      }
+    }
   } finally {
     if (fs.existsSync(temporary)) fs.unlinkSync(temporary);
   }

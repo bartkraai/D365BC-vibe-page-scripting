@@ -28,4 +28,4 @@ A new upload immediately affects every workflow that uses the script. Results sh
 
 ## Citations
 
-1. [`/Plans/20261013-Script Library.md`](../Plans/20261013-Script%20Library.md) — full specification.
+1. [`/Plans/20261013-Script Library.md`](../.archive/20261013-Script%20Library.md) — full specification.

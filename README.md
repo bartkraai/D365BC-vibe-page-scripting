@@ -12,35 +12,27 @@ Automate Business Central page testing using YAML-based scripts executed via Pla
 ## 🚀 Quick Start
 
 1. **Setup** — Run `.\setup.ps1` from the repo root to check prerequisites and open the Workflow Builder
-2. **Design your workflow** — Open [tools/workflow-builder/index.html](tools/workflow-builder/index.html) in a browser: add user roles, drag in scripts, and export `workflow.json`
-3. **Record scripts** — See [the page scripting guide](docs/PAGE-SCRIPTING-QUICK-START.md) for recording in BC
+2. **Record scripts** — Record YAML scripts in Business Central, then upload them in the app's Script Library tab
+3. **Design your workflow** — Select reusable library scripts in the Workflow Builder and save to a workflow folder
 4. **Run** — See [the bc-replay guide](docs/BC-REPLAY-QUICK-START.md) for execution options
-5. **Examples** — Study `page-scripting/PO Post DirectionsEMEA/` (single-user) or `page-scripting/PO Approval Workflow/` (multi-user)
+5. **Examples** — Study `page-scripting/workflows/Tenderproject/` and `page-scripting/workflows/Termijnschema/`
 6. **Full Guide** — [Getting started](docs/GETTING_STARTED.md)
 
 ## Project Structure
 
-**`page-scripting/`** - Script generation and variant automation
-- PowerShell generators for creating test variants
-- Project folders with BASE recordings and data files
-- **Workflow projects** with multi-user step definitions
-- **`catalog.json`** — 3-level test hierarchy (Type > Value Chain > Process Flow)
-- [PAGE-SCRIPTING-QUICK-START.md](docs/PAGE-SCRIPTING-QUICK-START.md) - Recording guide
+- **`page-scripting/script-library/`** — Reusable YAML scripts with immutable numbered versions.
+- **`page-scripting/workflows/`** — Workflow definitions, user configuration, results, and generated variants.
+- **`page-scripting/Generate-BC-Script-Variants.ps1`** — Existing PowerShell variant generator.
+- **`page-scripting/catalog.json`** — 3-level test hierarchy (Type > Value Chain > Process Flow).
+- [Page scripting quick start](docs/PAGE-SCRIPTING-QUICK-START.md) — Recording guide.
 
-**`bc-replay/`** - Test execution including multi-user workflows
-- Script runner for automated pipelines
-- **Workflow orchestrator** for multi-user sequential execution
-- **Catalog runner** for executing workflows by hierarchy filter
-- **Native value capture** via BC's `copy-value` step (reads from replay log)
-- 📖 [BC-REPLAY-QUICK-START.md](docs/BC-REPLAY-QUICK-START.md) - Execution guide
-- 📖 [bc-replay-capture-solution/](bc-replay/bc-replay-capture-solution/) - Value capture (superseded by native `copy-value`)
+**`bc-replay/`** — Test execution, multi-user orchestration, and reporting.
+- [BC-replay quick start](docs/BC-REPLAY-QUICK-START.md) — Execution guide.
+- [Workflow Builder guide](docs/WORKFLOW-BUILDER.md) — Script Library and workflow format.
 
-**`tools/`** - Visual tools
-- [workflow-builder/index.html](tools/workflow-builder/index.html) - Visual workflow designer (open in browser — no install needed)
+**`tools/`** — Visual tools and workflow builder.
 
-**`docs/`** - Architecture and planning
-- [OVERVIEW.md](docs/OVERVIEW.md) - Visual solution overview
-- [Documentation index](docs/README.md) - Guides, architecture, security, and operational references
+**`docs/`** — Architecture and user guides.
 
 ## 👥 Multi-User Workflows
 
@@ -50,12 +42,12 @@ Orchestrate BC processes that span multiple users - for example, a purchaser cre
 # Credentials are stored in users.json per role
 # Run the workflow
 cd bc-replay
-.\Run-BCWorkflow.ps1 -WorkflowPath "..\page-scripting\PO Approval Workflow"
+.\Run-BCWorkflow.ps1 -WorkflowPath "..\page-scripting\workflows\Tenderproject"
 ```
 
 Each step runs with its own credentials. Captured values (like a PO number) are automatically injected into the next step's native BC `parameters:` section.
 
-**See [page-scripting/PO Approval Workflow/](page-scripting/PO%20Approval%20Workflow/) for a working example.**
+**See [page-scripting/workflows/Tenderproject/](page-scripting/workflows/Tenderproject/) for a working example.**
 
 ## Test Catalog — 3-Level Hierarchy
 
@@ -84,7 +76,7 @@ cd bc-replay
 .\New-CatalogReport.ps1
 ```
 
-The catalog is defined in [page-scripting/catalog.json](page-scripting/catalog.json). Each workflow can include an optional `catalog` block in its `workflow.json` for back-reference.
+The catalog is defined in [page-scripting/catalog.json](page-scripting/catalog.json). Its workflow paths are relative to `page-scripting/workflows/`. Workflow steps refer to shared library scripts by ID and always run the latest version.
 
 ##  Security
 
@@ -104,7 +96,8 @@ The catalog is defined in [page-scripting/catalog.json](page-scripting/catalog.j
 | **[docs/GETTING_STARTED.md](docs/GETTING_STARTED.md)** | Step-by-step setup walkthrough |
 | **[tools/workflow-builder/index.html](tools/workflow-builder/index.html)** | Visual Workflow Builder (open in browser) |
 | **[SECURITY.md](SECURITY.md)** | Security guidelines and TOTP account setup |
-| **[page-scripting/](page-scripting/)** | Recording scripts and variant generation |
+| **[page-scripting/script-library/](page-scripting/script-library/)** | Reusable, versioned recording scripts |
+| **[page-scripting/workflows/](page-scripting/workflows/)** | Workflow definitions and run data |
 | **[bc-replay/](bc-replay/)** | Execution and multi-user workflows |
 | **[.github/copilot-instructions.md](.github/copilot-instructions.md)** | AI agent instructions and YAML patterns |
 

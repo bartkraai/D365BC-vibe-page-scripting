@@ -1,0 +1,95 @@
+{
+  "name": "Besteksposten",
+  "description": "Deze workflow beschrijft de waarde keten van de contractvorm UAV met vaste termijnen.",
+  "steps": [
+    {
+      "id": "step-1",
+      "name": "Traject",
+      "user": "Acquisiteur 4PS",
+      "capture": {
+        "null_project_pr00316_is_aangemaakt": "null - Project PR00316 is aangemaakt.",
+        "try_out_successor_project_no": "Try-out Successor - Project No."
+      },
+      "scriptIds": [
+        "s-d454a584-fd42-4ba7-9fb7-c0be6bdefe95"
+      ]
+    },
+    {
+      "id": "step-2",
+      "name": "Projectregistratie",
+      "user": "Project Controller",
+      "inject": {
+        "Job List.No.": "{capture.step-1.null_project_pr00316_is_aangemaakt}"
+      },
+      "depends_on": "step-1",
+      "scriptIds": [
+        "s-d6f2242e-ca85-420d-bb02-e74073cb9f0e"
+      ]
+    },
+    {
+      "id": "step-3",
+      "name": "Project inrichten",
+      "user": "Projectleider",
+      "inject": {
+        "Job List.No.": "{capture.step-1.null_project_pr00316_is_aangemaakt}"
+      },
+      "depends_on": "step-2",
+      "scriptIds": [
+        "s-9048c1b8-2e2b-4ec2-aaa4-df56c3493c12"
+      ]
+    },
+    {
+      "id": "step-4",
+      "name": "Aanmaken inkooporder(s)",
+      "user": "Werkvoorbereider",
+      "capture": {
+        "null_inkooporder_io230600_is_aangemaakt": "null - Inkooporder IO230600 is aangemaakt."
+      },
+      "inject": {
+        "Job List.No.": "{capture.step-1.null_project_pr00316_is_aangemaakt}",
+        "Project Purchase Order List.No.": "{capture.step-1.try_out_successor_project_no}"
+      },
+      "depends_on": "step-3",
+      "scriptIds": [
+        "s-e583e5c2-bfa5-4b7d-a120-eb7c66f5b921"
+      ]
+    },
+    {
+      "id": "step-5",
+      "name": "Inkooporder goedkeuren",
+      "user": "Projectleider",
+      "inject": {
+        "Approval (Compressed).Document No.": "{capture.step-1.null_project_pr00316_is_aangemaakt}"
+      },
+      "depends_on": "step-4",
+      "scriptIds": [
+        "s-43deda09-c9da-4a96-868b-2f9a7d270b12"
+      ]
+    },
+    {
+      "id": "step-6",
+      "name": "Inkooporder ontvangst",
+      "user": "Uitvoerder GWW 4PS",
+      "inject": {
+        "Job List.No.": "{capture.step-1.null_project_pr00316_is_aangemaakt}",
+        "Project Purchase Order List.No.": "{capture.step-1.try_out_successor_project_no}"
+      },
+      "depends_on": "step-5",
+      "scriptIds": [
+        "s-223272f1-fa45-4f39-b876-d6b9a885aa5a"
+      ]
+    },
+    {
+      "id": "step-7",
+      "name": "Periodieke administratie",
+      "user": "Projectleider",
+      "inject": {
+        "Projects by Responsible Person.No.": "{capture.step-1.null_project_pr00316_is_aangemaakt}"
+      },
+      "depends_on": "step-6",
+      "scriptIds": [
+        "s-b31b7934-af41-4c25-aef8-59f277e361f4"
+      ]
+    }
+  ]
+}

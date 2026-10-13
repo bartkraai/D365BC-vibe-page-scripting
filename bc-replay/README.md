@@ -23,66 +23,41 @@ npx playwright show-report
 
 ---
 
-## 👥 Multi-User Workflow Orchestrator
+## Multi-User Workflow Orchestrator
 
-**Problem:** Real BC processes span multiple users - one creates a PO, another approves it, a third receives goods.
-
-**Solution:** The workflow orchestrator runs sequential bc-replay steps, each with different user credentials, passing captured values between steps.
+The orchestrator runs workflow steps sequentially with per-role credentials, passing captured values between steps. Workflow steps reference reusable Script Library entries by stable ID; each run automatically resolves the latest numbered version and records the version used.
 
 ### Quick Start
 
+1. Upload BC-recorded YAML in the app's **Script Library** tab.
+2. Build a workflow in **Test Flow Builder**, selecting one or more library scripts per step.
+3. Configure the workflow's `users.json` credentials locally (never commit this file).
+4. Run the workflow:
+
 ```powershell
-# 1. Create users.json with credentials for each role (see users.sample.json)
-# 2. Run the workflow
 cd bc-replay
-.\Run-BCWorkflow.ps1 -WorkflowPath "..\page-scripting\PO Approval Workflow"
+.\Run-BCWorkflow.ps1 -WorkflowPath "..\page-scripting\workflows\Tenderproject"
 ```
 
-### What It Does
+### Workflow script references
 
-- Reads `workflow.json` for step definitions, users, and capture/inject rules
-- Supports single script (`"script"`) or multiple scripts (`"scripts"` array) per step
-- Switches credentials per step via `users.json` (gitignored, use `users.sample.json` as template)
-- Captures values using BC's native `copy-value` step (reads from replay log)
-- Injects captured values into the next step's native BC `parameters:` section
-- Generates per-step Playwright reports + workflow summary (HTML + JSON)
-- Shows the local app's **Results** screen on completion; the HTML summary remains available for offline review
-
-### Multi-Script Steps
-
-A step can run multiple scripts sequentially under the same user credentials:
+Every step uses `scriptIds`, an ordered array of stable library IDs:
 
 ```json
 {
-  "id": "prepare-po",
-  "name": "Prepare and Post PO",
+  "id": "create-po",
+  "name": "Create purchase order",
   "user": "purchaser",
-  "scripts": [
-    "./scripts/create-po.yml",
-    "./scripts/post-po.yml"
-  ],
+  "scriptIds": ["s-<stable-script-id>"],
   "capture": { "po_number": "Purchase Order - No." }
 }
 ```
 
-- Each script gets its own Playwright report (`step-{id}/script-{n}/playwright-report/`)
-- Capture scans all scripts in the step (last value wins for duplicates)
-- Failure in any script stops the remaining scripts in that step
-- The HTML report shows sub-rows for each script with individual report links
-- Use `"script"` (string) for single-script steps - fully backward compatible
+For multiple scripts in one step, include multiple IDs in `scriptIds`. The UI shows script names and version dates; run reports record the exact version selected at execution time.
 
-### Key Files
+The orchestrator reads `workflow.json`, switches credentials from `users.json`, handles BC `copy-value` captures and native `parameters:` injection, and generates per-step Playwright reports plus an HTML/JSON workflow summary.
 
-| File | Purpose |
-|------|--------|
-| `Run-BCWorkflow.ps1` | Orchestrator — executes workflow steps sequentially |
-
-**Internal scripts** (used by the orchestrator, not called directly):
-- `Invoke-YamlPreprocess.ps1` — updates native BC parameter `default:` values in YAML
-- `New-WorkflowReport.ps1` — generates workflow summary report (HTML + JSON)
-
-📖 See [PO Approval Workflow](../page-scripting/PO%20Approval%20Workflow/) for a working example  
-📖 See [MULTI-USER-WORKFLOW-PLAN.md](../docs/MULTI-USER-WORKFLOW-PLAN.md) for architecture details
+📖 See the [Tenderproject workflow](../page-scripting/workflows/Tenderproject/) for a migrated example. See the [Workflow Builder guide](../docs/WORKFLOW-BUILDER.md) for the current storage format.
 
 ---
 

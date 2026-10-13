@@ -70,6 +70,7 @@ if (-not (Test-Path $CatalogPath)) {
 }
 $CatalogPath = Resolve-Path $CatalogPath
 $pageScriptingRoot = Split-Path $CatalogPath -Parent
+$workflowRoot = Join-Path $pageScriptingRoot "workflows"
 
 # ── Validate catalog first ──────────────────────────────────────────────────
 Write-Host ""
@@ -97,7 +98,7 @@ foreach ($typ in $catalog.types) {
                 continue
             }
 
-            $workflowFolder = Join-Path $pageScriptingRoot $pf.workflow_path
+            $workflowFolder = Join-Path $workflowRoot $pf.workflow_path
             $matchingFlows += [PSCustomObject]@{
                 CompositeCode  = $compositeCode
                 Breadcrumb     = $breadcrumb

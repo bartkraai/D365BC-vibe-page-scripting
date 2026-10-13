@@ -1,7 +1,9 @@
 # Multi-User Workflow Orchestration & Result Capture — Developer Reference
 
+> **Historical architecture reference:** Some examples below show the original path-based design. Current workflows use `page-scripting/workflows/`, library-backed `scriptIds`, and the latest immutable Script Library version. See [the maintained Workflow Builder guide](WORKFLOW-BUILDER.md) for the current format.
+
 > **This is an internal developer/architecture document.** It contains research notes, approach comparisons, and implementation rationale.
-> For a user-friendly guide to creating and running multi-user workflows, see [page-scripting/PO Approval Workflow/Process.md](../page-scripting/PO%20Approval%20Workflow/Process.md) or open the [Workflow Builder](../tools/workflow-builder/index.html).
+> For a user-friendly guide to creating and running multi-user workflows, see [the migrated Tenderproject workflow](../page-scripting/workflows/Tenderproject/) or open the [Workflow Builder](../tools/workflow-builder/index.html).
 
 > **Status:** Complete (tested end-to-end)  
 > **Date:** February 2026  

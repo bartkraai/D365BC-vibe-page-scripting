@@ -1,0 +1,15 @@
+{
+  "$schema": "./workflow.schema.json",
+  "name": "Switch Role and Permissions",
+  "description": "",
+  "steps": [
+    {
+      "id": "step-1",
+      "name": "Van Projectleider naar Acquisiteur",
+      "user": "Projectleider",
+      "scriptIds": [
+        "s-c0f34fe0-cf42-4d5c-a6cc-94a6f20ea4fa"
+      ]
+    }
+  ]
+}

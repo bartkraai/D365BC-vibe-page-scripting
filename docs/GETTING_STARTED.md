@@ -46,7 +46,7 @@ After exporting from the Workflow Builder:
 
 ## Step 4 — Record Scripts in BC
 
-Open any BC page → **Settings ⚙️ → Page Scripting** → Record your process → Save as `.yml`.
+Open any BC page → **Settings → Page Scripting** → record your process and save as `.yml`. Upload the recording in the app's **Script Library** tab.
 
 For workflows that capture values (e.g. PO number), add a `copy-value` step at the end of the recording.
 
@@ -57,40 +57,19 @@ See the [page scripting guide](PAGE-SCRIPTING-QUICK-START.md) for full recording
 **Multi-user workflow:**
 ```powershell
 cd bc-replay
-.\Run-BCWorkflow.ps1 -WorkflowPath "..\page-scripting\PO Approval Workflow"
+.\Run-BCWorkflow.ps1 -WorkflowPath "..\page-scripting\workflows\Tenderproject"
 ```
 
-**Single-user variant batch test:**
-```powershell
-cd page-scripting
-.\Generate-BC-Script-Variants.ps1 `
-    -BaseScriptPath ".\MyProject\BASE Recording.yml" `
-    -ProjectFolder ".\MyProject" `
-    -OutputFolder ".\MyProject\Variants"
-
-cd ..\bc-replay
-.\npx-run.ps1 -ScriptPath "..\page-scripting\MyProject\Variants\*.yml" `
-    -BcUrl "https://businesscentral.dynamics.com/tenant/Sandbox"
-```
+**Single-user variant batch:** Use the app's **Variant Generator** tab to choose a Script Library entry, supply data, and generate variants in a workflow folder. The tab loads the latest script version automatically. The standalone PowerShell generator remains available for direct use; see the [page scripting guide](PAGE-SCRIPTING-QUICK-START.md).
 
 ## Repository Structure
 
-- **`page-scripting/`** - Script generation and variant automation
-  - PowerShell generators and project folders
-  - Workflow projects with multi-user step definitions
-  - `catalog.json` — 3-level test hierarchy (Type > Value Chain > Process Flow)
-
-- **`bc-replay/`** - Test execution
-  - `Run-BCWorkflow.ps1` — multi-user workflow orchestrator
-  - `Run-CatalogWorkflows.ps1` — run workflows by hierarchy filter
-  - `Test-Catalog.ps1` — validate catalog structure
-  - `New-CatalogReport.ps1` — aggregate dashboard report
-  - `npx-run.ps1` — single-user variant batch runner
-
-- **`tools/workflow-builder/`** - Visual Workflow Builder (open `index.html` in browser)
-
-- **`docs/`** - User guides, architecture, and operational documentation
-
+- **`page-scripting/script-library/`** — Reusable page scripts and immutable versions.
+- **`page-scripting/workflows/`** — Workflow definitions and run data.
+- **`page-scripting/catalog.json`** — 3-level test hierarchy.
+- **`bc-replay/`** — Workflow execution and reports.
+- **`tools/workflow-builder/`** — Standalone visual workflow designer.
+- **`docs/`** — User guides and operational documentation.
 ## Test Catalog
 
 Workflows are organised into a 3-level hierarchy for traceability:
@@ -120,7 +99,7 @@ The Workflow Builder includes a **Catalog** button (header) to view the full hie
 - **[PAGE-SCRIPTING-QUICK-START.md](PAGE-SCRIPTING-QUICK-START.md)** - BC recording guide
 - **[BC-REPLAY-QUICK-START.md](BC-REPLAY-QUICK-START.md)** - Execution and MFA setup
 - **[../SECURITY.md](../SECURITY.md)** - Security guidelines
-- **[page-scripting/PO Approval Workflow/](page-scripting/PO%20Approval%20Workflow/)** - Working multi-user example
+- **[page-scripting/workflows/Tenderproject/](page-scripting/workflows/Tenderproject/)** - Working multi-user example
 
 ## Quick Troubleshooting
 

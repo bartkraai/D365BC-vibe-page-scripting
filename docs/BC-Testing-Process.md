@@ -122,7 +122,7 @@ Two testing modes:
 2. Go to **Settings** → **Page Scripting**
 3. Record your business process (inputs, actions, navigations)
 4. Optionally add **validations**, **parameters**, and **copy-value** steps
-5. Save as `.yml` file
+5. Save as `.yml` file and upload it in the app's **Script Library** tab. Each upload creates an immutable, numbered version.
 
 ### Prerequisites
 
@@ -133,9 +133,9 @@ Two testing modes:
 
 ---
 
-# Step 2a — Generate Variants (Single-User)
+## Step 2a — Generate Variants (Single-User)
 
-Turn one BASE recording into dozens of test combinations:
+Use the app's **Variant Generator** tab to select a library script (the latest version is loaded), provide data values, and save generated variants in a workflow folder. The standalone PowerShell generator remains available for direct use.
 
 ```
 BASE Recording.yml  +  Items.txt  +  Locations.txt
@@ -149,10 +149,12 @@ BASE Recording.yml  +  Items.txt  +  Locations.txt
 
 ```powershell
 .\Generate-BC-Script-Variants.ps1 `
-    -BaseScriptPath ".\MyProject\BASE Recording.yml" `
-    -ProjectFolder ".\MyProject" `
-    -OutputFolder  ".\MyProject\Variants"
+    -BaseScriptPath ".\script-library\scripts\<scriptId>\v<N>.yml" `
+    -ProjectFolder ".\workflows\<Workflow>" `
+    -OutputFolder  ".\workflows\<Workflow>\Variants"
 ```
+
+Prefer the app's Variant Generator when you want it to resolve the latest library version automatically.
 
 Data files are plain text, one value per line — Items, Locations, Vendors.
 
@@ -160,29 +162,19 @@ Data files are plain text, one value per line — Items, Locations, Vendors.
 
 # Step 2b — Design a Workflow (Multi-User)
 
-For processes spanning multiple roles, use the **visual Workflow Builder**:
+Use the app's **Script Library** tab to upload reusable recordings, then create or update workflows in **Test Flow Builder**. Select library scripts for each step, assign user roles, and configure capture/inject rules. Workflows reference stable script IDs and always execute the latest version; run results record the exact version used.
 
-1. Open `tools/workflow-builder/index.html` in any browser
-2. Define user roles (purchaser, approver, warehouse)
-3. Assign scripts to steps
-4. Wire capture/inject rules for state passing
-5. Export `workflow.json`
+A workflow step uses `scriptIds`, not a local script path:
 
 ```json
 {
-  "name": "Purchase Order Approval",
-  "steps": [
-    { "id": "create-po", "user": "purchaser",
-      "script": "./scripts/create-po.yml",
-      "capture": { "po_number": "Purchase Order - No." } },
-    { "id": "approve-po", "user": "approver",
-      "script": "./scripts/approve-po.yml",
-      "inject": { "PO No.": "{capture.create-po.po_number}" } }
-  ]
+  "id": "create-po",
+  "name": "Create purchase order",
+  "user": "purchaser",
+  "scriptIds": ["s-<stable-script-id>"],
+  "capture": { "po_number": "Purchase Order - No." }
 }
 ```
-
----
 
 # Step 3 — Execute Tests
 
@@ -191,7 +183,7 @@ For processes spanning multiple roles, use the **visual Workflow Builder**:
 ```powershell
 cd bc-replay
 .\npx-run.ps1 `
-    -ScriptPath "..\page-scripting\MyProject\Variants\*.yml" `
+    -ScriptPath "..\page-scripting\workflows\<Workflow>\Variants\*.yml" `
     -BcUrl "https://businesscentral.dynamics.com/tenant/env"
 ```
 
@@ -200,7 +192,7 @@ cd bc-replay
 ```powershell
 cd bc-replay
 .\Run-BCWorkflow.ps1 `
-    -WorkflowPath "..\page-scripting\PO Approval Workflow"
+    -WorkflowPath "..\page-scripting\workflows\Tenderproject"
 ```
 
 The orchestrator:
@@ -310,7 +302,7 @@ jobs:
           BC_APPROVER_PASS:  ${{ secrets.BC_APPROVER_PASS }}
         run: |
           pwsh -File Run-BCWorkflow.ps1 `
-            -WorkflowPath "..\page-scripting\PO Approval Workflow"
+            -WorkflowPath "..\page-scripting\workflows\Tenderproject"
 ```
 
 ---
@@ -323,7 +315,7 @@ jobs:
         working-directory: bc-replay
         run: |
           pwsh -File Test-WorkflowQuality.ps1 `
-            -WorkflowPath "..\page-scripting\PO Approval Workflow"
+            -WorkflowPath "..\page-scripting\workflows\Tenderproject"
 
       - name: Publish Playwright report
         if: always()
@@ -331,7 +323,7 @@ jobs:
         with:
           name: test-reports
           path: |
-            page-scripting/PO Approval Workflow/results/
+            page-scripting/workflows/Tenderproject/results/
           retention-days: 30
 
       - name: Publish JUnit results
@@ -339,7 +331,7 @@ jobs:
         uses: dorny/test-reporter@v1
         with:
           name: BC Test Results
-          path: page-scripting/PO Approval Workflow/results/**/results.xml
+          path: page-scripting/workflows/Tenderproject/results/**/results.xml
           reporter: java-junit
 ```
 
@@ -365,7 +357,7 @@ steps:
 
   - pwsh: |
       .\Run-BCWorkflow.ps1 `
-        -WorkflowPath "..\page-scripting\PO Approval Workflow"
+        -WorkflowPath "..\page-scripting\workflows\Tenderproject"
     workingDirectory: bc-replay
     env:
       BC_PURCHASER_USER: $(BC_PURCHASER_USER)
@@ -447,12 +439,10 @@ steps:
 ```
 D365BC-vibe-page-scripting/
 ├── page-scripting/              ← Script generation & workflows
-│   ├── Generate-BC-Script-Variants.ps1
-│   └── PO Approval Workflow/   ← Example multi-user workflow
-│       ├── workflow.json
-│       ├── users.sample.json
-│       ├── scripts/
-│       └── results/
+│   ├── script-library/         ← Shared, versioned YAML scripts
+│   ├── workflows/              ← Workflow definitions and results
+│   ├── catalog.json
+│   └── Generate-BC-Script-Variants.ps1
 ├── bc-replay/                   ← Test execution
 │   ├── npx-run.ps1             ← Single-user runner
 │   ├── Run-BCWorkflow.ps1      ← Multi-user orchestrator
